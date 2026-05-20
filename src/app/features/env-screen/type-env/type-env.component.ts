@@ -16,6 +16,7 @@ export class TypeEnvComponent implements OnInit {
 
   nuevoNombre = '';
   editandoId?: number | null = null;
+  editingName = '';
   search = '';
 
   // para confirmar eliminación
@@ -119,12 +120,12 @@ export class TypeEnvComponent implements OnInit {
 
   editar(t: TypeAcademicSpace): void {
     this.editandoId = t.id_type_academic_space;
-    this.nuevoNombre = t.name;
+    this.editingName = t.name;
   }
 
   save(): void {
     if (this.editandoId == null) return;
-    const nombre = this.nuevoNombre.trim();
+    const nombre = this.editingName.trim();
     if (!nombre) return;
 
     const tipo = this.tipos.find(
@@ -175,6 +176,7 @@ export class TypeEnvComponent implements OnInit {
   private resetForm(): void {
     this.nuevoNombre = '';
     this.editandoId = null;
+    this.editingName = '';
   }
 
   trackById = (_: number, item: TypeAcademicSpace) =>

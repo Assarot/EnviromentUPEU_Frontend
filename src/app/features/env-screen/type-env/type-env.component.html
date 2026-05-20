@@ -1,26 +1,16 @@
 <div class="mx-auto max-w-5xl px-6 py-8">
   <!-- Toast top-right -->
   <div *ngIf="showToast" class="fixed top-5 right-5 z-50">
-    <div
-      class="toast rounded-md bg-emerald-600 px-4 py-2 text-white shadow-sm inline-flex items-center gap-3"
-    >
+    <div class="toast rounded-md bg-emerald-600 px-4 py-2 text-white shadow-sm inline-flex items-center gap-3">
       <span>{{ toastMessage }}</span>
-      <button
-        *ngIf="toastHasUndo && lastDeleted"
-        (click)="undoDelete()"
-        class="underline text-sm"
-      >
+      <button *ngIf="toastHasUndo && lastDeleted" (click)="undoDelete()" class="underline text-sm">
         Deshacer
       </button>
     </div>
   </div>
 
   <!-- floating confirm popup positioned near the clicked button -->
-  <div
-    *ngIf="pendingDeleteId && popupStyle"
-    [ngStyle]="popupStyle"
-    class="confirm-popup z-50 w-56 rounded-md border border-slate-200 bg-white p-3 shadow-lg"
-  >
+  <div *ngIf="pendingDeleteId && popupStyle" [ngStyle]="popupStyle" class="confirm-popup z-50 w-56 rounded-md border border-slate-200 bg-white p-3 shadow-lg">
     <div class="text-sm font-semibold text-slate-800">
       ¿Seguro que quieres eliminar?
     </div>
@@ -28,34 +18,19 @@
       Se eliminará: <strong>{{ pendingDeleteName }}</strong>
     </div>
     <div class="mt-3 flex gap-2 justify-end">
-      <button
-        (click)="performDeleteConfirmed()"
-        class="rounded px-3 py-1 text-sm font-semibold text-white"
-        style="background: #ef4444"
-      >
+      <button (click)="performDeleteConfirmed()" class="rounded px-3 py-1 text-sm font-semibold text-white" style="background: #ef4444">
         Eliminar
       </button>
-      <button
-        (click)="cancelRemove()"
-        class="rounded px-3 py-1 text-sm font-semibold text-slate-700 border border-slate-200"
-      >
+      <button (click)="cancelRemove()" class="rounded px-3 py-1 text-sm font-semibold text-slate-700 border border-slate-200">
         Cancelar
       </button>
     </div>
   </div>
 
   <!-- Botón Volver -->
-  <button
-    (click)="volver()"
-    class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-  >
+  <button (click)="volver()" class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M15 19l-7-7 7-7"
-      ></path>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
     </svg>
     Volver a opciones
   </button>
@@ -68,48 +43,21 @@
     </p>
   </header>
 
-  <!-- Card: Crear/Editar -->
-  <section
-    class="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-  >
+  <!-- Card: Crear Nuevo -->
+  <section class="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
     <h2 class="mb-4 text-base font-semibold text-slate-800">
-      {{
-        editandoId ? "Editar Tipo de Ambiente" : "Crear Nuevo Tipo de Ambiente"
-      }}
+      Crear Nuevo Tipo de Ambiente
     </h2>
 
     <div class="grid gap-4">
-      <!-- Nombre -->
       <div>
-        <label
-          for="nombre"
-          class="mb-1 block text-sm font-medium text-slate-700"
-          >Nombre del Tipo de Ambiente</label
-        >
-        <input
-          id="nombre"
-          type="text"
-          [(ngModel)]="nuevoNombre"
-          placeholder="Ej. Sala de Reuniones, Sala de Conferencias…"
-          class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none ring-0 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-        />
+        <label for="nombre" class="mb-1 block text-sm font-medium text-slate-700">Nombre del Tipo de Ambiente</label>
+        <input id="nombre" type="text" [(ngModel)]="nuevoNombre" placeholder="Ej. Sala de Reuniones, Sala de Conferencias…" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none ring-0 focus:border-slate-400 focus:ring-2 focus:ring-slate-200" />
       </div>
 
-      <!-- Botones -->
       <div class="flex items-center gap-3">
-        <button
-          (click)="editandoId ? save() : crearOActualizar()"
-          class="inline-flex items-center rounded-lg bg-[#BFC621] px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:brightness-95 active:translate-y-px"
-        >
-          {{ editandoId ? "Guardar Cambios" : "Crear Tipo de Ambiente" }}
-        </button>
-
-        <button
-          *ngIf="editandoId !== null"
-          (click)="cancelarEdicion()"
-          class="text-sm font-medium text-slate-600 hover:text-slate-800"
-        >
-          Cancelar
+        <button (click)="crearOActualizar()" class="inline-flex items-center rounded-lg bg-[#BFC621] px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:brightness-95 active:translate-y-px">
+          Crear Tipo de Ambiente
         </button>
       </div>
     </div>
@@ -122,35 +70,19 @@
     </h2>
 
     <!-- Barra de búsqueda -->
-    <div
-      class="mb-3 flex items-center gap-2 rounded-xl border border-amber-100 bg-amber-50/60 px-3 py-2"
-    >
-      <!-- icono -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        class="h-5 w-5 shrink-0 text-slate-400"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
+    <div class="mb-3 flex items-center gap-2 rounded-xl border border-amber-100 bg-amber-50/60 px-3 py-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-5 w-5 shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="7"></circle>
         <path d="m20 20-3.5-3.5"></path>
       </svg>
-      <input
-        type="text"
-        [(ngModel)]="search"
-        placeholder="Buscar tipos de ambiente"
-        class="w-full border-0 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-0"
-      />
+      <input type="text" [(ngModel)]="search" placeholder="Buscar tipos de ambiente" class="w-full border-0 bg-transparent text-sm text-slate-700 placeholder-slate-400 outline-none focus:ring-0" />
     </div>
 
-    <!-- Tabla -->
+    <!-- Tabla con edición In-Line -->
     <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
       <table class="w-full table-auto text-left">
         <thead class="bg-slate-50">
-          <tr
-            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+          <tr class="text-xs font-semibold uppercase tracking-wide text-slate-500"
           >
             <th class="px-4 py-3">#</th>
             <th class="px-4 py-3">Nombre</th>
@@ -159,134 +91,63 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            *ngFor="let t of tiposFiltrados; let i = index; trackBy: trackById"
-            class="border-t border-slate-100 text-sm text-slate-700"
-          >
+          <tr *ngFor="let t of tiposFiltrados; let i = index; trackBy: trackById" class="border-t border-slate-100 text-sm text-slate-700">
             <td class="px-4 py-3">{{ i + 1 }}</td>
+            
+            <!-- Celda del Nombre (Cambia a Input si está en edición) -->
             <td class="px-4 py-3">
-              <ng-container
-                *ngIf="editandoId !== t.id_type_academic_space; else editName"
-              >
+              <ng-container *ngIf="editandoId !== t.id_type_academic_space; else editName">
                 {{ t.name }}
               </ng-container>
               <ng-template #editName>
-                <!-- Durante la edición principal usamos el formulario superior (nuevoNombre).
-                     Evitamos mostrar aquí un input ligado a nuevoNombre para que no se duplique.
-                     Mostramos sólo el nombre actual en la fila. -->
-                <span class="text-slate-700">{{ t.name }}</span>
+                <input [(ngModel)]="editingName" class="w-full rounded-md border border-slate-300 px-2 py-1 text-sm text-slate-800 outline-none focus:border-slate-400" />
               </ng-template>
             </td>
+
             <td class="px-4 py-3">
-              <button
-                (click)="toggleEstado(t)"
-                class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold"
-                [ngClass]="estadoChipClasses(t.is_active)"
-                title="Alternar estado"
-              >
-                <span
-                  class="inline-block h-2 w-2 rounded-full"
-                  [class.bg-green-500]="t.is_active === 'A'"
-                  [class.bg-gray-500]="t.is_active === 'I'"
-                ></span>
+              <button (click)="toggleEstado(t)" class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold" [ngClass]="estadoChipClasses(t.is_active)" title="Alternar estado">
+                <span class="inline-block h-2 w-2 rounded-full" [class.bg-green-500]="t.is_active === 'A'" [class.bg-gray-500]="t.is_active === 'I'"></span>
                 {{ t.is_active === "A" ? "Activo" : "Inactivo" }}
               </button>
             </td>
+
+            <!-- Acciones Dinámicas por Fila -->
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
-                <ng-container
-                  *ngIf="
-                    editandoId !== t.id_type_academic_space;
-                    else editingActions
-                  "
-                >
-                  <button
-                    (click)="editar(t)"
-                    title="Editar"
-                    class="text-slate-600 hover:text-emerald-700"
-                  >
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
+                <ng-container *ngIf="editandoId !== t.id_type_academic_space; else editingActions">
+                  <!-- Botón Editar -->
+                  <button (click)="editar(t)" title="Editar" class="text-slate-600 hover:text-emerald-700">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button
-                    (click)="confirmRemove(t, $event)"
-                    title="Eliminar"
-                    class="text-slate-600 hover:text-red-600"
-                  >
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
+                  <!-- Botón Eliminar -->
+                  <button (click)="confirmRemove(t, $event)" title="Eliminar" class="text-slate-600 hover:text-red-600">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </ng-container>
+
+                <!-- Botones de Guardar / Cancelar en la Fila Activa -->
                 <ng-template #editingActions>
-                  <button
-                    (click)="save()"
-                    title="Guardar cambios"
-                    class="text-green-600 hover:text-green-800"
-                  >
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M5 13l4 4L19 7"
-                      />
+                  <button (click)="save()" title="Guardar cambios" class="text-green-600 hover:text-green-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                   </button>
-                  <button
-                    (click)="cancelarEdicion()"
-                    title="Cancelar"
-                    class="text-slate-600 hover:text-gray-800"
-                  >
-                    <svg
-                      class="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                  <button (click)="cancelarEdicion()" title="Cancelar" class="text-slate-600 hover:text-gray-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </ng-template>
               </div>
             </td>
           </tr>
+          
           <tr *ngIf="tiposFiltrados.length === 0">
-            <td
-              colspan="4"
-              class="px-4 py-8 text-center text-sm text-slate-500"
-            >
+            <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">
               No se encontraron tipos que coincidan con “{{ search }}”.
             </td>
           </tr>
