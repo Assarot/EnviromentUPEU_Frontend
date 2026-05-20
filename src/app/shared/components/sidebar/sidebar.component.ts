@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/auth.model';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,9 +14,11 @@ import { User } from '../../../core/models/auth.model';
 })
 export class SidebarComponent {
   private authService = inject(AuthService);
+  private userService = inject(UserService);
   horariosExpanded = false;
   currentRoute = '';
   currentUser: User | null = null;
+  profileImageUrl: string | null = null;
 
   constructor(private router: Router) {
     this.router.events
@@ -27,7 +30,30 @@ export class SidebarComponent {
     // Suscribirse al usuario actual
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
+      // el usuario autenticado contiene `userProfileId` que apunta al perfil
+      // usar `userProfileId` en lugar de `id` para cargar la foto de perfil
+      const profileId =
+        (user as any)?.userProfileId ??
+        (user as any)?.userProfile?.id ??
+        (user as any)?.id;
+      if (profileId) {
+        this.loadUserProfile(profileId);
+      }
     });
+  }
+
+  loadUserProfile(id: number | string) {
+    this.userService.getUser(id).subscribe({
+      next: (profile) => {
+        // Asignamos la foto usando la propiedad que mapea tu servicio
+        this.profileImageUrl = profile.profilePicture || null;
+      },
+      error: (err) => console.error('Error cargando perfil', err),
+    });
+  }
+
+  onProfileImageError() {
+    this.profileImageUrl = null;
   }
 
   toggleHorarios() {
