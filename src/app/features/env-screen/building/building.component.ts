@@ -39,7 +39,6 @@ export class BuildingComponent implements OnInit {
   // Selección separada para el formulario "Crear Piso" (no debe afectar al selector de ver pisos)
   selectedBuildingIdForCreateFloor?: number | null = null;
   floorsForSelected: Floor[] = [];
-  newFloorNumber: number | null = null;
   // Edición inline de pisos
   editingFloorId?: number | null = null;
   editingFloorNumber: number | null = null;
@@ -92,26 +91,55 @@ export class BuildingComponent implements OnInit {
           ? res
           : [];
         const b = this.buildings.find((x) => x.id_building === Number(id));
-        this.floorsForSelected = items.map((it: any, idx: number) => {
-          const id_floor = it.id ?? it.id_floor ?? idx + 1;
-          const floor_number = Number(it.floor_number ?? 0);
-          const buildingObj =
-            b ??
-            new Building(
-              it.building?.name ?? '',
-              it.building?.is_active ?? 'A',
-              it.building?.id_building ?? Number(id)
+        this.floorsForSelected = items
+          .map((it: any, idx: number) => {
+            const id_floor = it.id ?? it.id_floor ?? idx + 1;
+            const floor_number = Number(it.floor_number ?? 0);
+            const buildingObj =
+              b ??
+              new Building(
+                it.building?.name ?? '',
+                it.building?.is_active ?? 'A',
+                it.building?.id_building ?? Number(id)
+              );
+            return new Floor(
+              floor_number,
+              it.is_active ?? 'A',
+              buildingObj,
+              id_floor
             );
-          return new Floor(
-            floor_number,
-            it.is_active ?? 'A',
-            buildingObj,
-            id_floor
-          );
-        });
+          })
+          .sort((a: Floor, b: Floor) => a.floor_number - b.floor_number);
       },
       error: () => {
         this.floorsForSelected = [];
+      },
+    });
+  }
+
+  removeLastFloor(): void {
+    if (!this.selectedBuildingIdForFloors || this.floorsForSelected.length === 0)
+      return;
+
+    const lastFloor = this.floorsForSelected.reduce((prev, current) =>
+      Number(current.floor_number ?? 0) > Number(prev.floor_number ?? 0)
+        ? current
+        : prev
+    );
+
+    if (!lastFloor?.id_floor) return;
+
+    this.floorService.deleteFloor(lastFloor.id_floor).subscribe({
+      next: () => {
+        this.loadFloorsForBuilding(this.selectedBuildingIdForFloors);
+        this.showTransientToast(
+          `Piso ${lastFloor.floor_number} eliminado`,
+          5000,
+          true
+        );
+      },
+      error: () => {
+        this.showTransientToast('Error al eliminar piso', 3000, false);
       },
     });
   }
@@ -172,32 +200,69 @@ export class BuildingComponent implements OnInit {
     );
   }
 
+  private getNextFloorNumberForBuilding(floors: Floor[]): number {
+    const numbers = floors
+      .map((fl) => Number(fl.floor_number ?? 0))
+      .filter((n) => !isNaN(n) && n > 0);
+    return numbers.length > 0 ? Math.max(...numbers) + 1 : 1;
+  }
+
   createFloorForBuilding(): void {
+    if (this.selectedBuildingIdForCreateFloor == null) return;
+    const buildingId = Number(this.selectedBuildingIdForCreateFloor);
+
+    const createFloor = (floorNumber: number): void => {
+      this.floorService
+        .createFloor({
+          floor_number: floorNumber,
+          id_building: buildingId,
+          is_active: 'A',
+        })
+        .subscribe({
+          next: () => {
+            // Si el usuario está viendo la lista de pisos del pabellón creado, recargarla
+            if (
+              this.selectedBuildingIdForFloors ===
+              this.selectedBuildingIdForCreateFloor
+            ) {
+              this.loadFloorsForBuilding(this.selectedBuildingIdForFloors);
+            }
+          },
+          error: () => {},
+        });
+    };
+
     if (
-      this.newFloorNumber == null ||
-      this.selectedBuildingIdForCreateFloor == null
-    )
-      return;
-    this.floorService
-      .createFloor({
-        floor_number: Number(this.newFloorNumber),
-        id_building: Number(this.selectedBuildingIdForCreateFloor),
-        is_active: 'A',
-      })
-      .subscribe({
-        next: () => {
-          this.newFloorNumber = null;
-          // Si el usuario está viendo la lista de pisos del pabellón creado, recargarla
-          if (
-            this.selectedBuildingIdForFloors ===
-            this.selectedBuildingIdForCreateFloor
-          ) {
-            this.loadFloorsForBuilding(this.selectedBuildingIdForFloors);
-          }
-          // no mostramos toast por creación aquí; la UX principal usará la recarga visible
+      this.selectedBuildingIdForFloors === buildingId &&
+      this.floorsForSelected.length > 0
+    ) {
+      createFloor(this.getNextFloorNumberForBuilding(this.floorsForSelected));
+    } else {
+      this.env.getFloorByBuilding(buildingId).subscribe({
+        next: (res: any) => {
+          const items = Array.isArray(res?.data)
+            ? res.data
+            : Array.isArray(res)
+            ? res
+            : [];
+          const floors = items.map(
+            (it: any) =>
+              new Floor(
+                Number(it.floor_number ?? 0),
+                it.is_active ?? 'A',
+                new Building(
+                  it.building?.name ?? '',
+                  it.building?.is_active ?? 'A',
+                  it.building?.id_building ?? buildingId
+                ),
+                it.id ?? it.id_floor
+              )
+          );
+          createFloor(this.getNextFloorNumberForBuilding(floors));
         },
         error: () => {},
       });
+    }
   }
 
   create(): void {
