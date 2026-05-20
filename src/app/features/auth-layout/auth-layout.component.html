@@ -1,16 +1,46 @@
-  <div class="flex min-h-screen">
-    <div class="w-full md:w-[30%] flex items-center justify-start bg-white pl-12">
-      <div class="w-full max-w-xs">
-        <router-outlet></router-outlet>
-      </div>
-    </div>
-
-    <div class="hidden md:block md:w-[70%] relative">
-      <img
-        src="assets/images/upeuLima.jpg"
-        class="object-cover w-full h-full brightness-90"
-        alt="Universidad Peruana Unión"
-      />
-      <div class="absolute inset-0 bg-black opacity-10"></div>
+<div class="auth-wrapper" [attr.data-theme]="themeService.theme()">
+  <!-- Panel Izquierdo: Formulario -->
+  <div class="auth-form-panel">
+    <div class="form-inner">
+      <router-outlet></router-outlet>
     </div>
   </div>
+
+  <!-- Panel Derecho: Imagen con overlay y branding -->
+  <div class="auth-image-panel">
+    <img
+      src="assets/images/upeuLima.jpg"
+      class="auth-bg-image"
+      alt="Campus Universidad Peruana Unión"
+    />
+    <div class="auth-overlay"></div>
+
+    <!-- Branding sobre imagen -->
+    <div class="auth-branding">
+      <div class="brand-badge">
+        <span class="brand-dot"></span>
+        Sistema de Gestión
+      </div>
+      <h2 class="brand-title">Universidad<br/>Peruana Unión</h2>
+      <p class="brand-subtitle">
+        Plataforma inteligente de administración de ambientes y recursos académicos del campus.
+      </p>
+      <div class="brand-stats">
+        <div class="stat-item">
+          <span class="stat-num">200+</span>
+          <span class="stat-label">Ambientes</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">15+</span>
+          <span class="stat-label">Pabellones</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">5K+</span>
+          <span class="stat-label">Recursos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

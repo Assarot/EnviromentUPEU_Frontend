@@ -3,6 +3,7 @@ import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  themeService = inject(ThemeService);
 
   loginForm: FormGroup;
   isLoading = false;
@@ -46,7 +48,7 @@ export class LoginComponent {
       error: (error) => {
         console.error('Error en login', error);
         this.isLoading = false;
-        
+
         if (error.status === 401) {
           this.errorMessage = 'Usuario o contraseña incorrectos';
         } else if (error.status === 0) {
@@ -58,11 +60,6 @@ export class LoginComponent {
     });
   }
 
-  get username() {
-    return this.loginForm.get('username');
-  }
-
-  get password() {
-    return this.loginForm.get('password');
-  }
+  get username() { return this.loginForm.get('username'); }
+  get password() { return this.loginForm.get('password'); }
 }

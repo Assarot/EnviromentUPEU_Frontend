@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/auth.model';
 import { UserService } from '../../../core/services/user.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,6 +16,7 @@ import { UserService } from '../../../core/services/user.service';
 export class SidebarComponent {
   private authService = inject(AuthService);
   private userService = inject(UserService);
+  themeService = inject(ThemeService);
   horariosExpanded = false;
   currentRoute = '';
   currentUser: User | null = null;

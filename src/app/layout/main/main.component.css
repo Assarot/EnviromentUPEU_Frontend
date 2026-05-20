@@ -1,0 +1,61 @@
+/* ════════════════════════════════════
+   MAIN LAYOUT — Dual Theme Support
+   ════════════════════════════════════ */
+
+:host { display: block; min-height: 100vh; }
+
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* El sidebar tiene width: 260px fijo */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  padding: 28px 32px;
+  position: relative;
+  overflow-x: hidden;
+  transition: background 0.45s ease;
+}
+
+/* ══ Tema Oscuro (por defecto) ══ */
+:host-context([data-theme="dark"]) .main-content,
+:host-context(.dark-theme) .main-content {
+  background: linear-gradient(135deg, #0d1a0c 0%, #111e10 60%, #101810 100%);
+}
+
+/* ══ Tema Claro ══ */
+:host-context([data-theme="light"]) .main-content,
+:host-context(.light-theme) .main-content {
+  background: linear-gradient(135deg, #f0f4ec 0%, #eef3ea 60%, #f2f6ee 100%);
+}
+
+/* Textura de puntos sutil */
+.main-content::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  transition: background-image 0.45s ease;
+}
+
+:host-context([data-theme="dark"]) .main-content::before,
+:host-context(.dark-theme) .main-content::before {
+  background-image: radial-gradient(rgba(191, 198, 33, 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+:host-context([data-theme="light"]) .main-content::before,
+:host-context(.light-theme) .main-content::before {
+  background-image: radial-gradient(rgba(107, 145, 86, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.main-content > * {
+  position: relative;
+  z-index: 1;
+}

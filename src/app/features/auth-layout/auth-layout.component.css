@@ -1,0 +1,195 @@
+/* ════════════════════════════════════════════════════════
+   AUTH LAYOUT — Dual Theme (Dark / Light)
+   Paleta: #BFC621 lima · #6b9156 verde · #0f1a0e dark
+   ════════════════════════════════════════════════════════ */
+
+:host { display: block; min-height: 100vh; }
+
+/* ══ Variables de tema por contenedor ══ */
+.auth-wrapper[data-theme="dark"] {
+  --panel-bg:    linear-gradient(160deg, #0a1409 0%, #0f1a0e 45%, #0d1c0c 100%);
+  --panel-color: #ffffff;
+  --panel-shadow: 8px 0 40px rgba(0,0,0,0.65);
+  --overlay-img: linear-gradient(135deg, rgba(8,22,8,0.90) 0%, rgba(12,28,12,0.62) 40%, rgba(8,18,8,0.78) 100%);
+}
+
+.auth-wrapper[data-theme="light"] {
+  --panel-bg:    linear-gradient(160deg, #f0f4ec 0%, #e8f0e4 50%, #eef4ea 100%);
+  --panel-color: #0f1a0e;
+  --panel-shadow: 8px 0 40px rgba(15,26,14,0.12);
+  --overlay-img: linear-gradient(135deg, rgba(10,26,10,0.85) 0%, rgba(15,35,15,0.55) 40%, rgba(10,22,10,0.72) 100%);
+}
+
+/* ══ Wrapper principal ══ */
+.auth-wrapper {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.45s ease;
+}
+
+/* ══ PANEL IZQUIERDO (formulario) ══ */
+.auth-form-panel {
+  width: 42%;
+  min-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-bg);
+  position: relative;
+  z-index: 2;
+  box-shadow: var(--panel-shadow);
+  overflow: hidden;
+  transition: background 0.45s ease, box-shadow 0.45s ease;
+}
+
+/* Destellos radiales decorativos */
+.auth-form-panel::before {
+  content: '';
+  position: absolute;
+  top: -180px; left: -180px;
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, rgba(191,198,33,0.10) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+.auth-form-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -140px; right: -100px;
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(107,145,86,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulseGlow 8s ease-in-out infinite reverse;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.12); }
+}
+
+/* Partículas flotantes decorativas (light mode) */
+.auth-wrapper[data-theme="light"] .auth-form-panel::before {
+  background: radial-gradient(circle, rgba(191,198,33,0.14) 0%, transparent 70%);
+}
+
+.form-inner {
+  width: 100%;
+  max-width: 400px;
+  padding: 0 44px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ══ PANEL DERECHO (imagen) ══ */
+.auth-image-panel {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .auth-image-panel { display: block; }
+}
+
+.auth-bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.04);
+  transition: transform 8s ease-out;
+}
+
+.auth-image-panel:hover .auth-bg-image { transform: scale(1); }
+
+.auth-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-img);
+  transition: background 0.5s ease;
+}
+
+/* ══ Branding sobre imagen ══ */
+.auth-branding {
+  position: absolute;
+  bottom: 56px; left: 56px; right: 56px;
+  color: #fff;
+  animation: fadeInUp 0.9s ease-out both;
+  animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(191,198,33,0.18);
+  border: 1px solid rgba(191,198,33,0.42);
+  backdrop-filter: blur(10px);
+  color: #BFC621;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 22px;
+}
+
+.brand-dot {
+  width: 7px;
+  height: 7px;
+  background: #BFC621;
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.brand-title {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  color: #ffffff;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+.brand-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.65;
+  max-width: 420px;
+  margin-bottom: 36px;
+}
+
+.brand-stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.stat-item { display: flex; flex-direction: column; gap: 2px; }
+.stat-num { font-size: 1.6rem; font-weight: 800; color: #BFC621; line-height: 1; }
+.stat-label { font-size: 0.76rem; font-weight: 500; color: rgba(255,255,255,0.58); letter-spacing: 0.06em; text-transform: uppercase; }
+.stat-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.2); }
+
+/* ══ Responsive ══ */
+@media (max-width: 767px) {
+  .auth-form-panel { width: 100%; min-width: unset; }
+  .form-inner { padding: 0 24px; }
+}
+
+@media (max-width: 1200px) {
+  .auth-form-panel { width: 48%; min-width: 380px; }
+}
