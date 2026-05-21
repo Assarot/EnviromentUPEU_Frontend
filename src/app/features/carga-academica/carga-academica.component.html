@@ -15,7 +15,7 @@
             class="w-full px-4 py-3 border focus:ring-color: #BFC621; border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 appearance-none cursor-pointer"
           >
             <option value="">Seleccionar facultad...</option>
-            <option *ngFor="let faculty of faculties" [value]="faculty.id">
+            <option *ngFor="let faculty of faculties" [value]="faculty.idFaculty">
               {{ faculty.name }}
             </option>
           </select>
@@ -38,7 +38,7 @@
             [disabled]="!selectedFaculty"
           >
             <option value="">Seleccionar escuela...</option>
-            <option *ngFor="let school of schools" [value]="school.id">
+            <option *ngFor="let school of schools" [value]="school.idProfessionalSchool">
               {{ school.name }}
             </option>
           </select>
@@ -89,24 +89,22 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <!-- CICLO I -->
-          <tr class="bg-blue-100">
-            <td colspan="3" class="px-6 py-3 text-sm font-semibold text-blue-800">CICLO I</td>
-          </tr>
-          <tr *ngFor="let course of ciclo1Courses" class="hover:bg-gray-50" [class]="getCourseRowClass(course)">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ course.school }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900">{{ course.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ course.mode }}</td>
-          </tr>
+          <ng-container *ngFor="let group of groupedCourses">
+            <tr class="bg-blue-100">
+              <td colspan="3" class="px-6 py-3 text-sm font-semibold text-blue-800">{{ group.cycleName }}</td>
+            </tr>
+            <tr *ngFor="let course of group.courses" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ course.group?.cycle?.professionalSchool?.name }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900">{{ course.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ course.courseType?.name }}</td>
+            </tr>
+          </ng-container>
           
-          <!-- CICLO II -->
-          <tr class="bg-blue-100">
-            <td colspan="3" class="px-6 py-3 text-sm font-semibold text-blue-800">CICLO II</td>
+          <tr *ngIf="groupedCourses.length === 0 && !isLoading">
+            <td colspan="3" class="px-6 py-8 text-center text-gray-500">No se encontraron cursos para esta escuela.</td>
           </tr>
-          <tr *ngFor="let course of ciclo2Courses" class="hover:bg-gray-50" [class]="getCourseRowClass(course)">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ course.school }}</td>
-            <td class="px-6 py-4 text-sm text-gray-900">{{ course.name }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ course.mode }}</td>
+          <tr *ngIf="isLoading">
+            <td colspan="3" class="px-6 py-8 text-center text-gray-500">Cargando cursos...</td>
           </tr>
         </tbody>
       </table>
@@ -135,34 +133,67 @@
     <div class="p-8 text-center">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Subiendo la carga academica</h2>
       
-      <!-- Upload Icon -->
-      <div class="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style="background-color: #0F766E;">
-        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-        </svg>
+      <!-- Error Message -->
+      <div *ngIf="uploadError" class="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+        {{ uploadError }}
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div 
+        class="border-2 border-dashed rounded-xl p-8 mb-6 transition-colors duration-200 cursor-pointer"
+        [ngClass]="{'border-teal-500 bg-teal-50': isDragging, 'border-gray-300 bg-gray-50': !isDragging, 'hover:border-teal-400 hover:bg-gray-100': !isDragging}"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+      >
+        <input 
+          type="file" 
+          #fileInput 
+          class="hidden" 
+          (change)="onFileSelected($event)" 
+          accept=".xlsx,.xls,.csv"
+        >
+        
+        <!-- Upload Icon -->
+        <div class="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style="background-color: #0F766E;">
+          <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        
+        <div *ngIf="!selectedFile" class="text-gray-600">
+          <span class="font-semibold text-teal-600">Haz clic para seleccionar</span> o arrastra y suelta aquí<br>
+          <span class="text-sm text-gray-500 mt-2 block">Archivos Excel (.xlsx, .xls) o CSV</span>
+        </div>
+        <div *ngIf="selectedFile" class="text-teal-700 font-medium break-words">
+          Archivo seleccionado:<br> {{ selectedFile.name }}
+        </div>
       </div>
       
-      <p class="text-gray-700 mb-6">Solo selecciona archivos csv</p>
-      
       <button 
-        (click)="selectFile()"
-        class="w-full px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 mb-6"
+        [disabled]="!selectedFile || isUploading"
+        (click)="uploadSelectedFile()"
+        class="w-full px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        style="background-color: #BFC621;"
       >
-        Seleccionar
+        {{ isUploading ? 'Subiendo...' : 'Cargar Archivo' }}
       </button>
       
       <!-- Progress Section -->
-      <div *ngIf="isUploading" class="space-y-4">
+      <div *ngIf="isUploading" class="space-y-4 mt-6">
         <div class="text-left">
-          <p class="text-sm font-medium text-gray-900 mb-2">Validando archivo</p>
+          <div class="flex justify-between text-sm font-medium text-gray-900 mb-2">
+            <span>Validando y subiendo archivo</span>
+            <span>{{ uploadProgress }}%</span>
+          </div>
           <div class="w-full bg-gray-200 rounded-full h-2">
             <div 
-              class="h-2 rounded-full transition-all duration-1000"
+              class="h-2 rounded-full transition-all duration-300"
               style="background-color: #BFC621;"
               [style.width.%]="uploadProgress"
             ></div>
           </div>
-          <p class="text-xs text-gray-500 mt-1">Tomara algunos segundos</p>
         </div>
       </div>
     </div>
