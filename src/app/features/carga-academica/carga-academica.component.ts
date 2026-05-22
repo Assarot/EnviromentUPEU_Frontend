@@ -76,6 +76,15 @@ export class CargaAcademicaComponent implements OnInit {
         this.allCourses = data.courses;
         this.allGroups = data.groups;
         this.allCycles = data.cycles;
+
+        // Restore filtering if the user already had a faculty/school selected
+        if (this.selectedFaculty) {
+          this.schools = this.allSchools.filter(s => s.faculty?.idFaculty == this.selectedFaculty);
+        }
+        if (this.selectedSchool) {
+          this.loadCoursesForSchool(Number(this.selectedSchool));
+        }
+
         this.isLoading = false;
       },
       error: (err) => {
@@ -209,6 +218,7 @@ export class CargaAcademicaComponent implements OnInit {
           this.isUploading = false;
           this.closeUploadModal();
           this.showSuccessModal = true;
+          this.loadInitialData(); // Reload courses from backend so new data appears
         }
       },
       error: (error) => {
@@ -221,7 +231,6 @@ export class CargaAcademicaComponent implements OnInit {
 
   closeSuccessModal() {
     this.showSuccessModal = false;
-    // Here you could redirect or refresh the data
   }
 
   viewPreviousVersions() {

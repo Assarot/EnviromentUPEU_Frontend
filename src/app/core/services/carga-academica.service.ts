@@ -7,8 +7,8 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root',
 })
 export class CargaAcademicaService {
-  // Se usa esta URL por defecto de momento, sin usar el environment como se solicitó
-  private apiUrl = `${environment.apiUrl}/api/v1/import/upload-excel`;
+  // Utilizamos la ruta autogenerada del discovery client del gateway que sí hace correctamente el RewritePath
+  private apiUrl = `${environment.apiUrl}/microservice-import/api/v1/import/upload-excel`;
 
   constructor(private http: HttpClient) {}
 
