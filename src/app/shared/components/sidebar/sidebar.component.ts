@@ -20,6 +20,7 @@ export class SidebarComponent {
   horariosExpanded = false;
   currentRoute = '';
   currentUser: User | null = null;
+  userProfile: any = null;
   profileImageUrl: string | null = null;
 
   constructor(private router: Router) {
@@ -33,11 +34,10 @@ export class SidebarComponent {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       // el usuario autenticado contiene `userProfileId` que apunta al perfil
-      // usar `userProfileId` en lugar de `id` para cargar la foto de perfil
       const profileId =
         (user as any)?.userProfileId ??
-        (user as any)?.userProfile?.id ??
-        (user as any)?.id;
+        (user as any)?.userProfile?.id;
+        
       if (profileId) {
         this.loadUserProfile(profileId);
       }
@@ -47,6 +47,7 @@ export class SidebarComponent {
   loadUserProfile(id: number | string) {
     this.userService.getUser(id).subscribe({
       next: (profile) => {
+        this.userProfile = profile;
         // Asignamos la foto usando la propiedad que mapea tu servicio
         this.profileImageUrl = profile.profilePicture || null;
       },
@@ -78,7 +79,15 @@ export class SidebarComponent {
   }
 
   getUserRole(): string {
-    return this.currentUser?.roles?.[0]?.name || 'Usuario';
+    const rawRole = this.currentUser?.roles?.[0]?.name || 'Usuario';
+    const roleMap: Record<string, string> = {
+      'USER': 'Alumno',
+      'TEACHER': 'Maestro',
+      'ASACAD': 'D. Asuntos Académicos',
+      'COOROOMS': 'Coord. Logístico',
+      'ADMIN': 'Administrador'
+    };
+    return roleMap[rawRole] || rawRole;
   }
 
   hasRole(roleName: string): boolean {
@@ -95,5 +104,13 @@ export class SidebarComponent {
 
   isAdmin(): boolean {
     return this.hasRole('ADMIN');
+  }
+
+  isUser(): boolean {
+    return this.hasRole('USER');
+  }
+
+  isTeacher(): boolean {
+    return this.hasRole('TEACHER');
   }
 }

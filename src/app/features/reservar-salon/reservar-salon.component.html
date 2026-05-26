@@ -1,0 +1,168 @@
+<div class="p-6">
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Disponibilidad de Salones</h1>
+      <p class="text-gray-500 text-sm mt-1">Encuentra y reserva el espacio ideal para tus sesiones de estudio o grupos de trabajo.</p>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-8 flex flex-wrap gap-4 items-end">
+      <!-- Fecha -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Fecha</label>
+        <div class="relative">
+          <input type="date" class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50" value="2024-03-25">
+          <svg class="w-4 h-4 absolute left-3.5 top-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+        </div>
+      </div>
+
+      <!-- Rango de Tiempo -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Rango de Tiempo</label>
+        <div class="relative">
+          <select class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50 appearance-none">
+            <option>08:00 AM - 10:00 AM</option>
+            <option>10:00 AM - 12:00 PM</option>
+            <option>12:00 PM - 02:00 PM</option>
+          </select>
+          <svg class="w-4 h-4 absolute left-3.5 top-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <svg class="w-4 h-4 absolute right-3.5 top-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+      </div>
+
+      <!-- Tipo de Ambiente -->
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">Tipo de Ambiente</label>
+        <div class="relative">
+          <select class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50 appearance-none">
+            <option>Todos los tipos</option>
+            <option>Laboratorio</option>
+            <option>Aula Teórica</option>
+            <option>Sala de Estudio</option>
+          </select>
+          <svg class="w-4 h-4 absolute left-3.5 top-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          <svg class="w-4 h-4 absolute right-3.5 top-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+      </div>
+
+      <!-- Botón Buscar -->
+      <div class="flex-none">
+        <button class="flex items-center gap-2 px-6 py-2.5 bg-[#BFC621] text-[#4d5612] font-semibold rounded-lg hover:bg-[#aab11d] transition-colors shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+          Buscar Disponibilidad
+        </button>
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Card 1 -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:shadow-md transition-shadow h-[280px]">
+        <div class="w-full sm:w-2/5 relative bg-gray-200">
+          <div class="absolute top-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded">PISO 3</div>
+          <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=400&q=80" alt="Lab" class="w-full h-full object-cover">
+        </div>
+        <div class="w-full sm:w-3/5 p-5 flex flex-col">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold text-gray-900 text-lg leading-tight">Lab. de IA &<br>Datos</h3>
+            <div class="flex flex-col items-center justify-center bg-[#e8eacc] text-[#5d6a17] rounded-full w-12 h-12 text-xs font-bold shrink-0">
+              <span class="text-sm">24</span>
+              <span class="text-[9px] font-normal">cap.</span>
+            </div>
+          </div>
+          <p class="text-gray-500 text-xs mb-4 flex-1">Equipado con estaciones de trabajo de alto rendimiento y conectividad fibra óptica.</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">Proyector 4K</span>
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">Pizarra Smart</span>
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">AC</span>
+          </div>
+          <div class="flex items-center justify-between mt-auto">
+            <span class="text-[#5d6a17] font-bold text-xs">DISPONIBLE<br>AHORA</span>
+            <button class="bg-[#5d6a17] text-white px-4 py-2 rounded font-medium text-sm hover:bg-[#4d5612] transition-colors">Reservar Ahora</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:shadow-md transition-shadow h-[280px]">
+        <div class="w-full sm:w-2/5 relative bg-gray-200">
+          <div class="absolute top-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded">PISO 2</div>
+          <img src="https://images.unsplash.com/photo-1577412647305-991150c7d163?auto=format&fit=crop&w=400&q=80" alt="Aula" class="w-full h-full object-cover">
+        </div>
+        <div class="w-full sm:w-3/5 p-5 flex flex-col">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold text-gray-900 text-lg leading-tight">Aula Teórica A-<br>204</h3>
+            <div class="flex flex-col items-center justify-center bg-[#e8eacc] text-[#5d6a17] rounded-full w-12 h-12 text-xs font-bold shrink-0">
+              <span class="text-sm">45</span>
+              <span class="text-[9px] font-normal">cap.</span>
+            </div>
+          </div>
+          <p class="text-gray-500 text-xs mb-4 flex-1">Espacio amplio para clases magistrales y presentaciones de proyectos grupales.</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">Audio Surround</span>
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">Ventilación</span>
+          </div>
+          <div class="flex items-center justify-between mt-auto">
+            <span class="text-[#5d6a17] font-bold text-xs">DISPONIBLE:<br>10:00 AM</span>
+            <button class="bg-[#5d6a17] text-white px-4 py-2 rounded font-medium text-sm hover:bg-[#4d5612] transition-colors">Reservar Ahora</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:shadow-md transition-shadow h-[280px]">
+        <div class="w-full sm:w-2/5 relative bg-gray-200">
+          <div class="absolute top-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded">PISO 4</div>
+          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80" alt="Sala" class="w-full h-full object-cover">
+        </div>
+        <div class="w-full sm:w-3/5 p-5 flex flex-col">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold text-gray-900 text-lg leading-tight">Sala de<br>Innovación</h3>
+            <div class="flex flex-col items-center justify-center bg-[#e8eacc] text-[#5d6a17] rounded-full w-12 h-12 text-xs font-bold shrink-0">
+              <span class="text-sm">12</span>
+              <span class="text-[9px] font-normal">cap.</span>
+            </div>
+          </div>
+          <p class="text-gray-500 text-xs mb-4 flex-1">Mobiliario flexible y paredes de vidrio para fomento de la creatividad y coworking.</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">Mesa Modular</span>
+            <span class="bg-gray-100 text-gray-600 text-[10px] font-medium px-2 py-1 rounded">Pizarra Cristal</span>
+          </div>
+          <div class="flex items-center justify-between mt-auto">
+            <span class="text-[#5d6a17] font-bold text-xs">DISPONIBLE<br>AHORA</span>
+            <button class="bg-[#5d6a17] text-white px-4 py-2 rounded font-medium text-sm hover:bg-[#4d5612] transition-colors">Reservar Ahora</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col sm:flex-row hover:shadow-md transition-shadow h-[280px]">
+        <div class="w-full sm:w-2/5 relative bg-gray-200">
+          <div class="absolute top-3 left-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded">PISO 1</div>
+          <img src="https://images.unsplash.com/photo-1565626423186-0dc065e9275b?auto=format&fit=crop&w=400&q=80" alt="Taller" class="w-full h-full object-cover">
+        </div>
+        <div class="w-full sm:w-3/5 p-5 flex flex-col">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-bold text-gray-900 text-lg leading-tight">Taller de<br>Mecánica</h3>
+            <div class="flex flex-col items-center justify-center bg-[#f3f4f6] text-gray-500 rounded-full w-12 h-12 text-xs font-bold shrink-0">
+              <span class="text-sm">15</span>
+              <span class="text-[9px] font-normal">cap.</span>
+            </div>
+          </div>
+          <p class="text-gray-500 text-xs mb-4 flex-1">Espacio para prácticas de ingeniería con herramientas industriales y seguridad reforzada.</p>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <!-- No tags here in image -->
+          </div>
+          <div class="flex items-center justify-between mt-auto">
+            <span class="text-red-500 font-bold text-xs">OCUPADO<br>HASTA 12:00 PM</span>
+            <button class="bg-gray-200 text-gray-400 px-4 py-2 rounded font-medium text-sm cursor-not-allowed">No Disponible</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

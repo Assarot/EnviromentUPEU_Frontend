@@ -10,6 +10,10 @@ import { CargaAcademicaComponent } from './features/carga-academica/carga-academ
 import { ProximamenteComponent } from './features/proximamente/proximamente.component';
 import { NotificacionesComponent } from './features/notificaciones/notificaciones.component';
 import { ConfiguracionComponent } from './features/configuracion/configuracion.component';
+import { MisHorariosComponent } from './features/mis-horarios/mis-horarios.component';
+import { ReservarSalonComponent } from './features/reservar-salon/reservar-salon.component';
+import { MisSolicitudesComponent } from './features/mis-solicitudes/mis-solicitudes.component';
+import { NotificarIncidenciasComponent } from './features/notificar-incidencias/notificar-incidencias.component';
 import { EnvScreenComponent } from './features/env-screen/env-screen.component';
 import { TypeEnvComponent } from './features/env-screen/type-env/type-env.component';
 import { AmbienteComponent } from './features/env-screen/ambiente/ambiente.component';
@@ -60,6 +64,10 @@ export const routes: Routes = [
       { path: 'menu', component: MenuComponent },
       { path: 'home', component: HomeComponent },
       { path: 'carga-academica', component: CargaAcademicaComponent },
+      { path: 'mis-horarios', component: MisHorariosComponent },
+      { path: 'reservar-salon', component: ReservarSalonComponent },
+      { path: 'mis-solicitudes', component: MisSolicitudesComponent },
+      { path: 'notificar-incidencias', component: NotificarIncidenciasComponent },
       { path: 'proximamente', component: ProximamenteComponent },
       { path: 'notificaciones', component: NotificacionesComponent },
       { path: 'configuracion', component: ConfiguracionComponent },

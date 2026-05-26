@@ -5,7 +5,7 @@
   <div class="sidebar-glow-top"></div>
   <div class="sidebar-glow-bottom"></div>
 
-  <div class="sidebar-inner">
+  <div class="sidebar-inner flex flex-col h-full">
 
     <!-- ══════════ LOGO / HEADER ══════════ -->
     <div class="sidebar-header">
@@ -24,23 +24,98 @@
     <div class="sidebar-divider"></div>
 
     <!-- ══════════ NAVEGACIÓN ══════════ -->
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav flex-1 overflow-y-auto">
 
-      <!-- ── Menú (siempre visible) ── -->
-      <div class="nav-section-label">Principal</div>
+      <!-- ── Menú (siempre visible para admins) ── -->
+      <ng-container *ngIf="!isUser() && !isTeacher()">
+        <div class="nav-section-label">Principal</div>
 
-      <a routerLink="/main/menu"
-         id="nav-menu"
-         class="nav-item"
-         [class.nav-item--active]="isActive('/main/menu')">
-        <span class="nav-icon">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </span>
-        <span class="nav-label">Menú</span>
-        <span class="nav-active-dot" *ngIf="isActive('/main/menu')"></span>
-      </a>
+        <a routerLink="/main/menu"
+           id="nav-menu"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/menu')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </span>
+          <span class="nav-label">Menú</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/menu')"></span>
+        </a>
+      </ng-container>
+
+      <!-- ════ USER / TEACHER ════ -->
+      <ng-container *ngIf="isUser() || isTeacher()">
+        <div class="nav-section-label">Académico</div>
+
+        <a routerLink="/main/mis-horarios" id="nav-horarios"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/mis-horarios')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </span>
+          <span class="nav-label">Mis Horarios</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/mis-horarios')"></span>
+        </a>
+
+        <a routerLink="/main/reservar-salon" id="nav-reservar"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/reservar-salon')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/>
+              <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
+            </svg>
+          </span>
+          <span class="nav-label">Reservar Salón</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/reservar-salon')"></span>
+        </a>
+
+        <a routerLink="/main/mis-solicitudes" id="nav-solicitudes"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/mis-solicitudes')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 11l3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          </span>
+          <span class="nav-label">Mis Solicitudes</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/mis-solicitudes')"></span>
+        </a>
+
+        <a routerLink="/main/notificaciones" id="nav-noti-user"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/notificaciones')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </span>
+          <span class="nav-label">Notificaciones</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/notificaciones')"></span>
+        </a>
+
+        <!-- Solo visible para TEACHER -->
+        <a *ngIf="isTeacher()" routerLink="/main/notificar-incidencias" id="nav-incidencias"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/notificar-incidencias')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </span>
+          <span class="nav-label">Notificar Incidencias</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/notificar-incidencias')"></span>
+        </a>
+      </ng-container>
 
       <!-- ════ ASACAD ════ -->
       <ng-container *ngIf="isAsacad()">
@@ -260,9 +335,20 @@
       </ng-container>
 
     </nav>
+
+    <!-- Botón de Nueva Solicitud para Estudiantes/Profesores -->
+    <div class="px-6 pb-6 mt-auto" *ngIf="isUser() || isTeacher()">
+      <button class="student-new-request-btn w-full flex items-center justify-center space-x-2 py-3 rounded-lg font-medium transition-colors" routerLink="/main/reservar-salon">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-5 h-5">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        <span>Nueva Solicitud</span>
+      </button>
+    </div>
+
   </div>
 
-  <!-- ══════════ USER PROFILE (FOOTER) ══════════ -->
+  <!-- ══════════ USER PROFILE FOOTER (TODOS LOS ROLES) ══════════ -->
   <div class="sidebar-footer">
     <div class="user-avatar">
       <img
@@ -279,7 +365,7 @@
     </div>
 
     <div class="user-info">
-      <p class="user-name">{{ currentUser?.username || 'Usuario' }}</p>
+      <p class="user-name">{{ userProfile?.names || currentUser?.username || 'Usuario' }}</p>
       <p class="user-role">{{ getUserRole() }}</p>
     </div>
 
@@ -293,7 +379,7 @@
       </svg>
     </button>
 
-    <!-- Toggle tema compacto -->
+    <!-- Toggle tema -->
     <button
       id="btn-sidebar-theme"
       class="sidebar-theme-btn"

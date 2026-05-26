@@ -1,0 +1,75 @@
+<div class="p-6">
+  <div class="max-w-4xl mx-auto space-y-6">
+    
+    <!-- Header Section -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Notificar Incidencias</h1>
+      <p class="text-gray-500 text-sm mt-1">Reporta cualquier problema con los ambientes, equipos o infraestructura.</p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8">
+      <form class="space-y-6">
+        
+        <!-- Tipo de Incidencia -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Incidencia *</label>
+          <div class="relative">
+            <select class="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50 appearance-none">
+              <option disabled selected>Selecciona el tipo de problema...</option>
+              <option>Problema con Equipos (Proyector, PC, etc.)</option>
+              <option>Problema de Infraestructura (Luz, Agua, Sillas, etc.)</option>
+              <option>Problema de Limpieza</option>
+              <option>Otros</option>
+            </select>
+            <svg class="w-5 h-5 absolute right-3.5 top-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Pabellón / Ambiente -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Ambiente Afectado *</label>
+            <input type="text" placeholder="Ej. Pabellón D - Lab. 204" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50">
+          </div>
+          
+          <!-- Urgencia -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Nivel de Urgencia</label>
+            <div class="relative">
+              <select class="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50 appearance-none">
+                <option>Baja (No afecta las clases)</option>
+                <option>Media (Incomodidad moderada)</option>
+                <option>Alta (Impide el desarrollo de la clase)</option>
+              </select>
+              <svg class="w-5 h-5 absolute right-3.5 top-3 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción del Problema *</label>
+          <textarea rows="4" placeholder="Describe detalladamente el problema que has encontrado..." class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#BFC621] text-gray-700 bg-gray-50 resize-none"></textarea>
+        </div>
+
+        <!-- Evidencia (opcional) -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Evidencia Fotográfica (Opcional)</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer">
+            <svg class="w-10 h-10 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p class="text-sm text-gray-600">Haz clic aquí o arrastra una imagen para subir</p>
+            <p class="text-xs text-gray-400 mt-1">Formatos soportados: JPG, PNG, max 5MB</p>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex justify-end pt-4 border-t border-gray-100">
+          <button type="button" class="px-6 py-2.5 text-gray-600 font-medium text-sm hover:bg-gray-100 rounded-lg mr-3 transition-colors">Cancelar</button>
+          <button type="button" class="px-6 py-2.5 bg-[#71801D] text-white font-semibold text-sm rounded-lg hover:bg-[#5d6a17] transition-colors shadow-sm">Enviar Reporte</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
