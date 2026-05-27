@@ -4,45 +4,14 @@
       class="toast rounded-md bg-emerald-600 px-4 py-2 text-white shadow-sm inline-flex items-center gap-3"
     >
       <span>{{ toastMessage }}</span>
-      <button
-        *ngIf="toastHasUndo && lastDeleted"
-        (click)="undoDelete()"
-        class="underline text-sm"
-      >
-        Deshacer
-      </button>
+
     </div>
   </div>
 
-  <div
-    *ngIf="pendingDeleteId && popupStyle"
-    [ngStyle]="popupStyle"
-    class="confirm-popup z-50 w-56 rounded-md border border-slate-200 bg-white p-3 shadow-lg"
-  >
-    <div class="text-sm font-semibold text-slate-800">
-      ¿Seguro que quieres eliminar?
-    </div>
-    <div class="mt-1 text-sm text-slate-600">
-      Se eliminará: <strong>{{ pendingDeleteName }}</strong>
-    </div>
-    <div class="mt-3 flex gap-2 justify-end">
-      <button
-        (click)="performDeleteConfirmed()"
-        class="rounded px-3 py-1 text-sm font-semibold text-white"
-        style="background: #ef4444"
-      >
-        Eliminar
-      </button>
-      <button
-        (click)="cancelRemove()"
-        class="rounded px-3 py-1 text-sm font-semibold text-slate-700 border border-slate-200"
-      >
-        Cancelar
-      </button>
-    </div>
-  </div>
+
 
   <button
+    *ngIf="!hideBack"
     (click)="volver()"
     class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
   >
@@ -178,25 +147,53 @@
                       />
                     </svg>
                   </button>
-                  <button
-                    (click)="confirmRemove(g, $event)"
-                    title="Eliminar"
-                    class="text-slate-600 hover:text-red-600"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <div class="relative inline-block">
+                    <button
+                      (click)="confirmRemove(g, $event)"
+                      title="Eliminar"
+                      class="text-slate-600 hover:text-red-600"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-7 4v12m6-12v12"
-                      />
-                    </svg>
-                  </button>
+                      <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-7 4v12m6-12v12"
+                        />
+                      </svg>
+                    </button>
+                    <!-- Popover local de confirmación (Flotación a la izquierda inteligente) -->
+                    <div
+                      *ngIf="pendingDeleteId === g.idGroup"
+                      class="absolute bottom-1/2 translate-y-1/2 right-full mr-3 z-50 w-60 rounded-xl border border-slate-200 bg-white p-4 shadow-xl text-left animate-fade-in"
+                    >
+                      <div class="text-xs font-bold text-slate-800">
+                        ¿Seguro que quieres eliminar?
+                      </div>
+                      <div class="mt-1 text-xs text-slate-500">
+                        Se eliminará: <strong class="text-slate-700">{{ pendingDeleteName }}</strong>
+                      </div>
+                      <div class="mt-3 flex gap-2 justify-end">
+                        <button
+                          (click)="performDeleteConfirmed()"
+                          class="rounded-lg px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm active:scale-95"
+                        >
+                          Eliminar
+                        </button>
+                        <button
+                          (click)="cancelRemove()"
+                          class="rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition-colors active:scale-95"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </ng-container>
                 <ng-template #editingActions>
                   <button
@@ -253,4 +250,6 @@
       </table>
     </div>
   </section>
+
+
 </div>

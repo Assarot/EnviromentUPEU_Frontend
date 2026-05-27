@@ -1,0 +1,176 @@
+<div class="mx-auto max-w-5xl px-6 py-10 animate-fade-in">
+  <!-- Back navigation button -->
+  <button
+    (click)="volver()"
+    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-all duration-300 transform hover:-translate-x-1"
+  >
+    <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+    </svg>
+    Volver a opciones
+  </button>
+
+  <!-- Premium Header -->
+  <header class="mb-10 relative">
+    <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full" [style.backgroundColor]="brand"></div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Estructura Académica</h1>
+    <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-2xl">
+      Configura y gestiona la jerarquía académica de la institución: Facultades, Escuelas Profesionales, Ciclos de estudio y Grupos en una sola interfaz interactiva.
+    </p>
+  </header>
+
+  <!-- Modern Interactive Tabs -->
+  <div class="mb-8 border-b border-slate-200/80 bg-white/60 backdrop-blur-md sticky top-0 z-40 rounded-t-2xl shadow-sm border border-slate-100 p-2">
+    <nav class="flex flex-wrap gap-1" aria-label="Tabs">
+      <button
+        (click)="setTab('unified')"
+        [class]="activeTab === 'unified' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+        class="flex-1 text-center py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-300 ease-out active:scale-98"
+      >
+        Vista Unificada
+      </button>
+      <button
+        (click)="setTab('faculty')"
+        [class]="activeTab === 'faculty' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+        class="flex-1 text-center py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-300 ease-out active:scale-98"
+      >
+        Facultades
+      </button>
+      <button
+        (click)="setTab('school')"
+        [class]="activeTab === 'school' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+        class="flex-1 text-center py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-300 ease-out active:scale-98"
+      >
+        Escuelas Profesionales
+      </button>
+      <button
+        (click)="setTab('cycle')"
+        [class]="activeTab === 'cycle' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+        class="flex-1 text-center py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-300 ease-out active:scale-98"
+      >
+        Ciclos Académicos
+      </button>
+      <button
+        (click)="setTab('group')"
+        [class]="activeTab === 'group' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+        class="flex-1 text-center py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm transition-all duration-300 ease-out active:scale-98"
+      >
+        Grupos de Estudiantes
+      </button>
+    </nav>
+  </div>
+
+  <!-- Dynamic Content Area -->
+  <main>
+    
+    <!-- Vista Unificada Tab -->
+    <div *ngIf="activeTab === 'unified'">
+      <!-- Loading spinner -->
+      <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-lime-500"></div>
+        <p class="mt-4 text-slate-500 text-sm font-semibold">Cargando estructura unificada...</p>
+      </div>
+
+      <div *ngIf="!isLoading && unifiedStructure.length === 0" class="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm text-slate-500">
+        <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+        </svg>
+        No hay datos de estructura académica disponibles en este momento.
+      </div>
+
+      <div *ngIf="!isLoading && unifiedStructure.length > 0" class="space-y-6">
+        <!-- Loop Faculties -->
+        <div *ngFor="let item of unifiedStructure" class="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md">
+          <!-- Faculty Header -->
+          <div (click)="toggleFaculty(item)" class="flex items-center justify-between px-6 py-5 bg-slate-50/50 cursor-pointer border-b border-slate-100 hover:bg-slate-50 select-none">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-lime-500/10 flex items-center justify-center text-lime-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-slate-800">{{ item.faculty.name }}</h3>
+                <p class="text-xs text-slate-500">{{ item.schools.length }} Escuelas profesionales asociadas</p>
+              </div>
+            </div>
+            <div class="text-slate-400">
+              <svg class="w-5 h-5 transition-transform duration-300" [class.rotate-180]="item.expanded" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Faculty Content (Schools) -->
+          <div *ngIf="item.expanded" class="p-6 space-y-6">
+            <div *ngIf="item.schools.length === 0" class="text-center py-4 text-sm text-slate-400">
+              No hay escuelas registradas en esta facultad.
+            </div>
+
+            <!-- Loop Schools -->
+            <div *ngFor="let sItem of item.schools" class="rounded-xl border border-slate-100 bg-slate-50/20 p-5 space-y-4">
+              <!-- School Title -->
+              <div (click)="toggleSchool(sItem)" class="flex items-center justify-between cursor-pointer select-none">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-lime-500 shadow-sm shadow-lime-500/50"></span>
+                  <h4 class="text-base font-bold text-slate-700 hover:text-slate-900 transition-colors">{{ sItem.school.name }}</h4>
+                </div>
+                <div class="text-slate-400 flex items-center gap-2">
+                  <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">{{ sItem.cycles.length }} Ciclos</span>
+                  <svg class="w-4 h-4 transition-transform duration-300" [class.rotate-180]="sItem.expanded" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- School Content (Cycles & Groups) -->
+              <div *ngIf="sItem.expanded" class="pl-4 border-l-2 border-slate-200/60 ml-1.5 mt-2 space-y-3">
+                <div *ngIf="sItem.cycles.length === 0" class="text-xs text-slate-400 py-1 italic">
+                  No hay ciclos configurados en esta escuela profesional.
+                </div>
+
+                <!-- Loop Cycles -->
+                <div *ngFor="let cyItem of sItem.cycles" class="flex flex-col md:flex-row md:items-center justify-between gap-2 py-2.5 border-b border-slate-100 last:border-0">
+                  <div class="flex items-center gap-3">
+                    <span class="text-xs font-bold text-slate-600 bg-slate-100/80 px-2.5 py-1 rounded-lg">{{ cyItem.cycle.name }}</span>
+                  </div>
+                  <!-- Groups row -->
+                  <div class="flex flex-wrap gap-2">
+                    <span *ngIf="cyItem.groups.length === 0" class="text-xs text-slate-400 italic">Sin grupos registrados</span>
+                    <!-- Loop Groups -->
+                    <div *ngFor="let g of cyItem.groups" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:border-slate-300 transition-all select-none">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <span>Grupo {{ g.groupNumber }}</span>
+                      <span class="text-slate-400">| Cap: {{ g.capacity }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facultades Tab -->
+    <div *ngIf="activeTab === 'faculty'">
+      <app-faculty></app-faculty>
+    </div>
+
+    <!-- Escuelas Profesionales Tab -->
+    <div *ngIf="activeTab === 'school'">
+      <app-professional-school [hideBack]="true"></app-professional-school>
+    </div>
+
+    <!-- Ciclos Académicos Tab -->
+    <div *ngIf="activeTab === 'cycle'">
+      <app-cycle [hideBack]="true"></app-cycle>
+    </div>
+
+    <!-- Grupos de Estudiantes Tab -->
+    <div *ngIf="activeTab === 'group'">
+      <app-group [hideBack]="true"></app-group>
+    </div>
+
+  </main>
+</div>

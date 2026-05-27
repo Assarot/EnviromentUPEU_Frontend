@@ -12,11 +12,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/microservice-auth/api/auth/login',
     '/microservice-auth/api/auth/login/remember',
     '/microservice-auth/api/auth/register',
-    '/microservice-auth/api/auth/refresh'
+    '/microservice-auth/api/auth/refresh',
   ];
 
   // No agregar token a las rutas públicas
-  const isPublicRoute = publicRoutes.some(route => req.url.includes(route));
+  const isPublicRoute = publicRoutes.some((route) => req.url.includes(route));
   if (isPublicRoute) {
     return next(req);
   }
@@ -38,20 +38,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 return throwError(() => error);
               }
               const retryReq = req.clone({
-                setHeaders: { Authorization: `Bearer ${newAccess}` }
+                setHeaders: { Authorization: `Bearer ${newAccess}` },
               });
               return next(retryReq);
             }),
             catchError((refreshErr) => {
               authService.handleUnauthorized();
               return throwError(() => refreshErr);
-            })
+            }),
           );
         } else {
           authService.handleUnauthorized();
         }
       }
       return throwError(() => error);
-    })
+    }),
   );
 };

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CourseType } from '../../../core/models/course-type';
 import { CourseTypeService } from '../../../core/services/course-type.service';
@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./course-type.component.css'],
 })
 export class CourseTypeComponent implements OnInit {
+  @Input() hideBack = false;
   private service = inject(CourseTypeService);
   private router = inject(Router);
 

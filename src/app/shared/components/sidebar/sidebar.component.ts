@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/auth.model';
 import { UserService } from '../../../core/services/user.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { SidebarService } from '../../../core/services/sidebar.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -17,7 +18,9 @@ export class SidebarComponent {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   themeService = inject(ThemeService);
+  sidebarService = inject(SidebarService);
   horariosExpanded = false;
+  cursosExpanded = false;
   currentRoute = '';
   currentUser: User | null = null;
   userProfile: any = null;
@@ -28,6 +31,9 @@ export class SidebarComponent {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.currentRoute = event.url;
+        if (this.currentRoute.startsWith('/main/course-creation')) {
+          this.cursosExpanded = true;
+        }
       });
 
     // Suscribirse al usuario actual
@@ -61,6 +67,10 @@ export class SidebarComponent {
 
   toggleHorarios() {
     this.horariosExpanded = !this.horariosExpanded;
+  }
+
+  toggleCursos() {
+    this.cursosExpanded = !this.cursosExpanded;
   }
 
   isActive(route: string): boolean {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Plan } from '../../../core/models/plan';
 import { PlanService } from '../../../core/services/plan.service';
@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./plan.component.css'],
 })
 export class PlanComponent implements OnInit {
+  @Input() hideBack = false;
   private service = inject(PlanService);
   private router = inject(Router);
 

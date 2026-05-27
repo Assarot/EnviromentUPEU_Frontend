@@ -1,421 +1,335 @@
-<div class="mx-auto max-w-4xl px-6 py-8">
-  <div *ngIf="showToast" class="fixed top-5 right-5 z-50">
-    <div
-      class="toast rounded-md bg-emerald-600 px-4 py-2 text-white shadow-sm inline-flex items-center gap-3"
-    >
-      <span>{{ toastMessage }}</span>
-      <button
-        *ngIf="toastHasUndo && lastDeleted"
-        (click)="undoDelete()"
-        class="underline text-sm"
-      >
+<div class="mx-auto max-w-6xl px-6 py-10 animate-fade-in">
+  <!-- Toast message -->
+  <div *ngIf="showToast" class="fixed top-5 right-5 z-50 animate-bounce">
+    <div class="rounded-xl bg-slate-900 border border-lime-500/20 px-4 py-3 text-white shadow-2xl inline-flex items-center gap-3 backdrop-blur-md">
+      <span class="w-2 h-2 rounded-full bg-lime-500 animate-pulse"></span>
+      <span class="text-sm font-semibold">{{ toastMessage }}</span>
+      <button *ngIf="toastHasUndo" (click)="undoDelete()" class="text-xs text-lime-400 hover:text-lime-300 font-bold ml-2 underline">
         Deshacer
       </button>
     </div>
   </div>
 
-  <div
-    *ngIf="pendingDeleteId && popupStyle"
-    [ngStyle]="popupStyle"
-    class="confirm-popup z-50 w-56 rounded-md border border-slate-200 bg-white p-3 shadow-lg"
-  >
-    <div class="text-sm font-semibold text-slate-800">
-      ¿Seguro que quieres eliminar?
-    </div>
-    <div class="mt-1 text-sm text-slate-600">
-      Se eliminará: <strong>{{ pendingDeleteName }}</strong>
-    </div>
-    <div class="mt-3 flex gap-2 justify-end">
-      <button
-        (click)="performDeleteConfirmed()"
-        class="rounded px-3 py-1 text-sm font-semibold text-white"
-        style="background: #ef4444"
-      >
-        Eliminar
-      </button>
-      <button
-        (click)="cancelRemove()"
-        class="rounded px-3 py-1 text-sm font-semibold text-slate-700 border border-slate-200"
-      >
-        Cancelar
-      </button>
-    </div>
-  </div>
-
+  <!-- Back navigation button -->
   <button
+    *ngIf="!hideBack"
     (click)="volver()"
-    class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-all duration-300 transform hover:-translate-x-1"
   >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M15 19l-7-7 7-7"
-      ></path>
+    <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
     </svg>
     Volver a opciones
   </button>
 
-  <h1 class="text-2xl font-bold text-slate-800 mb-4">Cursos</h1>
+  <!-- Premium Header -->
+  <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 relative">
+    <div>
+      <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full bg-[#BFC621]"></div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Cursos Académicos</h1>
+      <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-2xl">
+        Administra todas las asignaturas de la oferta curricular, asignando sus respectivas cargas horarias y vinculando su plan, ciclo y grupo de estudio.
+      </p>
+    </div>
 
-  <section
-    class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-  >
-    <h2 class="text-base font-semibold mb-3">Crear Curso</h2>
-    <div class="flex flex-wrap gap-3">
-      <input
-        type="text"
-        [(ngModel)]="name"
-        placeholder="Nombre del Curso"
-        class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-      />
-      <input
-        type="text"
-        [(ngModel)]="code"
-        placeholder="Código"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-      />
-      <input
-        type="text"
-        [(ngModel)]="description"
-        placeholder="Descripción"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-      />
-    </div>
-    <div class="mt-3 flex flex-wrap gap-3">
-      <div class="flex items-center gap-2">
-        <label class="text-sm">Duración:</label>
-        <input
-          type="number"
-          [(ngModel)]="durationHoursInput"
-          min="0"
-          class="w-20 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">h</span>
-        <input
-          type="number"
-          [(ngModel)]="durationMinutesInput"
-          min="0"
-          max="59"
-          class="w-20 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">m</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <label class="text-sm">Prácticas:</label>
-        <input
-          type="number"
-          [(ngModel)]="practicalHoursInput"
-          min="0"
-          class="w-16 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">h</span>
-        <input
-          type="number"
-          [(ngModel)]="practicalMinutesInput"
-          min="0"
-          max="59"
-          class="w-16 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">m</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <label class="text-sm">Teóricas:</label>
-        <input
-          type="number"
-          [(ngModel)]="theoreticalHoursInput"
-          min="0"
-          class="w-16 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">h</span>
-        <input
-          type="number"
-          [(ngModel)]="theoreticalMinutesInput"
-          min="0"
-          max="59"
-          class="w-16 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">m</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <label class="text-sm">Total:</label>
-        <input
-          type="number"
-          [(ngModel)]="totalHoursInput"
-          min="0"
-          class="w-16 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">h</span>
-        <input
-          type="number"
-          [(ngModel)]="totalMinutesInput"
-          min="0"
-          max="59"
-          class="w-16 rounded-lg border px-2 py-1 text-sm"
-        />
-        <span class="text-sm">m</span>
-      </div>
-    </div>
-    <div class="mt-3 flex gap-3">
-      <select
-        [(ngModel)]="selectedTypeId"
-        class="rounded-lg border px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null">-- Tipo --</option>
-        <option *ngFor="let t of types" [ngValue]="t.idCourseType">
-          {{ t.name }}
-        </option>
-      </select>
-      <select
-        [(ngModel)]="selectedGroupId"
-        class="rounded-lg border px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null">-- Grupo --</option>
-        <option *ngFor="let g of groups" [ngValue]="g.idGroup">
-          {{ g.groupNumber }}
-        </option>
-      </select>
-      <select
-        [(ngModel)]="selectedPlanId"
-        class="rounded-lg border px-3 py-2 text-sm"
-      >
-        <option [ngValue]="null">-- Plan --</option>
-        <option *ngFor="let p of plans" [ngValue]="p.idPlan">
-          {{ p.name }}
-        </option>
-      </select>
-      <button
-        (click)="create()"
-        class="rounded-lg px-4 py-2 text-sm font-semibold text-slate-900"
-        style="background: #bfc621"
-      >
-        Guardar
-      </button>
-    </div>
-  </section>
+    <!-- Create Course Button -->
+    <button
+      (click)="openCreateModal()"
+      class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-slate-900 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 border border-[#BFC621]/20 hover:bg-[#BFC621]/90"
+      style="background: #bfc621"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+      </svg>
+      Nuevo Curso
+    </button>
+  </header>
 
-  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 class="text-base font-semibold mb-3">Lista de Cursos</h2>
-    <div class="overflow-x-auto">
-      <table class="w-full table-auto text-left">
-        <thead class="bg-slate-50">
-          <tr
-            class="text-xs font-semibold uppercase tracking-wide text-slate-500"
-          >
-            <th class="px-4 py-3">#</th>
-            <th class="px-4 py-3">Nombre</th>
-            <th class="px-4 py-3">Código</th>
-            <th class="px-4 py-3">Tipo</th>
-            <th class="px-4 py-3">Grupo</th>
-            <th class="px-4 py-3">Plan</th>
-            <th class="px-4 py-3">Duración</th>
-            <th class="px-4 py-3">Acciones</th>
+  <!-- Course List Grid / Table -->
+  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="text-lg font-bold text-slate-800 mb-4">Lista de Cursos</h2>
+    <div class="overflow-x-auto rounded-xl border border-slate-100">
+      <table class="w-full table-auto text-left border-collapse">
+        <thead class="bg-slate-50 border-b border-slate-100">
+          <tr class="text-xs font-bold uppercase tracking-wide text-slate-500">
+            <th class="px-5 py-4">#</th>
+            <th class="px-5 py-4">Nombre</th>
+            <th class="px-5 py-4">Código</th>
+            <th class="px-5 py-4">Tipo</th>
+            <th class="px-5 py-4">Grupo</th>
+            <th class="px-5 py-4">Plan</th>
+            <th class="px-5 py-4">Duración</th>
+            <th class="px-5 py-4 text-right">Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          <tr
-            *ngFor="let it of items; let i = index"
-            class="border-t border-slate-100 text-sm text-slate-700"
-          >
-            <td class="px-4 py-3">{{ i + 1 }}</td>
-            <td class="px-4 py-3">
-              <ng-container *ngIf="editingId !== it.idCourse; else editName">{{
-                it.name
-              }}</ng-container>
-              <ng-template #editName>
-                <input
-                  [(ngModel)]="editingName"
-                  class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-              </ng-template>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let it of items; let i = index" class="hover:bg-slate-50/50 text-sm text-slate-700 transition-colors">
+            <td class="px-5 py-4 font-semibold text-slate-400">{{ i + 1 }}</td>
+            <td class="px-5 py-4 font-bold text-slate-800">{{ it.name }}</td>
+            <td class="px-5 py-4 font-mono text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded inline-block my-2 border border-slate-100">{{ it.code }}</td>
+            <td class="px-5 py-4">
+              <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">{{ it.courseType.name }}</span>
             </td>
-            <td class="px-4 py-3">
-              <ng-container *ngIf="editingId !== it.idCourse; else editCode">{{
-                it.code
-              }}</ng-container>
-              <ng-template #editCode>
-                <input
-                  [(ngModel)]="editingCode"
-                  class="rounded-lg border border-slate-300 px-2 py-1 text-sm"
-                />
-              </ng-template>
+            <td class="px-5 py-4">
+              <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Grupo {{ it.group.groupNumber }}</span>
             </td>
-            <td class="px-4 py-3">
-              <ng-container *ngIf="editingId !== it.idCourse; else editType">{{
-                it.courseType.name
-              }}</ng-container>
-              <ng-template #editType>
-                <select
-                  [(ngModel)]="editingTypeId"
-                  class="rounded-lg border px-2 py-1 text-sm"
+            <td class="px-5 py-4 text-xs font-medium text-slate-500">{{ it.plan.name }}</td>
+            <td class="px-5 py-4 font-medium text-slate-800">{{ formatMinutes(it.duration) }}</td>
+            <td class="px-5 py-4 text-right">
+              <div class="flex items-center justify-end gap-3">
+                <button
+                  (click)="openEditModal(it)"
+                  title="Editar curso"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-lime-600 hover:bg-slate-100 transition-all duration-200"
                 >
-                  <option [ngValue]="null">-- Tipo --</option>
-                  <option *ngFor="let t of types" [ngValue]="t.idCourseType">
-                    {{ t.name }}
-                  </option>
-                </select>
-              </ng-template>
-            </td>
-            <td class="px-4 py-3">
-              <ng-container *ngIf="editingId !== it.idCourse; else editGroup">{{
-                it.group.groupNumber
-              }}</ng-container>
-              <ng-template #editGroup>
-                <select
-                  [(ngModel)]="editingGroupId"
-                  class="rounded-lg border px-2 py-1 text-sm"
-                >
-                  <option [ngValue]="null">-- Grupo --</option>
-                  <option *ngFor="let g of groups" [ngValue]="g.idGroup">
-                    {{ g.groupNumber }}
-                  </option>
-                </select>
-              </ng-template>
-            </td>
-            <td class="px-4 py-3">
-              <ng-container *ngIf="editingId !== it.idCourse; else editPlan">{{
-                it.plan.name
-              }}</ng-container>
-              <ng-template #editPlan>
-                <select
-                  [(ngModel)]="editingPlanId"
-                  class="rounded-lg border px-2 py-1 text-sm"
-                >
-                  <option [ngValue]="null">-- Plan --</option>
-                  <option *ngFor="let p of plans" [ngValue]="p.idPlan">
-                    {{ p.name }}
-                  </option>
-                </select>
-              </ng-template>
-            </td>
-            <td class="px-4 py-3">
-              <ng-container
-                *ngIf="editingId !== it.idCourse; else editDuration"
-              >
-                {{ formatMinutes(it.duration) }}
-              </ng-container>
-              <ng-template #editDuration>
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-2">
-                    <input
-                      type="number"
-                      [(ngModel)]="editingDurationHours"
-                      min="0"
-                      class="w-16 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-sm">h</span>
-                    <input
-                      type="number"
-                      [(ngModel)]="editingDurationMinutes"
-                      min="0"
-                      max="59"
-                      class="w-16 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-sm">m</span>
-                  </div>
-                  <div class="text-xs text-slate-600">
-                    Prácticas / Teóricas / Total
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <input
-                      type="number"
-                      [(ngModel)]="editingPracticalHours"
-                      min="0"
-                      class="w-12 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-xs">h</span>
-                    <input
-                      type="number"
-                      [(ngModel)]="editingPracticalMinutes"
-                      min="0"
-                      max="59"
-                      class="w-12 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-xs">m</span>
-                    <input
-                      type="number"
-                      [(ngModel)]="editingTheoreticalHours"
-                      min="0"
-                      class="w-12 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-xs">h</span>
-                    <input
-                      type="number"
-                      [(ngModel)]="editingTheoreticalMinutes"
-                      min="0"
-                      max="59"
-                      class="w-12 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-xs">m</span>
-                    <input
-                      type="number"
-                      [(ngModel)]="editingTotalHours"
-                      min="0"
-                      class="w-12 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-xs">h</span>
-                    <input
-                      type="number"
-                      [(ngModel)]="editingTotalMinutes"
-                      min="0"
-                      max="59"
-                      class="w-12 rounded-lg border px-2 py-1 text-sm"
-                    />
-                    <span class="text-xs">m</span>
-                  </div>
-                </div>
-              </ng-template>
-            </td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-3 relative">
-                <ng-container
-                  *ngIf="editingId !== it.idCourse; else editingActions"
-                >
-                  <button
-                    (click)="edit(it)"
-                    title="Editar"
-                    class="text-slate-600 hover:text-emerald-700"
-                  >
-                    Editar
-                  </button>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
+                  </svg>
+                </button>
+                <div class="relative inline-block text-left">
                   <button
                     (click)="confirmRemove(it, $event)"
-                    title="Eliminar"
-                    class="text-slate-600 hover:text-red-600"
+                    title="Eliminar curso"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-slate-100 transition-all duration-200"
                   >
-                    Eliminar
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-7 4v12m6-12v12" />
+                    </svg>
                   </button>
-                </ng-container>
-                <ng-template #editingActions>
-                  <button
-                    (click)="save()"
-                    title="Guardar cambios"
-                    class="text-green-600 hover:text-green-800"
+                  <!-- Popover local de confirmación (Flotación a la izquierda inteligente) -->
+                  <div
+                    *ngIf="pendingDeleteId === it.idCourse"
+                    class="absolute bottom-1/2 translate-y-1/2 right-full mr-3 z-50 w-60 rounded-xl border border-slate-200 bg-white p-4 shadow-xl text-left animate-fade-in"
                   >
-                    Guardar
-                  </button>
-                  <button
-                    (click)="cancel()"
-                    title="Cancelar"
-                    class="text-slate-600 hover:text-gray-800"
-                  >
-                    Cancelar
-                  </button>
-                </ng-template>
+                    <div class="text-xs font-bold text-slate-800">
+                      ¿Seguro que quieres eliminar?
+                    </div>
+                    <div class="mt-1 text-xs text-slate-500">
+                      Se eliminará: <strong class="text-slate-700">{{ pendingDeleteName }}</strong>
+                    </div>
+                    <div class="mt-3 flex gap-2 justify-end">
+                      <button
+                        (click)="performDeleteConfirmed()"
+                        class="rounded-lg px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm active:scale-95"
+                      >
+                        Eliminar
+                      </button>
+                      <button
+                        (click)="cancelRemove()"
+                        class="rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition-colors active:scale-95"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </td>
           </tr>
           <tr *ngIf="items.length === 0">
-            <td
-              colspan="7"
-              class="px-4 py-6 text-center text-sm text-slate-500"
-            >
-              No hay cursos disponibles
+            <td colspan="8" class="px-5 py-12 text-center text-sm text-slate-400 italic">
+              No hay cursos registrados en el sistema.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
+
+  <!-- Premium Glassmorphism Creation & Edition Modal Dialog -->
+  <div *ngIf="showFormModal" 
+       class="fixed inset-0 z-[100] overflow-y-auto p-4 bg-slate-900/60 backdrop-blur-md flex items-start justify-center animate-fade-in transition-all duration-300 md:p-6"
+       [class.md:pl-[260px]]="!sidebarService.collapsed()">
+    <div class="relative w-full max-w-3xl bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 md:p-8 animate-scale-up my-8 md:my-16">
+      <!-- Close Button -->
+      <button (click)="closeModal()" class="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <!-- Modal Header -->
+      <header class="mb-6">
+        <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-[#BFC621]/15 text-[#BFC621] border border-[#BFC621]/20 uppercase tracking-wider mb-2">
+          {{ isEditing ? 'Editar Registro' : 'Nuevo Registro' }}
+        </span>
+        <h3 class="text-2xl font-extrabold text-slate-900">
+          {{ isEditing ? 'Modificar Curso' : 'Crear Curso Académico' }}
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">Completa todos los campos obligatorios para guardar el curso.</p>
+      </header>
+
+      <!-- Modal Form Content -->
+      <form (ngSubmit)="saveCourse()" class="space-y-6">
+        
+        <!-- Row 1: Name and Code -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Nombre del Curso <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="name"
+              name="name"
+              placeholder="Ej. Matemática Discreta"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm focus:border-[#BFC621] focus:bg-white focus:outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Código <span class="text-red-500">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="code"
+              name="code"
+              placeholder="Ej. MAT-101"
+              required
+              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm focus:border-[#BFC621] focus:bg-white focus:outline-none transition-all font-mono"
+            />
+          </div>
+        </div>
+
+        <!-- Row 2: Description -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">Descripción</label>
+          <textarea
+            [(ngModel)]="description"
+            name="description"
+            placeholder="Escribe un breve resumen de los objetivos de la asignatura..."
+            rows="2"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm focus:border-[#BFC621] focus:bg-white focus:outline-none transition-all"
+          ></textarea>
+        </div>
+
+        <!-- Row 3: Durations Grid -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Carga Horaria de Asignatura</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <!-- Duración -->
+            <div>
+              <span class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Duración</span>
+              <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2 py-1.5 shadow-sm justify-center">
+                <input type="number" [(ngModel)]="durationHoursInput" name="durH" min="0" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold pr-1">h</span>
+                <input type="number" [(ngModel)]="durationMinutesInput" name="durM" min="0" max="59" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold">m</span>
+              </div>
+            </div>
+            <!-- H. Prácticas -->
+            <div>
+              <span class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">H. Prácticas</span>
+              <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2 py-1.5 shadow-sm justify-center">
+                <input type="number" [(ngModel)]="practicalHoursInput" name="pracH" min="0" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold pr-1">h</span>
+                <input type="number" [(ngModel)]="practicalMinutesInput" name="pracM" min="0" max="59" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold">m</span>
+              </div>
+            </div>
+            <!-- H. Teóricas -->
+            <div>
+              <span class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">H. Teóricas</span>
+              <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2 py-1.5 shadow-sm justify-center">
+                <input type="number" [(ngModel)]="theoreticalHoursInput" name="theoH" min="0" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold pr-1">h</span>
+                <input type="number" [(ngModel)]="theoreticalMinutesInput" name="theoM" min="0" max="59" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold">m</span>
+              </div>
+            </div>
+            <!-- Horas Totales -->
+            <div>
+              <span class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Horas Totales</span>
+              <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2 py-1.5 shadow-sm justify-center">
+                <input type="number" [(ngModel)]="totalHoursInput" name="totH" min="0" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold pr-1">h</span>
+                <input type="number" [(ngModel)]="totalMinutesInput" name="totM" min="0" max="59" class="w-14 text-center p-0 font-bold text-sm bg-transparent border-0 outline-none focus:ring-0" />
+                <span class="text-xs text-slate-400 font-bold">m</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 4: Dropdowns and Cascading Selection -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Plan, Clasificación y Estructura del Grupo</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 rounded-2xl border border-slate-100 bg-white shadow-inner space-y-1">
+            
+            <!-- Plan Académico -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Plan de Estudios <span class="text-red-500">*</span></label>
+              <select [(ngModel)]="selectedPlanId" name="plan" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-[#BFC621]">
+                <option [ngValue]="null">-- Seleccione plan --</option>
+                <option *ngFor="let p of plans" [ngValue]="p.idPlan">{{ p.name }}</option>
+              </select>
+            </div>
+
+            <!-- Tipo de Curso -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Clasificación / Tipo de Curso <span class="text-red-500">*</span></label>
+              <select [(ngModel)]="selectedTypeId" name="type" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-[#BFC621]">
+                <option [ngValue]="null">-- Seleccione tipo --</option>
+                <option *ngFor="let t of types" [ngValue]="t.idCourseType">{{ t.name }}</option>
+              </select>
+            </div>
+
+            <!-- Facultad -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Facultad <span class="text-red-500">*</span></label>
+              <select [(ngModel)]="selectedFacultyId" name="faculty" (change)="onFacultyChange()" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-[#BFC621]">
+                <option [ngValue]="null">-- Seleccione facultad --</option>
+                <option *ngFor="let f of faculties" [ngValue]="f.idFaculty">{{ f.name }}</option>
+              </select>
+            </div>
+
+            <!-- Escuela Profesional -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Escuela Profesional <span class="text-red-500">*</span></label>
+              <select [(ngModel)]="selectedSchoolId" name="school" (change)="onSchoolChange()" [disabled]="!selectedFacultyId" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-[#BFC621] disabled:opacity-50">
+                <option [ngValue]="null">-- Seleccione escuela profesional --</option>
+                <option *ngFor="let s of getFilteredSchools()" [ngValue]="s.idProfessionalSchool">{{ s.name }}</option>
+              </select>
+            </div>
+
+            <!-- Ciclo -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Ciclo <span class="text-red-500">*</span></label>
+              <select [(ngModel)]="selectedCycleId" name="cycle" (change)="onCycleChange()" [disabled]="!selectedSchoolId" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-[#BFC621] disabled:opacity-50">
+                <option [ngValue]="null">-- Seleccione ciclo --</option>
+                <option *ngFor="let c of getFilteredCycles()" [ngValue]="c.idCycle">{{ c.name }}</option>
+              </select>
+            </div>
+
+            <!-- Grupo -->
+            <div>
+              <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Grupo <span class="text-red-500">*</span></label>
+              <select [(ngModel)]="selectedGroupId" name="group" [disabled]="!selectedCycleId" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-medium focus:outline-none focus:border-[#BFC621] disabled:opacity-50">
+                <option [ngValue]="null">-- Seleccione grupo --</option>
+                <option *ngFor="let g of getFilteredGroups()" [ngValue]="g.idGroup">Grupo {{ g.groupNumber }} (Capacidad: {{ g.capacity }})</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Modal Actions Footer -->
+        <footer class="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-5">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="rounded-xl px-5 py-3 text-sm font-bold text-slate-700 border border-slate-200 bg-white hover:bg-slate-50 transition-colors active:scale-95"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="rounded-xl px-6 py-3 text-sm font-bold text-slate-900 shadow-md hover:shadow-lg transition-all active:scale-95 border border-[#BFC621]/20 hover:bg-[#BFC621]/90"
+            style="background: #bfc621"
+          >
+            Guardar Curso
+          </button>
+        </footer>
+
+      </form>
+    </div>
+  </div>
+
+
 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Cycle } from '../../../core/models/cycle';
 import { CycleService } from '../../../core/services/cycle.service';
@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./cycle.component.css'],
 })
 export class CycleComponent implements OnInit {
+  @Input() hideBack = false;
   private service = inject(CycleService);
   private schoolService = inject(ProfessionalSchoolService);
   private router = inject(Router);

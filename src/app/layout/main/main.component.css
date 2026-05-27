@@ -10,15 +10,88 @@
   font-family: 'Inter', sans-serif;
 }
 
-/* El sidebar tiene width: 260px fijo */
 .main-content {
   flex: 1;
   margin-left: 260px;
   min-height: 100vh;
-  padding: 28px 32px;
+  padding: 80px 32px 28px;
   position: relative;
   overflow-x: hidden;
-  transition: background 0.45s ease;
+  transition: background 0.45s ease, margin-left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), padding 0.4s ease;
+}
+
+/* Cuando el sidebar está oculto */
+.sidebar-collapsed .main-content {
+  margin-left: 0 !important;
+  padding-left: 32px;
+}
+
+.sidebar-inline-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 6px 12px 6px 0;
+  color: #94a3b8;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-inline-toggle:hover {
+  color: #0f172a;
+  transform: translateX(-3px);
+}
+
+:host-context([data-theme="dark"]) .sidebar-inline-toggle:hover,
+:host-context(.dark-theme) .sidebar-inline-toggle:hover {
+  color: #ffffff;
+}
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  color: #64748b;
+  cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 284px; /* 260px sidebar + 24px gap */
+  z-index: 60;
+  transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-collapsed .sidebar-toggle-btn {
+  left: 24px !important;
+}
+
+.sidebar-toggle-btn:hover {
+  color: #0f172a;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+:host-context([data-theme="dark"]) .sidebar-toggle-btn,
+:host-context(.dark-theme) .sidebar-toggle-btn {
+  background: #142413;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+:host-context([data-theme="dark"]) .sidebar-toggle-btn:hover,
+:host-context(.dark-theme) .sidebar-toggle-btn:hover {
+  color: #ffffff;
 }
 
 /* ══ Tema Oscuro (por defecto) ══ */

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Group } from '../../../core/models/group';
 import { GroupService } from '../../../core/services/group.service';
@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
   templateUrl: './group.component.html',
 })
 export class GroupComponent implements OnInit {
+  @Input() hideBack = false;
   private service = inject(GroupService);
   private cycleService = inject(CycleService);
   private router = inject(Router);

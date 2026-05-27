@@ -21,71 +21,37 @@ export class CourseScreenComponent implements OnInit {
 
   cards = [
     {
-      key: 'faculty',
-      title: 'Crear Facultad',
-      desc: 'Registra una nueva facultad y gestiona sus escuelas profesionales asociadas.',
-      route: 'faculty',
-      cta: 'Ir a Facultades',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
+      key: 'academic-structure',
+      title: 'Estructura Académica',
+      desc: 'Configura y gestiona las escuelas profesionales de la facultad, sus ciclos de estudio y los grupos de estudiantes en una sola vista unificada.',
+      route: 'academic-structure',
+      cta: 'Ir a Estructura Académica',
+      iconPath:
+        'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
     },
     {
-      key: 'professional-school',
-      title: 'Crear Escuela Profesional',
-      desc: 'Añade una nueva escuela profesional vinculada a una facultad existente.',
-      route: 'professional-school',
-      cta: 'Ir a Escuelas Profesionales',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
-    },
-    {
-      key: 'cycle',
-      title: 'Crear Ciclo',
-      desc: 'Agrega un nuevo ciclo académico asociado a una escuela profesional.',
-      route: 'cycle',
-      cta: 'Ir a Ciclos',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
-    },
-    {
-      key: 'group',
-      title: 'Crear Grupo',
-      desc: 'Crea un nuevo grupo dentro de un ciclo académico específico.',
-      route: 'group',
-      cta: 'Ir a Grupos',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
-    },
-    {
-      key: 'course',
-      title: 'Crear Curso',
-      desc: 'Registra un nuevo curso y asignalo a un grupo académico.',
-      route: 'course',
+      key: 'course-management',
+      title: 'Gestionar Cursos',
+      desc: 'Administra todas las asignaturas de la oferta curricular, los planes de estudio correspondientes y las clasificaciones por tipo de curso.',
+      route: 'course-management',
       cta: 'Ir a Cursos',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
+      iconPath:
+        'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
     },
     {
       key: 'teacher',
       title: 'Crear Docente',
-      desc: 'Añade un nuevo docente al sistema y gestiona sus asignaciones de cursos.',
+      desc: 'Añade nuevos docentes al sistema y gestiona sus asignaciones académicas de cursos.',
       route: 'teacher',
       cta: 'Ir a Docentes',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
-    },
-    {
-      key: 'course-type',
-      title: 'Crear Tipo de Curso',
-      desc: 'Define nuevos tipos de cursos para categorizar y organizar la oferta académica.',
-      route: 'course-type',
-      cta: 'Ir a Tipos de Curso',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
-    },
-    {
-      key: 'plan',
-      title: 'Crear Plan de Estudios',
-      desc: 'Establece nuevos planes de estudios para las diferentes carreras y programas académicos.',
-      route: 'plan',
-      cta: 'Ir a Planes de Estudios',
-      iconPath: 'M4 12l8-8 8 8M6 10v8a2 2 0 002 2h8a2 2 0 002-2v-8',
+      iconPath:
+        'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z',
     },
   ];
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
     this.checkChildRoute();

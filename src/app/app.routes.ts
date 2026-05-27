@@ -40,6 +40,8 @@ import { CourseComponent } from './features/course-screen/course/course.componen
 import { TeacherComponent } from './features/course-screen/teacher/teacher.component';
 import { CourseTypeComponent } from './features/course-screen/course-type/course-type.component';
 import { PlanComponent } from './features/course-screen/plan/plan.component';
+import { AcademicStructureComponent } from './features/course-screen/academic-structure/academic-structure.component';
+import { CourseManagementCombinedComponent } from './features/course-screen/course-management-combined/course-management-combined.component';
 
 export const routes: Routes = [
   {
@@ -131,32 +133,16 @@ export const routes: Routes = [
             component: FacultyComponent,
           },
           {
-            path: 'professional-school',
-            component: ProfessionalSchoolComponent,
+            path: 'academic-structure',
+            component: AcademicStructureComponent,
           },
           {
-            path: 'cycle',
-            component: CycleComponent,
-          },
-          {
-            path: 'group',
-            component: GroupComponent,
-          },
-          {
-            path: 'course',
-            component: CourseComponent,
+            path: 'course-management',
+            component: CourseManagementCombinedComponent,
           },
           {
             path: 'teacher',
             component: TeacherComponent,
-          },
-          {
-            path: 'course-type',
-            component: CourseTypeComponent,
-          },
-          {
-            path: 'plan',
-            component: PlanComponent,
           },
         ],
       },

@@ -1,5 +1,20 @@
-<div class="main-layout">
+<div class="main-layout" [class.sidebar-collapsed]="sidebarService.collapsed()">
     <app-sidebar></app-sidebar>
+
+    <!-- Unificado: Un único botón para colapsar y expandir el menú lateral (Fixed in Viewport) -->
+    <button
+      (click)="sidebarService.toggle()"
+      class="sidebar-toggle-btn active:scale-95"
+      [title]="sidebarService.collapsed() ? 'Mostrar menú lateral' : 'Ocultar menú lateral'"
+    >
+      <!-- Chevrons dinámicos según el estado colapsado -->
+      <svg *ngIf="sidebarService.collapsed()" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5"></path>
+      </svg>
+      <svg *ngIf="!sidebarService.collapsed()" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"></path>
+      </svg>
+    </button>
 
     <!-- Main Content -->
     <main class="main-content">

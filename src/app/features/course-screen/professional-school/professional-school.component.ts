@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProfessionalSchool } from '../../../core/models/professional-school';
 import { ProfessionalSchoolService } from '../../../core/services/professional-school.service';
@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./professional-school.component.css'],
 })
 export class ProfessionalSchoolComponent implements OnInit {
+  @Input() hideBack = false;
   private service = inject(ProfessionalSchoolService);
   private facultyService = inject(FacultyService);
   private router = inject(Router);

@@ -1,5 +1,6 @@
 <aside id="default-sidebar" class="sidebar" aria-label="Sidenav"
-  [attr.data-theme]="themeService.theme()">
+  [attr.data-theme]="themeService.theme()"
+  [class.sidebar--collapsed]="sidebarService.collapsed()">
 
   <!-- Glow decorativo animado de fondo -->
   <div class="sidebar-glow-top"></div>
@@ -45,7 +46,7 @@
       </ng-container>
 
       <!-- ════ USER / TEACHER ════ -->
-      <ng-container *ngIf="isUser() || isTeacher()">
+      <ng-container *ngIf="isUser() || isTeacher() || isAdmin()">
         <div class="nav-section-label">Académico</div>
 
         <a routerLink="/main/mis-horarios" id="nav-horarios"
@@ -88,7 +89,7 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/mis-solicitudes')"></span>
         </a>
 
-        <a routerLink="/main/notificaciones" id="nav-noti-user"
+        <a *ngIf="!isAdmin()" routerLink="/main/notificaciones" id="nav-noti-user"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/notificaciones')">
           <span class="nav-icon">
@@ -118,8 +119,8 @@
       </ng-container>
 
       <!-- ════ ASACAD ════ -->
-      <ng-container *ngIf="isAsacad()">
-        <div class="nav-section-label">Académico</div>
+      <ng-container *ngIf="isAsacad() || isAdmin()">
+        <div class="nav-section-label" *ngIf="!isAdmin()">Académico</div>
 
         <!-- Horarios (expandible) -->
         <button type="button" class="nav-item nav-item--expandable"
@@ -141,7 +142,7 @@
         </button>
 
         <!-- Submenu Horarios -->
-        <div class="nav-submenu" [class.nav-submenu--open]="horariosExpanded">
+        <div class="nav-submenu" *ngIf="horariosExpanded" [ngClass]="{'nav-submenu--open': horariosExpanded}">
           <a routerLink="/main/carga-academica" id="nav-carga" class="nav-subitem">
             <span class="nav-subitem-dot"></span>
             Carga Académica
@@ -153,7 +154,7 @@
         </div>
 
         <!-- Notificaciones -->
-        <a routerLink="/main/notificaciones" id="nav-noti-asacad"
+        <a *ngIf="!isAdmin()" routerLink="/main/notificaciones" id="nav-noti-asacad"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/notificaciones')">
           <span class="nav-icon">
@@ -167,7 +168,7 @@
         </a>
 
         <!-- Configuración -->
-        <a routerLink="/main/configuracion" id="nav-config-asacad"
+        <a *ngIf="!isAdmin()" routerLink="/main/configuracion" id="nav-config-asacad"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/configuracion')">
           <span class="nav-icon">
@@ -182,10 +183,10 @@
       </ng-container>
 
       <!-- ════ COOROOMS ════ -->
-      <ng-container *ngIf="isCoorooms()">
+      <ng-container *ngIf="isCoorooms() || isAdmin()">
         <div class="nav-section-label">Recursos</div>
 
-        <a routerLink="/main/res-creation" id="nav-recursos-coo"
+        <a *ngIf="!isAdmin()" routerLink="/main/res-creation" id="nav-recursos-coo"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/res-creation')">
           <span class="nav-icon">
@@ -210,7 +211,7 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/res-assign')"></span>
         </a>
 
-        <a routerLink="/main/notificaciones" id="nav-noti-coo"
+        <a *ngIf="!isAdmin()" routerLink="/main/notificaciones" id="nav-noti-coo"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/notificaciones')">
           <span class="nav-icon">
@@ -223,7 +224,7 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/notificaciones')"></span>
         </a>
 
-        <a routerLink="/main/configuracion" id="nav-config-coo"
+        <a *ngIf="!isAdmin()" routerLink="/main/configuracion" id="nav-config-coo"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/configuracion')">
           <span class="nav-icon">
@@ -236,7 +237,7 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/configuracion')"></span>
         </a>
 
-        <a routerLink="/main/users" id="nav-users-coo"
+        <a *ngIf="!isAdmin()" routerLink="/main/users" id="nav-users-coo"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/users')">
           <span class="nav-icon">
@@ -294,9 +295,10 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/user-management')"></span>
         </a>
 
-        <a routerLink="/main/course-creation" id="nav-cursos"
-           class="nav-item"
-           [class.nav-item--active]="isActive('/main/course-creation')">
+        <!-- Cursos (expandible) -->
+        <button type="button" class="nav-item nav-item--expandable"
+                [class.nav-item--expanded]="cursosExpanded"
+                (click)="toggleCursos()">
           <span class="nav-icon">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -304,8 +306,28 @@
             </svg>
           </span>
           <span class="nav-label">Cursos</span>
-          <span class="nav-active-dot" *ngIf="isActive('/main/course-creation')"></span>
-        </a>
+          <span class="nav-chevron" [class.nav-chevron--open]="cursosExpanded">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6,9 12,15 18,9"/>
+            </svg>
+          </span>
+        </button>
+
+        <!-- Submenu Cursos -->
+        <div class="nav-submenu" *ngIf="cursosExpanded" [ngClass]="{'nav-submenu--open': cursosExpanded}">
+          <a routerLink="/main/course-creation/academic-structure" id="nav-cursos-structure" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/academic-structure')">
+            <span class="nav-subitem-dot"></span>
+            Estructura Académica
+          </a>
+          <a routerLink="/main/course-creation/course-management" id="nav-cursos-mgmt" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/course-management')">
+            <span class="nav-subitem-dot"></span>
+            Gestionar Cursos
+          </a>
+          <a routerLink="/main/course-creation/teacher" id="nav-cursos-teacher" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/teacher')">
+            <span class="nav-subitem-dot"></span>
+            Docentes
+          </a>
+        </div>
 
         <a routerLink="/main/notificaciones" id="nav-noti-admin"
            class="nav-item"
@@ -336,15 +358,7 @@
 
     </nav>
 
-    <!-- Botón de Nueva Solicitud para Estudiantes/Profesores -->
-    <div class="px-6 pb-6 mt-auto" *ngIf="isUser() || isTeacher()">
-      <button class="student-new-request-btn w-full flex items-center justify-center space-x-2 py-3 rounded-lg font-medium transition-colors" routerLink="/main/reservar-salon">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-5 h-5">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
-        <span>Nueva Solicitud</span>
-      </button>
-    </div>
+
 
   </div>
 

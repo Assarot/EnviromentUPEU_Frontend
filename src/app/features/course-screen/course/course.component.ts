@@ -1,15 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
+
 import { Course } from '../../../core/models/course';
+import { CourseType } from '../../../core/models/course-type';
+import { Group } from '../../../core/models/group';
+import { Plan } from '../../../core/models/plan';
+import { Faculty } from '../../../core/models/faculty';
+import { ProfessionalSchool } from '../../../core/models/professional-school';
+import { Cycle } from '../../../core/models/cycle';
+
 import { CourseService } from '../../../core/services/course.service';
 import { CourseTypeService } from '../../../core/services/course-type.service';
 import { GroupService } from '../../../core/services/group.service';
 import { PlanService } from '../../../core/services/plan.service';
-import { CourseType } from '../../../core/models/course-type';
-import { Group } from '../../../core/models/group';
-import { Plan } from '../../../core/models/plan';
-import { Router } from '@angular/router';
+import { FacultyService } from '../../../core/services/faculty.service';
+import { ProfessionalSchoolService } from '../../../core/services/professional-school.service';
+import { CycleService } from '../../../core/services/cycle.service';
+import { SidebarService } from '../../../core/services/sidebar.service';
 
 @Component({
   selector: 'app-course',
@@ -19,68 +29,57 @@ import { Router } from '@angular/router';
   styleUrls: ['./course.component.css'],
 })
 export class CourseComponent implements OnInit {
+  @Input() hideBack = false;
+
   private service = inject(CourseService);
   private typeService = inject(CourseTypeService);
   private groupService = inject(GroupService);
   private planService = inject(PlanService);
+  private facultyService = inject(FacultyService);
+  private schoolService = inject(ProfessionalSchoolService);
+  private cycleService = inject(CycleService);
   private router = inject(Router);
+  sidebarService = inject(SidebarService);
 
   items: Course[] = [];
   types: CourseType[] = [];
   groups: Group[] = [];
   plans: Plan[] = [];
+  faculties: Faculty[] = [];
+  schools: ProfessionalSchool[] = [];
+  cycles: Cycle[] = [];
 
-  // create fields
+  // Modal Control
+  showFormModal = false;
+  isEditing = false;
+  editingId?: number | null = null;
+
+  // Unified Form Bindings
   name = '';
   code = '';
   description = '';
-  duration = 0;
-  // store minutes internally
-  durationMins = 0;
-  practicalMins = 0;
-  theoreticalMins = 0;
-  totalMins = 0;
-  // create form split fields
-  practicalHoursInput = 0; // hours
-  practicalMinutesInput = 0; // minutes
+  durationHoursInput = 0;
+  durationMinutesInput = 0;
+  practicalHoursInput = 0;
+  practicalMinutesInput = 0;
   theoreticalHoursInput = 0;
   theoreticalMinutesInput = 0;
   totalHoursInput = 0;
   totalMinutesInput = 0;
-  durationHoursInput = 0;
-  durationMinutesInput = 0;
+
   selectedTypeId?: number | null = null;
-  selectedGroupId?: number | null = null;
   selectedPlanId?: number | null = null;
+  selectedFacultyId?: number | null = null;
+  selectedSchoolId?: number | null = null;
+  selectedCycleId?: number | null = null;
+  selectedGroupId?: number | null = null;
 
-  // editing
-  editingId?: number | null = null;
-  editingName = '';
-  editingCode = '';
-  editingDescription = '';
-  // editing stored as minutes
-  editingDurationMins = 0;
-  editingPracticalMins = 0;
-  editingTheoreticalMins = 0;
-  editingTotalMins = 0;
-  // editing split fields
-  editingPracticalHours = 0;
-  editingPracticalMinutes = 0;
-  editingTheoreticalHours = 0;
-  editingTheoreticalMinutes = 0;
-  editingTotalHours = 0;
-  editingTotalMinutes = 0;
-  editingDurationHours = 0;
-  editingDurationMinutes = 0;
-  editingTypeId?: number | null = null;
-  editingGroupId?: number | null = null;
-  editingPlanId?: number | null = null;
-
+  // Deletion
   pendingDeleteId?: number | null = null;
   pendingDeleteName = '';
   lastDeleted?: Course | null = null;
-  popupStyle: { [k: string]: string } | null = null;
 
+  // Toast
   showToast = false;
   toastMessage = '';
   toastTimer: any = null;
@@ -102,33 +101,17 @@ export class CourseComponent implements OnInit {
   load(): void {
     this.service.getCourses().subscribe({
       next: (res: any) => {
-        const items = Array.isArray(res?.data)
-          ? res.data
-          : Array.isArray(res)
-          ? res
-          : [];
+        const items = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
         this.items = items.map((item: any, idx: number) => {
           const parseDur = (v: any) => {
             if (typeof v === 'string') return this.isoDurationToMinutes(v);
             if (typeof v === 'number') return Number(v);
             return 0;
           };
-          const durationM = parseDur(
-            item.duration ?? item.durationISO ?? item.durationString
-          );
-          const practicalM = parseDur(
-            item.practicalHours ??
-              item.practicalHoursISO ??
-              item.practicalHoursString
-          );
-          const theoreticalM = parseDur(
-            item.theoreticalHours ??
-              item.theoreticalHoursISO ??
-              item.theoreticalHoursString
-          );
-          const totalM = parseDur(
-            item.totalHours ?? item.totalHoursISO ?? item.totalHoursString
-          );
+          const durationM = parseDur(item.duration ?? item.durationISO ?? item.durationString);
+          const practicalM = parseDur(item.practicalHours ?? item.practicalHoursISO ?? item.practicalHoursString);
+          const theoreticalM = parseDur(item.theoreticalHours ?? item.theoreticalHoursISO ?? item.theoreticalHoursString);
+          const totalM = parseDur(item.totalHours ?? item.totalHoursISO ?? item.totalHoursString);
 
           const courseType = new CourseType(
             item.courseType?.name ?? '',
@@ -145,7 +128,7 @@ export class CourseComponent implements OnInit {
             item.plan?.idPlan ?? item.plan?.id ?? idx + 1
           );
 
-          const c = new Course(
+          return new Course(
             item.name ?? '',
             item.code ?? '',
             item.description ?? '',
@@ -158,239 +141,243 @@ export class CourseComponent implements OnInit {
             plan,
             item.idCourse ?? item.id ?? idx + 1
           );
-          return c;
         });
       },
       error: () => (this.items = []),
     });
   }
 
-  // Convert ISO 8601 duration string (e.g. PT4H30M) to total minutes
-  private isoDurationToMinutes(iso?: string | null): number {
-    if (!iso || typeof iso !== 'string') return 0;
-    // Matches PT#H#M#S variants
-    const m = iso.match(/P(?:T)?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-    if (!m) return 0;
-    const hours = parseInt(m[1] ?? '0', 10) || 0;
-    const minutes = parseInt(m[2] ?? '0', 10) || 0;
-    const seconds = parseInt(m[3] ?? '0', 10) || 0;
-    return hours * 60 + minutes + Math.round(seconds / 60);
-  }
-
-  // Convert total minutes to ISO 8601 duration string
-  private minutesToIsoDuration(totalMinutes: number): string {
-    if (!totalMinutes || totalMinutes <= 0) return 'PT0S';
-    const h = Math.floor(totalMinutes / 60);
-    const m = totalMinutes % 60;
-    let s = 'PT';
-    if (h) s += `${h}H`;
-    if (m) s += `${m}M`;
-    return s;
-  }
-
   loadRelations(): void {
-    this.typeService.getCourseTypes().subscribe({
+    forkJoin({
+      types: this.typeService.getCourseTypes(),
+      plans: this.planService.getPlans(),
+      faculties: this.facultyService.getFaculties(),
+      schools: this.schoolService.getProfessionalSchools(),
+      cycles: this.cycleService.getCycles(),
+      groups: this.groupService.getGroups()
+    }).subscribe({
       next: (res: any) => {
-        const items = Array.isArray(res?.data)
-          ? res.data
-          : Array.isArray(res)
-          ? res
-          : [];
-        this.types = items.map(
-          (item: any, idx: number) =>
-            new CourseType(
-              item.name ?? '',
-              item.idCourseType ?? item.id ?? idx + 1
-            )
-        );
+        const rawTypes = Array.isArray(res.types?.data) ? res.types.data : Array.isArray(res.types) ? res.types : [];
+        this.types = rawTypes.map((item: any, idx: number) => new CourseType(item.name ?? '', item.idCourseType ?? item.id ?? idx + 1));
+
+        const rawPlans = Array.isArray(res.plans?.data) ? res.plans.data : Array.isArray(res.plans) ? res.plans : [];
+        this.plans = rawPlans.map((item: any, idx: number) => new Plan(item.name ?? '', item.idPlan ?? item.id ?? idx + 1));
+
+        const rawFaculties = Array.isArray(res.faculties?.data) ? res.faculties.data : Array.isArray(res.faculties) ? res.faculties : [];
+        this.faculties = rawFaculties.map((item: any, idx: number) => new Faculty(item.name ?? '', item.idFaculty ?? item.id ?? idx + 1));
+
+        const rawSchools = Array.isArray(res.schools?.data) ? res.schools.data : Array.isArray(res.schools) ? res.schools : [];
+        this.schools = rawSchools.map((item: any, idx: number) => {
+          const fac = item.faculty ? new Faculty(item.faculty.name ?? '', item.faculty.idFaculty ?? item.facultyId ?? idx + 1) : new Faculty('', idx + 1);
+          return new ProfessionalSchool(item.name ?? '', fac, item.idProfessionalSchool ?? item.id ?? idx + 1);
+        });
+
+        const rawCycles = Array.isArray(res.cycles?.data) ? res.cycles.data : Array.isArray(res.cycles) ? res.cycles : [];
+        this.cycles = rawCycles.map((item: any, idx: number) => {
+          const school = item.professionalSchool ? new ProfessionalSchool(item.professionalSchool.name ?? '', null as any, item.professionalSchool.idProfessionalSchool ?? idx + 1) : new ProfessionalSchool('', null as any, idx + 1);
+          return new Cycle(item.name ?? '', school, item.idCycle ?? item.id ?? idx + 1);
+        });
+
+        const rawGroups = Array.isArray(res.groups?.data) ? res.groups.data : Array.isArray(res.groups) ? res.groups : [];
+        this.groups = rawGroups.map((item: any, idx: number) => {
+          const cycle = item.cycle ? new Cycle(item.cycle.name ?? '', null as any, item.cycle.idCycle ?? idx + 1) : new Cycle('', null as any, idx + 1);
+          return new Group(item.groupNumber ?? 0, item.capacity ?? 0, cycle, item.idGroup ?? item.id ?? idx + 1);
+        });
+
+        this.linkHierarchy();
       },
-      error: () => (this.types = []),
-    });
-    this.groupService.getGroups().subscribe({
-      next: (res: any) => {
-        const items = Array.isArray(res?.data)
-          ? res.data
-          : Array.isArray(res)
-          ? res
-          : [];
-        this.groups = items.map(
-          (item: any, idx: number) =>
-            new Group(
-              item.groupNumber ?? 0,
-              item.capacity ?? 0,
-              null as any,
-              item.idGroup ?? item.id ?? idx + 1
-            )
-        );
-      },
-      error: () => (this.groups = []),
-    });
-    this.planService.getPlans().subscribe({
-      next: (res: any) => {
-        const items = Array.isArray(res?.data)
-          ? res.data
-          : Array.isArray(res)
-          ? res
-          : [];
-        this.plans = items.map(
-          (item: any, idx: number) =>
-            new Plan(item.name ?? '', item.idPlan ?? item.id ?? idx + 1)
-        );
-      },
-      error: () => (this.plans = []),
+      error: () => {
+        this.types = [];
+        this.plans = [];
+        this.faculties = [];
+        this.schools = [];
+        this.cycles = [];
+        this.groups = [];
+      }
     });
   }
 
-  create(): void {
-    const n = this.name.trim();
-    if (
-      !n ||
-      !this.selectedTypeId ||
-      !this.selectedGroupId ||
-      !this.selectedPlanId
-    )
-      return;
-    // build minutes from inputs
-    const durationTotal =
-      Number(this.durationHoursInput || 0) * 60 +
-      Number(this.durationMinutesInput || 0);
-    const practicalTotal =
-      Number(this.practicalHoursInput || 0) * 60 +
-      Number(this.practicalMinutesInput || 0);
-    const theoreticalTotal =
-      Number(this.theoreticalHoursInput || 0) * 60 +
-      Number(this.theoreticalMinutesInput || 0);
-    const totalTotal =
-      Number(this.totalHoursInput || 0) * 60 +
-      Number(this.totalMinutesInput || 0);
-
-    this.service
-      .createCourse({
-        name: n,
-        code: this.code,
-        description: this.description,
-        duration: durationTotal,
-        practicalHours: practicalTotal,
-        theoreticalHours: theoreticalTotal,
-        totalHours: totalTotal,
-        idCourseType: this.selectedTypeId,
-        idGroup: this.selectedGroupId,
-        idPlan: this.selectedPlanId,
-      })
-      .subscribe({
-        next: () => {
-          this.name = '';
-          this.code = '';
-          this.description = '';
-          this.durationMins = 0;
-          this.practicalMins = 0;
-          this.theoreticalMins = 0;
-          this.totalMins = 0;
-          this.practicalHoursInput = 0;
-          this.practicalMinutesInput = 0;
-          this.theoreticalHoursInput = 0;
-          this.theoreticalMinutesInput = 0;
-          this.totalHoursInput = 0;
-          this.totalMinutesInput = 0;
-          this.selectedTypeId = null;
-          this.selectedGroupId = null;
-          this.selectedPlanId = null;
-          this.load();
-        },
-        error: () =>
-          this.showTransientToast('Error al crear curso', 3000, false),
-      });
+  linkHierarchy(): void {
+    // 1. Link School to Faculty
+    for (const s of this.schools) {
+      if (s.faculty && s.faculty.idFaculty) {
+        const f = this.faculties.find(x => x.idFaculty === s.faculty.idFaculty);
+        if (f) s.faculty = f;
+      }
+    }
+    // 2. Link Cycle to School
+    for (const c of this.cycles) {
+      if (c.professionalSchool && c.professionalSchool.idProfessionalSchool) {
+        const s = this.schools.find(x => x.idProfessionalSchool === c.professionalSchool.idProfessionalSchool);
+        if (s) c.professionalSchool = s;
+      }
+    }
+    // 3. Link Group to Cycle
+    for (const g of this.groups) {
+      if (g.cycle && g.cycle.idCycle) {
+        const c = this.cycles.find(x => x.idCycle === g.cycle.idCycle);
+        if (c) g.cycle = c;
+      }
+    }
   }
 
-  edit(it: Course): void {
-    this.editingId = it.idCourse;
-    this.editingName = it.name;
-    this.editingCode = it.code;
-    this.editingDescription = it.description;
-    this.editingDurationMins = Number(it.duration ?? 0);
-    this.editingPracticalMins = Number(it.practicalHours ?? 0);
-    this.editingTheoreticalMins = Number(it.theoreticalHours ?? 0);
-    this.editingTotalMins = Number(it.totalHours ?? 0);
-    // split into hours/minutes for editing UI
-    this.editingPracticalHours = Math.floor(this.editingPracticalMins / 60);
-    this.editingPracticalMinutes = this.editingPracticalMins % 60;
-    this.editingTheoreticalHours = Math.floor(this.editingTheoreticalMins / 60);
-    this.editingTheoreticalMinutes = this.editingTheoreticalMins % 60;
-    this.editingTotalHours = Math.floor(this.editingTotalMins / 60);
-    this.editingTotalMinutes = this.editingTotalMins % 60;
-    // split duration into hours/minutes
-    this.editingDurationHours = Math.floor(this.editingDurationMins / 60);
-    this.editingDurationMinutes = this.editingDurationMins % 60;
-    this.editingTypeId = it.courseType?.idCourseType ?? null;
-    this.editingGroupId = it.group?.idGroup ?? null;
-    this.editingPlanId = it.plan?.idPlan ?? null;
+  // Cascading Getters
+  getFilteredSchools(): ProfessionalSchool[] {
+    if (!this.selectedFacultyId) return [];
+    return this.schools.filter(s => s.faculty?.idFaculty == this.selectedFacultyId);
   }
-  cancel(): void {
+
+  getFilteredCycles(): Cycle[] {
+    if (!this.selectedSchoolId) return [];
+    return this.cycles.filter(c => c.professionalSchool?.idProfessionalSchool == this.selectedSchoolId);
+  }
+
+  getFilteredGroups(): Group[] {
+    if (!this.selectedCycleId) return [];
+    return this.groups.filter(g => g.cycle?.idCycle == this.selectedCycleId);
+  }
+
+  // Cascading Change Handlers
+  onFacultyChange(): void {
+    this.selectedSchoolId = null;
+    this.selectedCycleId = null;
+    this.selectedGroupId = null;
+  }
+
+  onSchoolChange(): void {
+    this.selectedCycleId = null;
+    this.selectedGroupId = null;
+  }
+
+  onCycleChange(): void {
+    this.selectedGroupId = null;
+  }
+
+  // Modal Open Handlers
+  openCreateModal(): void {
+    this.isEditing = false;
     this.editingId = null;
-    this.editingName = '';
-    this.editingCode = '';
-    this.editingDescription = '';
-    this.editingDurationMins = 0;
-    this.editingDurationHours = 0;
-    this.editingDurationMinutes = 0;
-    this.editingPracticalMins = 0;
-    this.editingTheoreticalMins = 0;
-    this.editingTotalMins = 0;
-    this.editingPracticalHours = 0;
-    this.editingPracticalMinutes = 0;
-    this.editingTheoreticalHours = 0;
-    this.editingTheoreticalMinutes = 0;
-    this.editingTotalHours = 0;
-    this.editingTotalMinutes = 0;
-    this.editingTypeId = null;
-    this.editingGroupId = null;
-    this.editingPlanId = null;
+    this.showFormModal = true;
+    this.sidebarService.modalOpen.set(true);
+
+    // Reset Form fields
+    this.name = '';
+    this.code = '';
+    this.description = '';
+    this.durationHoursInput = 0;
+    this.durationMinutesInput = 0;
+    this.practicalHoursInput = 0;
+    this.practicalMinutesInput = 0;
+    this.theoreticalHoursInput = 0;
+    this.theoreticalMinutesInput = 0;
+    this.totalHoursInput = 0;
+    this.totalMinutesInput = 0;
+
+    this.selectedTypeId = null;
+    this.selectedPlanId = null;
+    this.selectedFacultyId = null;
+    this.selectedSchoolId = null;
+    this.selectedCycleId = null;
+    this.selectedGroupId = null;
   }
-  save(): void {
-    if (this.editingId == null) return;
-    const n = this.editingName.trim();
-    if (
-      !n ||
-      !this.editingTypeId ||
-      !this.editingGroupId ||
-      !this.editingPlanId
-    )
+
+  openEditModal(it: Course): void {
+    this.isEditing = true;
+    this.editingId = it.idCourse;
+    this.showFormModal = true;
+    this.sidebarService.modalOpen.set(true);
+
+    this.name = it.name;
+    this.code = it.code;
+    this.description = it.description;
+
+    // Split minutes into Hours / Minutes inputs
+    const parseM = (v: any) => Number(v ?? 0) || 0;
+    const durM = parseM(it.duration);
+    this.durationHoursInput = Math.floor(durM / 60);
+    this.durationMinutesInput = durM % 60;
+
+    const pracM = parseM(it.practicalHours);
+    this.practicalHoursInput = Math.floor(pracM / 60);
+    this.practicalMinutesInput = pracM % 60;
+
+    const theoM = parseM(it.theoreticalHours);
+    this.theoreticalHoursInput = Math.floor(theoM / 60);
+    this.theoreticalMinutesInput = theoM % 60;
+
+    const totM = parseM(it.totalHours);
+    this.totalHoursInput = Math.floor(totM / 60);
+    this.totalMinutesInput = totM % 60;
+
+    this.selectedTypeId = it.courseType?.idCourseType ?? null;
+    this.selectedPlanId = it.plan?.idPlan ?? null;
+
+    // Cascade resolution
+    const group = this.groups.find(g => g.idGroup === it.group.idGroup);
+    if (group) {
+      this.selectedGroupId = group.idGroup ?? null;
+      this.selectedCycleId = group.cycle?.idCycle ?? null;
+      this.selectedSchoolId = group.cycle?.professionalSchool?.idProfessionalSchool ?? null;
+      this.selectedFacultyId = group.cycle?.professionalSchool?.faculty?.idFaculty ?? null;
+    } else {
+      this.selectedGroupId = null;
+      this.selectedCycleId = null;
+      this.selectedSchoolId = null;
+      this.selectedFacultyId = null;
+    }
+  }
+
+  closeModal(): void {
+    this.showFormModal = false;
+    this.isEditing = false;
+    this.editingId = null;
+    this.sidebarService.modalOpen.set(false);
+  }
+
+  saveCourse(): void {
+    const n = this.name.trim();
+    if (!n || !this.selectedTypeId || !this.selectedGroupId || !this.selectedPlanId) {
+      this.showTransientToast('Por favor, completa todos los campos requeridos', 3000, false);
       return;
+    }
 
-    const practicalTotal =
-      Number(this.editingPracticalHours || 0) * 60 +
-      Number(this.editingPracticalMinutes || 0);
-    const theoreticalTotal =
-      Number(this.editingTheoreticalHours || 0) * 60 +
-      Number(this.editingTheoreticalMinutes || 0);
-    const totalTotal =
-      Number(this.editingTotalHours || 0) * 60 +
-      Number(this.editingTotalMinutes || 0);
-    const durationTotal =
-      Number(this.editingDurationHours || 0) * 60 +
-      Number(this.editingDurationMinutes || 0);
+    const durationTotal = Number(this.durationHoursInput || 0) * 60 + Number(this.durationMinutesInput || 0);
+    const practicalTotal = Number(this.practicalHoursInput || 0) * 60 + Number(this.practicalMinutesInput || 0);
+    const theoreticalTotal = Number(this.theoreticalHoursInput || 0) * 60 + Number(this.theoreticalMinutesInput || 0);
+    const totalTotal = Number(this.totalHoursInput || 0) * 60 + Number(this.totalMinutesInput || 0);
 
-    this.service
-      .updateCourse(this.editingId, {
-        name: n,
-        code: this.editingCode,
-        description: this.editingDescription,
-        duration: durationTotal,
-        practicalHours: practicalTotal,
-        theoreticalHours: theoreticalTotal,
-        totalHours: totalTotal,
-        idCourseType: this.editingTypeId,
-        idGroup: this.editingGroupId,
-        idPlan: this.editingPlanId,
-      })
-      .subscribe({
+    const payload = {
+      name: n,
+      code: this.code,
+      description: this.description,
+      duration: durationTotal,
+      practicalHours: practicalTotal,
+      theoreticalHours: theoreticalTotal,
+      totalHours: totalTotal,
+      idCourseType: this.selectedTypeId,
+      idGroup: this.selectedGroupId,
+      idPlan: this.selectedPlanId,
+    };
+
+    if (this.isEditing && this.editingId) {
+      this.service.updateCourse(this.editingId, payload).subscribe({
         next: () => {
-          this.cancel();
+          this.closeModal();
           this.load();
+          this.showTransientToast('Curso actualizado correctamente', 3000, true);
         },
-        error: () =>
-          this.showTransientToast('Error al actualizar', 3000, false),
+        error: () => this.showTransientToast('Error al actualizar curso', 3000, false),
       });
+    } else {
+      this.service.createCourse(payload).subscribe({
+        next: () => {
+          this.closeModal();
+          this.load();
+          this.showTransientToast('Curso creado correctamente', 3000, true);
+        },
+        error: () => this.showTransientToast('Error al crear curso', 3000, false),
+      });
+    }
   }
 
   confirmRemove(it: Course, ev?: MouseEvent): void {
@@ -409,42 +396,11 @@ export class CourseComponent implements OnInit {
       it.plan,
       it.idCourse
     );
-    try {
-      const btn = ev?.currentTarget as HTMLElement | undefined;
-      const react = btn ? btn.getBoundingClientRect() : undefined;
-      const popupW = 224;
-      const popupH = 96;
-      let top: number;
-      let left: number;
-      if (react) {
-        if (react.top > popupH + 20) {
-          top = react.top - popupH - 8;
-        } else {
-          top = react.bottom + 8;
-        }
-        left = react.left + react.width / 2 - popupW / 2;
-        const minLeft = 8;
-        const maxLeft = Math.max(8, window.innerWidth - popupW - 8);
-        if (left < minLeft) left = minLeft;
-        if (left > maxLeft) left = maxLeft;
-      } else {
-        top = Math.max(8, window.innerHeight / 2 - popupH / 2);
-        left = Math.max(8, window.innerWidth / 2 - popupW / 2);
-      }
-      this.popupStyle = {
-        position: 'fixed',
-        top: `${top}px`,
-        left: `${left}px`,
-      };
-    } catch (e) {
-      this.popupStyle = null;
-    }
   }
 
   cancelRemove(): void {
     this.pendingDeleteId = null;
     this.pendingDeleteName = '';
-    this.popupStyle = null;
   }
 
   performDeleteConfirmed(): void {
@@ -455,21 +411,17 @@ export class CourseComponent implements OnInit {
         this.pendingDeleteId = null;
         this.pendingDeleteName = '';
         this.load();
-        this.showTransientToast('Eliminado correctamente', 5000, true);
+        this.showTransientToast('Curso eliminado correctamente', 5000, true);
       },
       error: () => {
         this.pendingDeleteId = null;
         this.pendingDeleteName = '';
-        this.showTransientToast('Error al eliminar', 3000, false);
+        this.showTransientToast('Error al eliminar el curso', 3000, false);
       },
     });
   }
 
-  private showTransientToast(
-    message: string,
-    ms = 3000,
-    undoable = false
-  ): void {
+  private showTransientToast(message: string, ms = 3000, undoable = false): void {
     this.toastMessage = message;
     this.showToast = true;
     this.toastHasUndo = undoable;
@@ -497,24 +449,42 @@ export class CourseComponent implements OnInit {
       idPlan: this.lastDeleted.plan?.idPlan!,
     };
     if (!payload.idCourseType || !payload.idGroup || !payload.idPlan) {
-      this.showTransientToast(
-        'No se puede restaurar: faltan referencias',
-        3000,
-        false
-      );
+      this.showTransientToast('No se puede restaurar: faltan referencias', 3000, false);
       return;
     }
     this.service.createCourse(payload).subscribe({
       next: () => {
         this.load();
-        this.showTransientToast('Restaurado', 3000, false);
+        this.showTransientToast('Curso restaurado', 3000, false);
         this.lastDeleted = null;
       },
-      error: () => this.showTransientToast('Error al restaurar', 3000, false),
+      error: () => this.showTransientToast('Error al restaurar curso', 3000, false),
     });
   }
 
   volver(): void {
     this.router.navigate(['/main/course-creation']);
+  }
+
+  // Convert ISO 8601 duration string (e.g. PT4H30M) to total minutes
+  private isoDurationToMinutes(iso?: string | null): number {
+    if (!iso || typeof iso !== 'string') return 0;
+    const m = iso.match(/P(?:T)?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!m) return 0;
+    const hours = parseInt(m[1] ?? '0', 10) || 0;
+    const minutes = parseInt(m[2] ?? '0', 10) || 0;
+    const seconds = parseInt(m[3] ?? '0', 10) || 0;
+    return hours * 60 + minutes + Math.round(seconds / 60);
+  }
+
+  // Convert total minutes to ISO 8601 duration string
+  private minutesToIsoDuration(totalMinutes: number): string {
+    if (!totalMinutes || totalMinutes <= 0) return 'PT0S';
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    let s = 'PT';
+    if (h) s += `${h}H`;
+    if (m) s += `${m}M`;
+    return s;
   }
 }
