@@ -56,8 +56,8 @@
             <th class="px-5 py-4">Nombre</th>
             <th class="px-5 py-4">Código</th>
             <th class="px-5 py-4">Tipo</th>
-            <th class="px-5 py-4">Grupo</th>
-            <th class="px-5 py-4">Plan</th>
+            <th class="px-5 py-4">Carrera / Escuela</th>
+            <th class="px-5 py-4">Ciclo</th>
             <th class="px-5 py-4">Duración</th>
             <th class="px-5 py-4 text-right">Acciones</th>
           </tr>
@@ -70,10 +70,12 @@
             <td class="px-5 py-4">
               <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">{{ it.courseType.name }}</span>
             </td>
-            <td class="px-5 py-4">
-              <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Grupo {{ it.group.groupNumber }}</span>
+            <td class="px-5 py-4 text-xs font-bold text-slate-700">
+              {{ getSchoolNameForCourse(it) }}
             </td>
-            <td class="px-5 py-4 text-xs font-medium text-slate-500">{{ it.plan.name }}</td>
+            <td class="px-5 py-4">
+              <span class="inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">{{ getCycleNameForCourse(it) }}</span>
+            </td>
             <td class="px-5 py-4 font-medium text-slate-800">{{ formatMinutes(it.duration) }}</td>
             <td class="px-5 py-4 text-right">
               <div class="flex items-center justify-end gap-3">

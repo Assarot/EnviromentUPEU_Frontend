@@ -31,7 +31,10 @@ export class SidebarComponent {
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this.currentRoute = event.url;
-        if (this.currentRoute.startsWith('/main/course-creation')) {
+        if (
+          this.currentRoute.startsWith('/main/course-creation') ||
+          this.currentRoute === '/main/carga-academica'
+        ) {
           this.cursosExpanded = true;
         }
       });
