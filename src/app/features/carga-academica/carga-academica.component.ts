@@ -15,8 +15,20 @@ import { Course } from '../../core/models/course';
 import { Group } from '../../core/models/group';
 import { Cycle } from '../../core/models/cycle';
 
-interface GroupedCourses {
-  cycleName: string;
+export interface UnifiedFacultyLoad {
+  faculty: Faculty;
+  expanded: boolean;
+  schools: UnifiedSchoolLoad[];
+}
+
+export interface UnifiedSchoolLoad {
+  school: ProfessionalSchool;
+  expanded: boolean;
+  cycles: UnifiedCycleLoad[];
+}
+
+export interface UnifiedCycleLoad {
+  cycle: Cycle;
   courses: Course[];
 }
 
@@ -43,8 +55,9 @@ export class CargaAcademicaComponent implements OnInit {
   allCourses: Course[] = [];
   allGroups: Group[] = [];
   allCycles: Cycle[] = [];
-  groupedCourses: GroupedCourses[] = [];
   
+  // Estructura jerárquica unificada
+  unifiedLoad: UnifiedFacultyLoad[] = [];
   isLoading = false;
 
   constructor(
@@ -71,18 +84,54 @@ export class CargaAcademicaComponent implements OnInit {
       cycles: this.cycleService.getCycles()
     }).subscribe({
       next: (data) => {
-        this.faculties = data.faculties;
-        this.allSchools = data.schools;
-        this.allCourses = data.courses;
-        this.allGroups = data.groups;
-        this.allCycles = data.cycles;
+        // Parse faculties
+        const rawFaculties = Array.isArray((data.faculties as any)?.data) ? (data.faculties as any).data : Array.isArray(data.faculties) ? data.faculties : [];
+        this.faculties = rawFaculties.map((f: any, idx: number) => new Faculty(f.name ?? '', f.idFaculty ?? f.id ?? idx + 1));
 
-        // Restore filtering if the user already had a faculty/school selected
+        // Parse schools
+        const rawSchools = Array.isArray((data.schools as any)?.data) ? (data.schools as any).data : Array.isArray(data.schools) ? data.schools : [];
+        this.allSchools = rawSchools.map((s: any, idx: number) => {
+          const fac = s.faculty ? new Faculty(s.faculty.name ?? '', s.faculty.idFaculty ?? s.facultyId ?? idx + 1) : new Faculty('', idx + 1);
+          return new ProfessionalSchool(s.name ?? '', fac, s.idProfessionalSchool ?? s.id ?? idx + 1);
+        });
+
+        // Parse courses
+        const rawCourses = Array.isArray((data.courses as any)?.data) ? (data.courses as any).data : Array.isArray(data.courses) ? data.courses : [];
+        this.allCourses = rawCourses.map((c: any, idx: number) => {
+          return new Course(
+            c.name ?? '',
+            c.code ?? '',
+            c.description ?? '',
+            c.duration ?? 0,
+            c.practicalHours ?? 0,
+            c.theoreticalHours ?? 0,
+            c.totalHours ?? 0,
+            c.courseType ? c.courseType : null,
+            c.group ? c.group : null,
+            c.plan ? c.plan : null,
+            c.idCourse ?? c.id ?? idx + 1
+          );
+        });
+
+        // Parse groups
+        const rawGroups = Array.isArray((data.groups as any)?.data) ? (data.groups as any).data : Array.isArray(data.groups) ? data.groups : [];
+        this.allGroups = rawGroups.map((g: any, idx: number) => {
+          const cy = g.cycle ? new Cycle(g.cycle.name ?? '', null as any, g.cycle.idCycle ?? idx + 1) : new Cycle('', null as any, idx + 1);
+          return new Group(g.groupNumber ?? 0, g.capacity ?? 0, cy, g.idGroup ?? g.id ?? idx + 1);
+        });
+
+        // Parse cycles
+        const rawCycles = Array.isArray((data.cycles as any)?.data) ? (data.cycles as any).data : Array.isArray(data.cycles) ? data.cycles : [];
+        this.allCycles = rawCycles.map((cy: any, idx: number) => {
+          const sch = cy.professionalSchool ? new ProfessionalSchool(cy.professionalSchool.name ?? '', null as any, cy.professionalSchool.idProfessionalSchool ?? idx + 1) : new ProfessionalSchool('', null as any, idx + 1);
+          return new Cycle(cy.name ?? '', sch, cy.idCycle ?? cy.id ?? idx + 1);
+        });
+
+        this.linkHierarchy();
+        this.buildUnifiedLoad();
+
         if (this.selectedFaculty) {
           this.schools = this.allSchools.filter(s => s.faculty?.idFaculty == this.selectedFaculty);
-        }
-        if (this.selectedSchool) {
-          this.loadCoursesForSchool(Number(this.selectedSchool));
         }
 
         this.isLoading = false;
@@ -94,9 +143,128 @@ export class CargaAcademicaComponent implements OnInit {
     });
   }
 
+  linkHierarchy(): void {
+    // Link school to faculty
+    for (const s of this.allSchools) {
+      if (s.faculty && s.faculty.idFaculty) {
+        const f = this.faculties.find(x => x.idFaculty === s.faculty.idFaculty);
+        if (f) s.faculty = f;
+      }
+    }
+    // Link cycle to school
+    for (const c of this.allCycles) {
+      if (c.professionalSchool && c.professionalSchool.idProfessionalSchool) {
+        const s = this.allSchools.find(x => x.idProfessionalSchool === c.professionalSchool.idProfessionalSchool);
+        if (s) c.professionalSchool = s;
+      }
+    }
+    // Link group to cycle
+    for (const g of this.allGroups) {
+      if (g.cycle && g.cycle.idCycle) {
+        const c = this.allCycles.find(x => x.idCycle === g.cycle.idCycle);
+        if (c) g.cycle = c;
+      }
+    }
+  }
+
+  private parseCycleWeight(name: string): number {
+    if (!name) return 0;
+    const clean = name.trim().toUpperCase();
+    const romanWeights: Record<string, number> = {
+      'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
+      'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+      'XI': 11, 'XII': 12
+    };
+    for (const key of Object.keys(romanWeights)) {
+      if (clean === key || clean.endsWith(' ' + key) || clean.endsWith('-' + key)) {
+        return romanWeights[key];
+      }
+    }
+    const numMatch = clean.match(/\d+/);
+    return numMatch ? parseInt(numMatch[0], 10) : 999;
+  }
+
+  buildUnifiedLoad() {
+    this.unifiedLoad = [];
+    
+    this.faculties.forEach(f => {
+      const fSchools = this.allSchools.filter(s => s.faculty?.idFaculty === f.idFaculty);
+      const schoolsLoad: UnifiedSchoolLoad[] = [];
+      
+      fSchools.forEach(s => {
+        const sCycles = this.allCycles.filter(cy => cy.professionalSchool?.idProfessionalSchool === s.idProfessionalSchool);
+        
+        // Ordenar ciclos de menor a mayor
+        sCycles.sort((a, b) => this.parseCycleWeight(a.name) - this.parseCycleWeight(b.name));
+        
+        const cyclesLoad: UnifiedCycleLoad[] = [];
+        
+        sCycles.forEach(cy => {
+          const cyGroups = this.allGroups.filter(g => g.cycle?.idCycle === cy.idCycle);
+          const cyCourses: Course[] = [];
+          
+          this.allCourses.forEach(c => {
+            if (!c.group) return;
+            const belongs = cyGroups.some(g => g.idGroup === c.group?.idGroup);
+            if (belongs) {
+              if (!cyCourses.some(added => added.idCourse === c.idCourse)) {
+                c.group.cycle = cy;
+                cyCourses.push(c);
+              }
+            }
+          });
+          
+          if (cyCourses.length > 0) {
+            cyclesLoad.push({
+              cycle: cy,
+              courses: cyCourses
+            });
+          }
+        });
+        
+        if (cyclesLoad.length > 0) {
+          schoolsLoad.push({
+            school: s,
+            expanded: false,
+            cycles: cyclesLoad
+          });
+        }
+      });
+      
+      if (schoolsLoad.length > 0) {
+        this.unifiedLoad.push({
+          faculty: f,
+          expanded: false,
+          schools: schoolsLoad
+        });
+      }
+    });
+  }
+
+  getFilteredUnifiedLoad(): UnifiedFacultyLoad[] {
+    let list = this.unifiedLoad;
+    if (this.selectedFaculty) {
+      list = list.filter(f => f.faculty.idFaculty == this.selectedFaculty);
+    }
+    if (this.selectedSchool) {
+      list = list.map(f => ({
+        ...f,
+        schools: f.schools.filter(s => s.school.idProfessionalSchool == this.selectedSchool)
+      })).filter(f => f.schools.length > 0);
+    }
+    return list;
+  }
+
+  toggleFaculty(item: UnifiedFacultyLoad) {
+    item.expanded = !item.expanded;
+  }
+
+  toggleSchool(item: UnifiedSchoolLoad) {
+    item.expanded = !item.expanded;
+  }
+
   onFacultyChange() {
     this.selectedSchool = '';
-    this.groupedCourses = [];
     if (this.selectedFaculty) {
       this.schools = this.allSchools.filter(s => s.faculty?.idFaculty == this.selectedFaculty);
     } else {
@@ -105,53 +273,11 @@ export class CargaAcademicaComponent implements OnInit {
   }
 
   onSchoolChange() {
-    if (this.selectedSchool) {
-      this.loadCoursesForSchool(Number(this.selectedSchool));
-    } else {
-      this.groupedCourses = [];
-    }
-  }
-
-  loadCoursesForSchool(schoolId: number) {
-    const grouped = new Map<string, Course[]>();
-    
-    this.allCourses.forEach(c => {
-      if (!c.group) return;
-      const group = this.allGroups.find(g => g.idGroup === c.group.idGroup);
-      if (!group) return;
-
-      const cycle = this.allCycles.find(cy => cy.idCycle === group.cycle?.idCycle);
-      if (!cycle) return;
-
-      if (cycle.professionalSchool?.idProfessionalSchool === schoolId) {
-        const cycleName = cycle.name || 'Sin Ciclo';
-        
-        if (!grouped.has(cycleName)) {
-          grouped.set(cycleName, []);
-        }
-        
-        // Re-assign the populated objects so the template can read them easily
-        c.group.cycle = cycle;
-        grouped.get(cycleName)!.push(c);
-      }
-    });
-
-    this.groupedCourses = Array.from(grouped.keys())
-      .sort() // Simple alphabetical sort
-      .map(cycleName => ({
-        cycleName,
-        courses: grouped.get(cycleName)!
-      }));
-  }
-
-  getCourseRowClass(course: Course): string {
-    return '';
+    // No-op ya que el filtrado se maneja en getFilteredUnifiedLoad()
   }
 
   downloadTemplate() {
-    // Simulate template download
     console.log('Descargando plantilla...');
-    // Here you would implement actual file download
   }
 
   openUploadModal() {
@@ -218,7 +344,7 @@ export class CargaAcademicaComponent implements OnInit {
           this.isUploading = false;
           this.closeUploadModal();
           this.showSuccessModal = true;
-          this.loadInitialData(); // Reload courses from backend so new data appears
+          this.loadInitialData();
         }
       },
       error: (error) => {
@@ -235,6 +361,5 @@ export class CargaAcademicaComponent implements OnInit {
 
   viewPreviousVersions() {
     console.log('Ver versiones anteriores...');
-    // Here you would implement the previous versions functionality
   }
 }

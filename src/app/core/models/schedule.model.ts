@@ -4,7 +4,9 @@ export interface ScheduleRequest {
   endTime?: string;   // HH:mm:ss
   idCourseAssignment?: number;
   idAcademicSpace?: number;
-  // Añade otros campos requeridos por tu DTO de backend aquí
+  idWeekName?: number;
+  duration?: number;
+  idTypeSchedule?: number;
 }
 
 export interface ScheduleResponse {
@@ -14,9 +16,12 @@ export interface ScheduleResponse {
   endTime?: string;
   idCourseAssignment?: number;
   idAcademicSpace?: number;
-  // Campos visuales mapeados desde backend (si tu backend los envía así)
+  idWeekName?: number;
+  duration?: number;
+  idTypeSchedule?: number;
   courseName?: string;
   spaceName?: string;
+  teacherName?: string;
   colorHex?: string;
   borderColorHex?: string;
 }

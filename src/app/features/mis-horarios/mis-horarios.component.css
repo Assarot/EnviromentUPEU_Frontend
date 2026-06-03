@@ -1,0 +1,110 @@
+/* ════════════════════════════════════
+   MIS HORARIOS — Styles & Print Support
+   ════════════════════════════════════ */
+
+:host {
+  display: block;
+}
+
+/* Print Layout Support */
+@media print {
+  /* Ocultar todos los elementos de la interfaz de la pantalla */
+  .no-print,
+  #default-sidebar,
+  aside,
+  button,
+  .sidebar-toggle-btn,
+  .sidebar,
+  .mb-8,
+  .mb-10,
+  nav,
+  input,
+  select,
+  .shadow-xl,
+  .bg-white {
+    display: none !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Mostrar la sección de impresión */
+  .print-only {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-only table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border: 2px solid #334155 !important;
+  }
+
+  .print-only th,
+  .print-only td {
+    border: 1px solid #64748b !important;
+    padding: 10px 6px !important;
+    text-align: center !important;
+    font-size: 10px !important;
+    color: #1e293b !important;
+  }
+
+  .print-only th {
+    background-color: #f1f5f9 !important;
+    font-weight: bold !important;
+  }
+
+  /* Forzar formato horizontal (apaisado) y eliminar márgenes de cabecera del navegador */
+  @page {
+    size: landscape;
+    margin: 0.8cm;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+}
+
+/* Ocultar sección de impresión en pantalla normal */
+.print-only {
+  display: none;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}

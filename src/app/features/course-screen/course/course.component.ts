@@ -221,6 +221,16 @@ export class CourseComponent implements OnInit {
     }
   }
 
+  getSchoolNameForCourse(course: Course): string {
+    const g = this.groups.find(x => x.idGroup === course.group?.idGroup);
+    return g?.cycle?.professionalSchool?.name ?? 'S/D';
+  }
+
+  getCycleNameForCourse(course: Course): string {
+    const g = this.groups.find(x => x.idGroup === course.group?.idGroup);
+    return g?.cycle?.name ?? 'S/D';
+  }
+
   // Cascading Getters
   getFilteredSchools(): ProfessionalSchool[] {
     if (!this.selectedFacultyId) return [];

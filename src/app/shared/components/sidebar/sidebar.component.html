@@ -134,34 +134,41 @@
       <ng-container *ngIf="isAsacad() || isAdmin()">
         <div class="nav-section-label" *ngIf="!isAdmin()">Académico</div>
 
-        <!-- Horarios (expandible) -->
+        <!-- Cursos (expandible) - visible to Admin and ASACAD -->
         <button type="button" class="nav-item nav-item--expandable"
-                [class.nav-item--expanded]="horariosExpanded"
-                (click)="toggleHorarios()">
+                [class.nav-item--expanded]="cursosExpanded"
+                (click)="toggleCursos()">
           <span class="nav-icon">
             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
             </svg>
           </span>
-          <span class="nav-label">Horarios</span>
-          <span class="nav-chevron" [class.nav-chevron--open]="horariosExpanded">
+          <span class="nav-label">Cursos</span>
+          <span class="nav-chevron" [class.nav-chevron--open]="cursosExpanded">
             <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <polyline points="6,9 12,15 18,9"/>
             </svg>
           </span>
         </button>
 
-        <!-- Submenu Horarios -->
-        <div class="nav-submenu" *ngIf="horariosExpanded" [ngClass]="{'nav-submenu--open': horariosExpanded}">
-          <a routerLink="/main/carga-academica" id="nav-carga" class="nav-subitem">
+        <!-- Submenu Cursos -->
+        <div class="nav-submenu" *ngIf="cursosExpanded" [ngClass]="{'nav-submenu--open': cursosExpanded}">
+          <a routerLink="/main/carga-academica" id="nav-carga" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/carga-academica')">
             <span class="nav-subitem-dot"></span>
             Carga Académica
           </a>
-          <a routerLink="/main/proximamente" id="nav-proximamente" class="nav-subitem">
+          <a *ngIf="isAdmin()" routerLink="/main/course-creation/academic-structure" id="nav-cursos-structure" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/academic-structure')">
             <span class="nav-subitem-dot"></span>
-            Próximamente
+            Estructura Académica
+          </a>
+          <a *ngIf="isAdmin()" routerLink="/main/course-creation/course-management" id="nav-cursos-mgmt" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/course-management')">
+            <span class="nav-subitem-dot"></span>
+            Gestionar Cursos
+          </a>
+          <a *ngIf="isAdmin()" routerLink="/main/course-creation/teacher" id="nav-cursos-teacher" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/teacher')">
+            <span class="nav-subitem-dot"></span>
+            Docentes
           </a>
         </div>
 
@@ -320,39 +327,7 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/user-management')"></span>
         </a>
 
-        <!-- Cursos (expandible) -->
-        <button type="button" class="nav-item nav-item--expandable"
-                [class.nav-item--expanded]="cursosExpanded"
-                (click)="toggleCursos()">
-          <span class="nav-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-            </svg>
-          </span>
-          <span class="nav-label">Cursos</span>
-          <span class="nav-chevron" [class.nav-chevron--open]="cursosExpanded">
-            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <polyline points="6,9 12,15 18,9"/>
-            </svg>
-          </span>
-        </button>
 
-        <!-- Submenu Cursos -->
-        <div class="nav-submenu" *ngIf="cursosExpanded" [ngClass]="{'nav-submenu--open': cursosExpanded}">
-          <a routerLink="/main/course-creation/academic-structure" id="nav-cursos-structure" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/academic-structure')">
-            <span class="nav-subitem-dot"></span>
-            Estructura Académica
-          </a>
-          <a routerLink="/main/course-creation/course-management" id="nav-cursos-mgmt" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/course-management')">
-            <span class="nav-subitem-dot"></span>
-            Gestionar Cursos
-          </a>
-          <a routerLink="/main/course-creation/teacher" id="nav-cursos-teacher" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/teacher')">
-            <span class="nav-subitem-dot"></span>
-            Docentes
-          </a>
-        </div>
 
         <a routerLink="/main/notificaciones" id="nav-noti-admin"
            class="nav-item"
