@@ -42,6 +42,9 @@ import { CourseTypeComponent } from './features/course-screen/course-type/course
 import { PlanComponent } from './features/course-screen/plan/plan.component';
 import { AcademicStructureComponent } from './features/course-screen/academic-structure/academic-structure.component';
 import { CourseManagementCombinedComponent } from './features/course-screen/course-management-combined/course-management-combined.component';
+import { AsignarAmbientesComponent } from './features/asignar-ambientes/asignar-ambientes.component';
+import { ConsultarDisponibilidadComponent } from './features/consultar-disponibilidad/consultar-disponibilidad.component';
+import { AsignacionAutomaticaComponent } from './features/asignacion-automatica/asignacion-automatica.component';
 
 export const routes: Routes = [
   {
@@ -111,6 +114,9 @@ export const routes: Routes = [
         ],
       },
       { path: 'res-assign', component: ResourceEnvComponent },
+      { path: 'asignar-ambientes', component: AsignarAmbientesComponent },
+      { path: 'asignacion-automatica', component: AsignacionAutomaticaComponent },
+      { path: 'consultar-disponibilidad', component: ConsultarDisponibilidadComponent },
 
       // Res-creation con rutas hijas
       {

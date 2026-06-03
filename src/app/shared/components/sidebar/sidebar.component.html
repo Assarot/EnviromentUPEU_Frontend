@@ -63,6 +63,18 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/mis-horarios')"></span>
         </a>
 
+        <a routerLink="/main/consultar-disponibilidad" id="nav-consultar-disp"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/consultar-disponibilidad')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/>
+            </svg>
+          </span>
+          <span class="nav-label">Disponibilidad</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/consultar-disponibilidad')"></span>
+        </a>
+
         <a routerLink="/main/reservar-salon" id="nav-reservar"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/reservar-salon')">
@@ -267,6 +279,19 @@
           </span>
           <span class="nav-label">Ambientes</span>
           <span class="nav-active-dot" *ngIf="isActive('/main/env-creation')"></span>
+        </a>
+
+        <a routerLink="/main/asignar-ambientes" id="nav-asignar-ambientes"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/asignar-ambientes')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 11l3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          </span>
+          <span class="nav-label">Asignar Ambientes</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/asignar-ambientes')"></span>
         </a>
 
         <a routerLink="/main/res-creation" id="nav-recursos-admin"
