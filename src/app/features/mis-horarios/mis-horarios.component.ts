@@ -13,6 +13,7 @@ import { GroupService } from '../../core/services/group.service';
 import { TeacherService } from '../../core/services/teacher.service';
 import { AcademicSpaceService } from '../../core/services/academic-space.service';
 import { CourseAssignmentCourseService } from '../../core/services/course-assignment-course.service';
+import { CourseService } from '../../core/services/course.service';
 import { CourseAssignmentService } from '../../core/services/course-assignment.service';
 
 import html2canvas from 'html2canvas';
@@ -58,6 +59,7 @@ export class MisHorariosComponent implements OnInit {
   private teacherService = inject(TeacherService);
   private spaceService = inject(AcademicSpaceService);
   private assignmentCourseService = inject(CourseAssignmentCourseService);
+  private courseService = inject(CourseService);
   private courseAssignmentService = inject(CourseAssignmentService);
 
   days = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
@@ -209,7 +211,20 @@ export class MisHorariosComponent implements OnInit {
       return gId && targetGroups.includes(gId);
     });
 
-    this.pendingCoursesForAutoAssign = targetCourses.map(ac => {
+    const uniqueCoursesMap = new Map<string, any>();
+    targetCourses.forEach(ac => {
+      const cId = ac.course?.idCourse;
+      const gId = ac.course?.group?.idGroup;
+      if (cId && gId) {
+        const key = `${cId}-${gId}`;
+        // Keep the one with a real teacher if there are duplicates
+        if (!uniqueCoursesMap.has(key) || ac.courseAssignment?.teacher?.idTeacher) {
+          uniqueCoursesMap.set(key, ac);
+        }
+      }
+    });
+
+    this.pendingCoursesForAutoAssign = Array.from(uniqueCoursesMap.values()).map(ac => {
       let hoursRequired = 4;
       const rawTotalHours: any = ac.course?.totalHours;
       if (typeof rawTotalHours === 'number') {
@@ -226,8 +241,7 @@ export class MisHorariosComponent implements OnInit {
       return {
         course: ac.course,
         assignment: ac,
-        hoursRequired: hoursRequired,
-        priority: 1
+        hoursRequired: hoursRequired
       };
     }).filter(pc => pc.assignment?.courseAssignment?.idCourseAssignment);
   }
@@ -393,6 +407,7 @@ export class MisHorariosComponent implements OnInit {
     else if (this.autoAssignShift === 'TARDE') startTimes = tarde;
     else startTimes = [...manana, ...tarde];
 
+    console.log('[VERIFICACIÓN PAYLOAD] Cursos a enviar al backend:', validCourses);
     const coursesPayload = validCourses.map(pc => ({
       idCourseAssignment: pc.assignment.courseAssignment.idCourseAssignment,
       capacityRequired: pc.course.group?.capacity || 30,
@@ -431,14 +446,11 @@ export class MisHorariosComponent implements OnInit {
       payload.idBuilding = Number(this.autoAssignBuildingId);
     }
 
-    console.log('[MisHorarios] Payload de Generación Automática:', payload);
 
     this.scheduleService.autoAssign(payload).subscribe({
       next: (res: any) => {
-        console.log('[MisHorarios] Asignación completada:', res);
       },
       error: (err: any) => {
-        console.error('[MisHorarios] Error en asignación automática:', err);
         this.isLoading = false;
         this.showTransientToast('Error al generar los horarios. Revisa la consola.', 4000);
       },
@@ -451,7 +463,6 @@ export class MisHorariosComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('[MisHorarios] Inicializando componente...');
     this.initEmptyGrid();
     this.loadAllInitialData();
     this.updateCurrentTimeStatus();
@@ -489,7 +500,6 @@ export class MisHorariosComponent implements OnInit {
       return currentTimeVal >= start && currentTimeVal <= end;
     });
 
-    console.log(`[MisHorarios] Tiempo Actualizado -> Hora: ${currentHourStr}, Día Index: ${this.currentDayIndex}, Slot Index: ${this.currentTimeSlotIndex}`);
   }
 
   private initEmptyGrid() {
@@ -517,7 +527,6 @@ export class MisHorariosComponent implements OnInit {
 
   private loadAllInitialData() {
     this.isLoading = true;
-    console.log('[MisHorarios] Iniciando carga de datos iniciales en paralelo con catchError defensivo...');
 
     forkJoin({
       faculties: this.facultyService.getFaculties().pipe(catchError(err => { console.error('[MisHorarios - ERROR] FacultyService.getFaculties falló:', err); return of({ data: [] }); })),
@@ -527,16 +536,15 @@ export class MisHorariosComponent implements OnInit {
       teachers: this.teacherService.getTeachers().pipe(catchError(err => { console.error('[MisHorarios - ERROR] TeacherService.getTeachers falló:', err); return of({ data: [] }); })),
       spaces: this.spaceService.getAcademicSpaces().pipe(catchError(err => { console.error('[MisHorarios - ERROR] SpaceService.getAcademicSpaces falló:', err); return of({ data: [] }); })),
       assignments: this.assignmentCourseService.getCouseAssignmentCourse().pipe(catchError(err => { console.error('[MisHorarios - ERROR] CourseAssignmentCourseService.getCouseAssignmentCourse falló:', err); return of({ data: [] }); })),
+      courses: this.courseService.getCourses().pipe(catchError(err => { console.error('[MisHorarios - ERROR] CourseService.getCourses falló:', err); return of({ data: [] }); })),
       baseAssignments: this.courseAssignmentService.getCouseAssignment().pipe(catchError(err => { console.error('[MisHorarios - ERROR] CourseAssignmentService falló:', err); return of({ data: [] }); })),
       schedules: this.scheduleService.findAll().pipe(catchError(err => { console.error('[MisHorarios - ERROR] ScheduleService.findAll falló:', err); return of({ data: [] }); }))
     }).subscribe({
       next: (res: any) => {
-        console.log('[MisHorarios] Peticiones completadas con éxito o resueltas con fallback vacío. Res: ', res);
 
         // Parse faculties
         const rawFacs = Array.isArray(res.faculties?.data) ? res.faculties.data : Array.isArray(res.faculties) ? res.faculties : [];
         this.faculties = rawFacs.map((f: any, idx: number) => new Faculty(f.name ?? '', f.idFaculty ?? f.id ?? idx + 1));
-        console.log(`[MisHorarios] Mapeadas ${this.faculties.length} Facultades:`, this.faculties);
 
         // Parse schools
         const rawSchools = Array.isArray(res.schools?.data) ? res.schools.data : Array.isArray(res.schools) ? res.schools : [];
@@ -544,7 +552,6 @@ export class MisHorariosComponent implements OnInit {
           const fac = s.faculty ? new Faculty(s.faculty.name ?? '', s.faculty.idFaculty ?? s.facultyId ?? idx + 1) : new Faculty('', idx + 1);
           return new ProfessionalSchool(s.name ?? '', fac, s.idProfessionalSchool ?? s.id ?? idx + 1);
         });
-        console.log(`[MisHorarios] Mapeadas ${this.allSchools.length} Escuelas:`, this.allSchools);
 
         // Parse cycles
         const rawCycles = Array.isArray(res.cycles?.data) ? res.cycles.data : Array.isArray(res.cycles) ? res.cycles : [];
@@ -552,7 +559,6 @@ export class MisHorariosComponent implements OnInit {
           const sch = cy.professionalSchool ? new ProfessionalSchool(cy.professionalSchool.name ?? '', null as any, cy.professionalSchool.idProfessionalSchool ?? idx + 1) : new ProfessionalSchool('', null as any, idx + 1);
           return new Cycle(cy.name ?? '', sch, cy.idCycle ?? cy.id ?? idx + 1);
         });
-        console.log(`[MisHorarios] Mapeados ${this.allCycles.length} Ciclos:`, this.allCycles);
 
         // Parse groups
         const rawGroups = Array.isArray(res.groups?.data) ? res.groups.data : Array.isArray(res.groups) ? res.groups : [];
@@ -560,17 +566,14 @@ export class MisHorariosComponent implements OnInit {
           const cy = g.cycle ? new Cycle(g.cycle.name ?? '', null as any, g.cycle.idCycle ?? idx + 1) : new Cycle('', null as any, idx + 1);
           return new Group(g.groupNumber ?? 0, g.capacity ?? 0, cy, g.idGroup ?? g.id ?? idx + 1);
         });
-        console.log(`[MisHorarios] Mapeados ${this.allGroups.length} Grupos:`, this.allGroups);
 
         // Parse teachers
         const rawTeachers = Array.isArray(res.teachers?.data) ? res.teachers.data : Array.isArray(res.teachers) ? res.teachers : [];
         this.allTeachers = rawTeachers.map((t: any, idx: number) => new Teacher(t.name ?? '', t.lastName ?? '', t.email ?? '', t.idTeacher ?? t.id ?? idx + 1));
-        console.log(`[MisHorarios] Mapeados ${this.allTeachers.length} Docentes:`, this.allTeachers);
 
         // Parse spaces
         const rawSpaces = Array.isArray(res.spaces?.data) ? res.spaces.data : Array.isArray(res.spaces) ? res.spaces : [];
         this.allSpaces = rawSpaces;
-        console.log(`[MisHorarios] Mapeadas ${this.allSpaces.length} Aulas:`, this.allSpaces);
 
         // Build a lookup map for base assignments (to get teacher if missing)
         const rawBaseAssigns = Array.isArray(res.baseAssignments?.data) ? res.baseAssignments.data : Array.isArray(res.baseAssignments) ? res.baseAssignments : [];
@@ -608,12 +611,13 @@ export class MisHorariosComponent implements OnInit {
             teacherData.idTeacher || teacherData.id || undefined
           );
 
+          const courseData = item.course ?? {};
+          const stableFakeId = courseData.idCourse ? (1000000 + courseData.idCourse) : (1000000 + idx);
+
           const courseAssignment = new CourseAssignment(
             teacher,
-            item.courseAssignment?.idCourseAssignment ?? item.courseAssignment?.id ?? (1000000 + idx)
+            item.courseAssignment?.idCourseAssignment ?? item.courseAssignment?.id ?? stableFakeId
           );
-
-          const courseData = item.course ?? {};
           const cGroupRaw = courseData.group ?? {};
           const cGroup = new Group(
             cGroupRaw.groupNumber ?? 0,
@@ -639,10 +643,67 @@ export class MisHorariosComponent implements OnInit {
           return new CourseAssignmentCourse(
             courseAssignment,
             course,
-            item.idCourseAssignmentCourse ?? item.id ?? (1000000 + idx)
+            item.idCourseAssignmentCourse ?? item.id ?? stableFakeId
           );
         });
-        console.log(`[MisHorarios] Mapeados ${this.allAssignmentCourses.length} Vínculos Curso-Docente:`, this.allAssignmentCourses);
+
+        // Merge missing courses (courses without teachers)
+        const rawCourses = Array.isArray(res.courses?.data) ? res.courses.data : Array.isArray(res.courses) ? res.courses : [];
+        rawCourses.forEach((cData: any, idx: number) => {
+          const cId = cData.idCourse ?? cData.id;
+          if (!cId) return;
+          const exists = this.allAssignmentCourses.some(ac => ac.course?.idCourse == cId);
+          if (!exists) {
+            const cGroupRaw = cData.group ?? {};
+            const cGroup = new Group(
+              cGroupRaw.groupNumber ?? 0,
+              cGroupRaw.capacity ?? 0,
+              cGroupRaw.cycle ? new Cycle(cGroupRaw.cycle.name ?? '', null as any, cGroupRaw.cycle.idCycle) : null as any,
+              cGroupRaw.idGroup ?? cGroupRaw.id ?? idx + 99000
+            );
+            const course = new Course(
+              cData.name ?? 'Curso',
+              cData.code ?? '',
+              cData.description ?? '',
+              cData.duration ?? 0,
+              cData.practicalHours ?? 0,
+              cData.theoreticalHours ?? 0,
+              cData.totalHours ?? 0,
+              null as any,
+              cGroup,
+              cData.courseType ?? null,
+              cId
+            );
+            
+            const stableFakeId = 1000000 + cId;
+            const fakeAssignment = new CourseAssignment(
+              new Teacher('Sin Asignar', '', '', undefined as any),
+              stableFakeId
+            );
+
+            let hoursRequired = 4;
+            const rawTotalHours: any = course.totalHours;
+            if (typeof rawTotalHours === 'number') {
+              hoursRequired = rawTotalHours;
+            } else if (typeof rawTotalHours === 'string') {
+              if (rawTotalHours.startsWith('PT')) {
+                const match = rawTotalHours.match(/(\d+)H/);
+                if (match) hoursRequired = parseInt(match[1], 10);
+              } else {
+                const parsed = parseInt(rawTotalHours, 10);
+                if (!isNaN(parsed)) hoursRequired = parsed;
+              }
+            }
+
+            this.allAssignmentCourses.push(
+              new CourseAssignmentCourse(
+                fakeAssignment,
+                course,
+                stableFakeId
+              )
+            );
+          }
+        });
 
         // Parse schedules defensively
         const rawSchedules = Array.isArray(res.schedules?.data) ? res.schedules.data : Array.isArray(res.schedules) ? res.schedules : [];
@@ -688,51 +749,11 @@ export class MisHorariosComponent implements OnInit {
           };
         });
         
-        // CLEAN AND DETAILED DEBUG LOGGING FOR THE SCHEDULE & COURSE IMPORT ANALYSIS
-        console.group('🔍 [DEBUG] Análisis de Cursos y Horarios Cargados');
-        console.log(`Total Horarios Mapeados: ${this.allSchedules.length}`);
-        console.log(`Total Vínculos Curso-Docente en Cache: ${this.allAssignmentCourses.length}`);
-        
-        const courseAnalysis: any[] = [];
-        this.allAssignmentCourses.forEach(ac => {
-          courseAnalysis.push({
-            'Curso ID': ac.course?.idCourse,
-            'Curso Nombre': ac.course?.name,
-            'Grupo ID': ac.course?.group?.idGroup,
-            'Grupo Número': ac.course?.group?.groupNumber,
-            'Ciclo ID': ac.course?.group?.cycle?.idCycle,
-            'Ciclo Nombre': ac.course?.group?.cycle?.name,
-            'Docente': ac.courseAssignment?.teacher ? `${ac.courseAssignment.teacher.name} ${ac.courseAssignment.teacher.lastName}` : 'Sin Docente'
-          });
-        });
-        console.log('--- Tabla de Cursos Asignados en Cache ---');
-        console.table(courseAnalysis);
-
-        const scheduleAnalysis: any[] = [];
-        this.allSchedules.forEach((sch, idx) => {
-          const associatedCourse = this.allAssignmentCourses.find(ac => 
-            ac.courseAssignment?.idCourseAssignment == sch.idCourseAssignment
-          );
-          scheduleAnalysis.push({
-            'Horario ID': sch.idSchedule,
-            'Día': sch.dayOfWeek,
-            'Inicio': sch.startTime,
-            'Fin': sch.endTime,
-            'Curso Asignado': associatedCourse?.course?.name ?? sch.courseName ?? 'No encontrado',
-            'Grupo Asignado': associatedCourse?.course?.group?.groupNumber ?? 'N/A',
-            'Ciclo Asignado': associatedCourse?.course?.group?.cycle?.name ?? 'N/A'
-          });
-        });
-        console.log('--- Tabla de Horarios Mapeados en Grilla ---');
-        console.table(scheduleAnalysis);
-        console.groupEnd();
-
         this.linkHierarchy();
         this.resolveUserContext();
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('[MisHorarios] Error grave cargando datos en forkJoin! Conexión fallida:', err);
         this.isLoading = false;
         this.showTransientToast('Error de conexión con el servidor. Revisa la consola.', 5000);
       }
@@ -768,14 +789,12 @@ export class MisHorariosComponent implements OnInit {
       next: (user: any) => {
         if (!user) return;
         this.currentUserName = user.username ?? 'Usuario';
-        console.log('[MisHorarios] Usuario autenticado detectado:', user.username, 'Roles:', user.roles);
 
         const profileId = user.userProfileId || (user as any)?.userProfile?.id;
         if (profileId) {
           this.userService.getUser(profileId).subscribe({
             next: (profile: any) => {
               this.currentUserName = `${profile.names} ${profile.lastName}`;
-              console.log('[MisHorarios] Perfil de usuario recuperado:', this.currentUserName, 'Email:', profile.email);
               
               if (this.isTeacher()) {
                 const userEmail = profile.email?.toLowerCase() || '';
@@ -783,10 +802,8 @@ export class MisHorariosComponent implements OnInit {
                 if (match) {
                   this.currentTeacherId = match.idTeacher;
                   this.currentUserName = `${match.name} ${match.lastName}`;
-                  console.log(`[MisHorarios] Docente identificado con ID: ${this.currentTeacherId}`);
                   this.loadTeacherGrid();
                 } else {
-                  console.warn('[MisHorarios] Docente no coincide con ningún registro por correo. Usando fallback...');
                   if (this.allTeachers.length > 0) {
                     const fallback = this.allTeachers[0];
                     this.currentTeacherId = fallback.idTeacher;
@@ -803,7 +820,6 @@ export class MisHorariosComponent implements OnInit {
               }
             },
             error: (err: any) => {
-              console.error('[MisHorarios] Error cargando perfil del usuario:', err);
               if (this.isTeacher() && this.allTeachers.length > 0) {
                 const fallback = this.allTeachers[0];
                 this.currentTeacherId = fallback.idTeacher;
@@ -833,7 +849,6 @@ export class MisHorariosComponent implements OnInit {
     this.initEmptyGrid();
     if (this.selectedFacultyId) {
       this.schools = this.allSchools.filter(s => s.faculty?.idFaculty == this.selectedFacultyId);
-      console.log(`[MisHorarios] Filtrado por facultad ID: ${this.selectedFacultyId}. Encontradas ${this.schools.length} escuelas.`);
     } else {
       this.schools = [];
     }
@@ -845,7 +860,6 @@ export class MisHorariosComponent implements OnInit {
     this.initEmptyGrid();
     if (this.selectedSchoolId) {
       this.cycles = this.allCycles.filter(c => c.professionalSchool?.idProfessionalSchool == this.selectedSchoolId);
-      console.log(`[MisHorarios] Filtrado por escuela ID: ${this.selectedSchoolId}. Encontrados ${this.cycles.length} ciclos.`);
     } else {
       this.cycles = [];
     }
@@ -856,14 +870,12 @@ export class MisHorariosComponent implements OnInit {
     this.initEmptyGrid();
     if (this.selectedCycleId) {
       this.groups = this.allGroups.filter(g => g.cycle?.idCycle == this.selectedCycleId);
-      console.log(`[MisHorarios] Filtrado por ciclo ID: ${this.selectedCycleId}. Encontrados ${this.groups.length} grupos.`);
     } else {
       this.groups = [];
     }
   }
 
   onGroupChange() {
-    console.log(`[MisHorarios] Cambio en grupo seleccionado ID: ${this.selectedGroupId}`);
     if (this.selectedGroupId) {
       this.loadGroupGrid();
     } else {
@@ -900,14 +912,12 @@ export class MisHorariosComponent implements OnInit {
 
   private getGroupIdForSchedule(schedule: ScheduleResponse): number | null {
     if (!schedule.idCourseAssignment) {
-      console.warn(`[MisHorarios] El bloque de horario ${schedule.idSchedule} no contiene idCourseAssignment.`);
       return null;
     }
     const match = this.allAssignmentCourses.find(ac => 
       ac.courseAssignment?.idCourseAssignment == schedule.idCourseAssignment
     );
     if (!match) {
-      console.warn(`[MisHorarios] No se encontró asignación en cache para idCourseAssignment: ${schedule.idCourseAssignment}`);
       return null;
     }
     return match.course?.group?.idGroup ?? null;
@@ -916,7 +926,6 @@ export class MisHorariosComponent implements OnInit {
   private loadGroupGrid() {
     if (!this.selectedGroupId) return;
     const groupId = Number(this.selectedGroupId);
-    console.log(`[MisHorarios] Cargando cuadrícula para el Grupo ID: ${groupId}...`);
     
     // Filter schedules belonging to this group OR global activities (Type 101 = Cultura, Type 102 = Activate)
     const filtered = this.allSchedules.filter(sch => {
@@ -928,12 +937,11 @@ export class MisHorariosComponent implements OnInit {
       const gId = this.getGroupIdForSchedule(sch);
       const isMatch = (gId == groupId);
       if (isMatch) {
-        console.log(`[MisHorarios] Match encontrado en horario ID: ${sch.idSchedule} para el grupo.`);
       }
       return isMatch;
     });
 
-    console.log(`[MisHorarios] Total de horarios filtrados para este grupo: ${filtered.length}. Iniciando población...`);
+    console.log('[VERIFICACIÓN HORARIOS] Horarios devueltos por el backend para este grupo:', filtered);
     this.populateGrid(filtered);
     this.calculateNextClass(filtered);
   }
@@ -941,28 +949,24 @@ export class MisHorariosComponent implements OnInit {
   private loadTeacherGrid() {
     if (!this.currentTeacherId) return;
     const teacherId = this.currentTeacherId;
-    console.log(`[MisHorarios] Cargando cuadrícula para el Docente ID: ${teacherId}...`);
 
     // Filter course assignments belonging to this teacher
     const teacherAssignments = this.allAssignmentCourses.filter(ac => 
       ac.courseAssignment?.teacher?.idTeacher == teacherId
     ).map(ac => ac.courseAssignment?.idCourseAssignment);
 
-    console.log(`[MisHorarios] El docente tiene ${teacherAssignments.length} asignaciones asociadas:`, teacherAssignments);
 
     // Filter schedules
     const filtered = this.allSchedules.filter(sch => 
       sch.idCourseAssignment && teacherAssignments.includes(sch.idCourseAssignment)
     );
 
-    console.log(`[MisHorarios] Total de horarios encontrados para este docente: ${filtered.length}. Iniciando población...`);
     this.populateGrid(filtered);
     this.calculateNextClass(filtered);
   }
 
   private populateGrid(schedules: ScheduleResponse[]) {
     this.initEmptyGrid();
-    console.log(`[MisHorarios] Poblando cuadrícula semanal con ${schedules.length} bloques...`);
 
     const colors = [
       { bg: 'rgba(232, 234, 204, 0.6)', border: '#d4d8a1' },
@@ -983,14 +987,11 @@ export class MisHorariosComponent implements OnInit {
         return startMins >= slotStart && startMins < slotEnd;
       });
 
-      console.log(`[MisHorarios] Mapeando Bloque -> ID: ${schedule.idSchedule}, Día: ${schedule.dayOfWeek} (Idx: ${dayIdx}), Hora: ${schedule.startTime} (Idx: ${timeIdx})`);
 
       if (dayIdx === -1) {
-        console.warn(`[MisHorarios] El día ${schedule.dayOfWeek} no coincide con ningún día de la cuadrícula.`);
         return;
       }
       if (timeIdx === -1) {
-        console.warn(`[MisHorarios] La hora de inicio ${schedule.startTime} no coincide con ningún segmento de la cuadrícula.`);
         return;
       }
 
@@ -1010,7 +1011,6 @@ export class MisHorariosComponent implements OnInit {
         }
 
         rowspan = Math.max(1, (endTimeIdx - timeIdx) + 1);
-        console.log(`[MisHorarios] Rowspan calculado por bloques académicos: ${rowspan}`);
       }
 
       const color = colors[colorIndex % colors.length];
@@ -1039,7 +1039,6 @@ export class MisHorariosComponent implements OnInit {
       }
     });
 
-    console.log('[MisHorarios] Cuadrícula poblada exitosamente.');
   }
 
   private parseTime(timeStr: string): number {
@@ -1168,10 +1167,8 @@ export class MisHorariosComponent implements OnInit {
     );
 
     if (existingCAC && existingCAC.idCourseAssignmentCourse) {
-      console.log(`[MisHorarios] Vínculo existente encontrado ID: ${existingCAC.idCourseAssignmentCourse}. Guardando horario...`);
       this.executeSave(existingCAC.idCourseAssignmentCourse);
     } else {
-      console.log('[MisHorarios] Vínculo no existe en caché. Creando nuevo CourseAssignment...');
       this.isLoading = true;
 
       // Check if this teacher already has a CourseAssignment
@@ -1180,13 +1177,11 @@ export class MisHorariosComponent implements OnInit {
       )?.courseAssignment;
 
       if (existingCA && existingCA.idCourseAssignment) {
-        console.log(`[MisHorarios] Docente ya tiene CourseAssignment ID: ${existingCA.idCourseAssignment}. Vinculando curso...`);
         this.assignmentCourseService.createCourseType({
           idCourse: Number(this.formCourseId),
           idCourseAssignment: existingCA.idCourseAssignment
         }).subscribe({
           next: (newCAC: any) => {
-            console.log('[MisHorarios] Vínculo creado exitosamente. Recargando caché...');
             const newAssignmentId = newCAC.idCourseAssignmentCourse ?? newCAC.id;
             this.scheduleService.findAll().subscribe(schedules => {
               this.allSchedules = Array.isArray(schedules) ? schedules : (schedules as any).data ?? [];
@@ -1196,39 +1191,33 @@ export class MisHorariosComponent implements OnInit {
             });
           },
           error: (err) => {
-            console.error('[MisHorarios] Error vinculando curso y docente:', err);
             this.isLoading = false;
             this.showTransientToast('Error al vincular el docente con el curso.', 3000);
           }
         });
       } else {
-        console.log('[MisHorarios] Docente no tiene CourseAssignment. Creando nuevo...');
         this.courseAssignmentService.createCourseType({
           idTeacher: Number(this.formTeacherId)
         }).subscribe({
           next: (newCA: any) => {
             const caId = newCA.idCourseAssignment ?? newCA.id ?? newCA.id_assignment;
-            console.log(`[MisHorarios] CourseAssignment creado con ID: ${caId}. Vinculando curso...`);
             
             this.assignmentCourseService.createCourseType({
               idCourse: Number(this.formCourseId),
               idCourseAssignment: caId
             }).subscribe({
               next: (newCAC: any) => {
-                console.log('[MisHorarios] Vínculo creado con éxito. Recargando...');
                 const newAssignmentId = newCAC.idCourseAssignmentCourse ?? newCAC.id;
                 this.loadAllInitialData();
                 this.executeSave(newAssignmentId);
               },
               error: (err) => {
-                console.error('[MisHorarios] Error vinculando curso y docente:', err);
                 this.isLoading = false;
                 this.showTransientToast('Error al vincular el docente con el curso.', 3000);
               }
             });
           },
           error: (err) => {
-            console.error('[MisHorarios] Error creando CourseAssignment:', err);
             this.isLoading = false;
             this.showTransientToast('Error al registrar la asignación docente.', 3000);
           }
@@ -1257,7 +1246,6 @@ export class MisHorariosComponent implements OnInit {
 
     if (this.isEditing && this.editingScheduleId) {
       payload.idSchedule = this.editingScheduleId;
-      console.log('[MisHorarios] Guardando bloque de horario (Edición)...', payload);
       this.scheduleService.update(this.editingScheduleId, payload).subscribe({
         next: () => {
           this.closeModal();
@@ -1265,13 +1253,11 @@ export class MisHorariosComponent implements OnInit {
           this.showTransientToast('Horario actualizado correctamente', 3000);
         },
         error: (err: any) => {
-          console.error('[MisHorarios] Error al actualizar horario:', err);
           this.isLoading = false;
           this.showTransientToast('Error al actualizar el horario', 3000);
         }
       });
     } else {
-      console.log('[MisHorarios] Guardando bloque de horario (Creación)...', payload);
       this.scheduleService.create(payload).subscribe({
         next: () => {
           this.closeModal();
@@ -1279,7 +1265,6 @@ export class MisHorariosComponent implements OnInit {
           this.showTransientToast('Horario creado correctamente', 3000);
         },
         error: (err: any) => {
-          console.error('[MisHorarios] Error al crear horario:', err);
           this.isLoading = false;
           this.showTransientToast('Error al crear el horario', 3000);
         }
@@ -1289,7 +1274,6 @@ export class MisHorariosComponent implements OnInit {
 
   deleteSchedule() {
     if (!this.editingScheduleId) return;
-    console.log(`[MisHorarios] Eliminando bloque de horario ID: ${this.editingScheduleId}...`);
     
     this.scheduleService.delete(this.editingScheduleId).subscribe({
       next: () => {
@@ -1298,7 +1282,6 @@ export class MisHorariosComponent implements OnInit {
         this.showTransientToast('Horario eliminado correctamente', 3000);
       },
       error: (err: any) => {
-        console.error('[MisHorarios] Error al eliminar horario:', err);
         this.showTransientToast('Error al eliminar el horario', 3000);
       }
     });
