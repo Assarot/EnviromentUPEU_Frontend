@@ -37,10 +37,10 @@ import { AcademicSpace } from '../../../core/models/academic-space';
               <div>
                 <span class="inline-block rounded-full px-3 py-1 text-xs font-bold text-white mb-2"
                       [ngClass]="getEstadoBadgeClass()">
-                  {{ ambiente.state?.name ?? 'Desconocido' }}
+                  {{ ambiente.state.name }}
                 </span>
                 <h2 class="text-2xl font-bold text-white">{{ ambiente.space_name }}</h2>
-                <p class="mt-1 text-sm text-white/90">{{ ambiente.type_academic_space?.name }}</p>
+                <p class="mt-1 text-sm text-white/90">{{ ambiente.type_academic_space.name }}</p>
               </div>
               <button
                 (click)="close()"
@@ -101,7 +101,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
                 </div>
                 <div>
                   <p class="text-xs font-medium text-slate-500">Pabellón</p>
-                  <p class="text-sm font-semibold text-slate-800">{{ ambiente.floor?.building?.name || 'No especificado' }}</p>
+                  <p class="text-sm font-semibold text-slate-800">{{ ambiente.floor.building.name || 'No especificado' }}</p>
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
                 <div>
                   <p class="text-xs font-medium text-slate-500">Piso</p>
                   <p class="text-sm font-semibold text-slate-800">
-                    {{ ambiente.floor?.floor_number != null ? 'Piso ' + ambiente.floor.floor_number : 'No especificado' }}
+                    {{ ambiente.floor.floor_number != null ? 'Piso ' + ambiente.floor.floor_number : 'No especificado' }}
                   </p>
                 </div>
               </div>
@@ -156,7 +156,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
                   </p>
                   <p class="text-xs"
                      [ngClass]="isDisponible() ? 'text-lime-600' : 'text-amber-600'">
-                    Estado: {{ ambiente.state?.name ?? 'Desconocido' }}
+                    Estado: {{ ambiente.state.name }}
                   </p>
                 </div>
               </div>
@@ -173,15 +173,15 @@ import { AcademicSpace } from '../../../core/models/academic-space';
               </div>
               <div class="flex items-center justify-between">
                 <span>Tipo de Espacio:</span>
-                <span class="font-semibold text-slate-800">{{ ambiente.type_academic_space?.name ?? 'N/A' }}</span>
+                <span class="font-semibold text-slate-800">{{ ambiente.type_academic_space.name }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span>Estado del Pabellón:</span>
-                <span class="font-semibold text-slate-800">{{ ambiente.floor?.building?.is_active || 'N/A' }}</span>
+                <span class="font-semibold text-slate-800">{{ ambiente.floor.building.is_active || 'N/A' }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span>Estado del Piso:</span>
-                <span class="font-semibold text-slate-800">{{ ambiente.floor?.is_active || 'N/A' }}</span>
+                <span class="font-semibold text-slate-800">{{ ambiente.floor.is_active || 'N/A' }}</span>
               </div>
             </div>
           </div>

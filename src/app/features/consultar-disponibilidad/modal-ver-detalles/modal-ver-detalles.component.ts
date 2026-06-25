@@ -25,7 +25,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
           <div>
             <h2 class="text-xl font-bold text-slate-800">{{ ambiente.space_name }}</h2>
             <p class="mt-0.5 text-sm text-slate-500">
-              {{ ambiente.type_academic_space?.name }}
+              {{ ambiente.type_academic_space.name }}
             </p>
           </div>
           <button
@@ -62,7 +62,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
                   class="h-2 w-2 rounded-full"
                   [style.background-color]="getEstadoDotColor()"
                 ></span>
-                {{ ambiente.state?.name ?? 'Desconocido' }}
+                {{ ambiente.state.name }}
               </span>
             </div>
           </div>
@@ -109,7 +109,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
                 </div>
                 <div>
                   <p class="text-xs font-medium text-slate-500">Pabellón</p>
-                  <p class="text-sm font-semibold text-slate-800">{{ ambiente.floor?.building?.name || 'No especificado' }}</p>
+                  <p class="text-sm font-semibold text-slate-800">{{ ambiente.floor.building.name || 'No especificado' }}</p>
                 </div>
               </div>
             </div>
@@ -125,7 +125,7 @@ import { AcademicSpace } from '../../../core/models/academic-space';
                 <div>
                   <p class="text-xs font-medium text-slate-500">Piso</p>
                   <p class="text-sm font-semibold text-slate-800">
-                    {{ ambiente.floor?.floor_number != null ? 'Piso ' + ambiente.floor.floor_number : 'No especificado' }}
+                    {{ ambiente.floor.floor_number != null ? 'Piso ' + ambiente.floor.floor_number : 'No especificado' }}
                   </p>
                 </div>
               </div>

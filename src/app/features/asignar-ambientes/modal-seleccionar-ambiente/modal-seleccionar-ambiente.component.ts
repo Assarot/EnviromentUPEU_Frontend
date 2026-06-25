@@ -120,13 +120,13 @@ import { CourseSpaceAssignment } from '../../../core/services/course-space-assig
                     <!-- Badge estado -->
                     <span
                       class="rounded-full px-2 py-0.5 text-xs font-medium"
-                      [ngClass]="getEstadoBadgeClass(a.state?.name)"
+                      [ngClass]="getEstadoBadgeClass(a.state.name)"
                     >
-                      {{ a.state?.name ?? 'Desconocido' }}
+                      {{ a.state.name }}
                     </span>
                   </div>
 
-                  <p class="mt-0.5 text-xs text-slate-500">{{ a.type_academic_space?.name }}</p>
+                  <p class="mt-0.5 text-xs text-slate-500">{{ a.type_academic_space.name }}</p>
 
                   <div class="mt-2 flex flex-wrap gap-3 text-xs text-slate-600">
                     <!-- Capacidad -->

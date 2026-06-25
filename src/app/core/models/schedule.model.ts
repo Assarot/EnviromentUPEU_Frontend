@@ -25,3 +25,27 @@ export interface ScheduleResponse {
   colorHex?: string;
   borderColorHex?: string;
 }
+
+export interface CourseToAssign {
+  idCourseAssignment: number;
+  capacityRequired?: number;
+  preferredType?: string;
+  candidateAcademicSpaceIds: number[];
+  idTypeSchedule?: number;
+  hoursRequired: number;
+  idTeacher?: number;
+  idGroup?: number;
+  priority?: number;
+}
+
+export interface AutoAssignRequest {
+  courses: CourseToAssign[];
+  startTimes: string[];
+  durationMinutes: number;
+  weekDayIds: number[];
+}
+
+export interface AutoAssignResponse {
+  assigned: ScheduleResponse[];
+  failedCourseAssignmentIds: number[];
+}

@@ -48,6 +48,7 @@ export class CargaAcademicaComponent implements OnInit {
   selectedFile: File | null = null;
   isDragging = false;
   uploadError: string | null = null;
+  private fakeProgressInterval: any = null;
 
   faculties: Faculty[] = [];
   allSchools: ProfessionalSchool[] = [];
@@ -295,6 +296,10 @@ export class CargaAcademicaComponent implements OnInit {
     this.selectedFile = null;
     this.isDragging = false;
     this.uploadError = null;
+    if (this.fakeProgressInterval) {
+      clearInterval(this.fakeProgressInterval);
+      this.fakeProgressInterval = null;
+    }
   }
 
   onDragOver(event: DragEvent) {
@@ -336,18 +341,35 @@ export class CargaAcademicaComponent implements OnInit {
     this.uploadProgress = 0;
     this.uploadError = null;
     
+    if (this.fakeProgressInterval) {
+      clearInterval(this.fakeProgressInterval);
+    }
+    
+    // Fake progress animation
+    this.fakeProgressInterval = setInterval(() => {
+      if (this.uploadProgress < 90) {
+        this.uploadProgress += Math.floor(Math.random() * 8) + 2; // Sube entre 2% y 10%
+        if (this.uploadProgress > 90) this.uploadProgress = 90;
+      } else if (this.uploadProgress < 96) {
+        this.uploadProgress += 1; // Sube lentamente al final
+      }
+    }, 400);
+
     this.cargaAcademicaService.uploadFile(this.selectedFile).subscribe({
       next: (event) => {
-        if (event.type === HttpEventType.UploadProgress) {
-          this.uploadProgress = Math.round(100 * event.loaded / (event.total || 1));
-        } else if (event.type === HttpEventType.Response) {
-          this.isUploading = false;
-          this.closeUploadModal();
-          this.showSuccessModal = true;
-          this.loadInitialData();
+        if (event.type === HttpEventType.Response) {
+          if (this.fakeProgressInterval) clearInterval(this.fakeProgressInterval);
+          this.uploadProgress = 100;
+          setTimeout(() => {
+            this.isUploading = false;
+            this.closeUploadModal();
+            this.showSuccessModal = true;
+            this.loadInitialData();
+          }, 600); // Pequeño retraso para que el usuario vea el 100%
         }
       },
       error: (error) => {
+        if (this.fakeProgressInterval) clearInterval(this.fakeProgressInterval);
         console.error('Error al subir archivo:', error);
         this.isUploading = false;
         this.uploadError = 'Ocurrió un error al subir el archivo. Inténtalo de nuevo.';

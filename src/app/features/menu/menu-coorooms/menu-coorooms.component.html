@@ -3,8 +3,12 @@
   <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Resumen de Ambientes y Recursos</h1>
-        <p class="text-gray-600">Gestiona los espacios y recursos de la institución</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Resumen de Ambientes y Recursos
+        </h1>
+        <p class="text-gray-600">
+          Gestiona los espacios y recursos de la institución
+        </p>
       </div>
       <div class="hidden md:block">
         <div class="text-right">
@@ -24,9 +28,21 @@
           <p class="text-sm text-gray-600 mb-1">Total de Ambientes</p>
           <p class="text-4xl font-bold text-gray-900">{{ totalAmbientes }}</p>
         </div>
-        <div class="w-16 h-16 rounded-full flex items-center justify-center" style="background-color: rgba(191, 198, 33, 0.1);">
-          <svg class="w-8 h-8" style="color: #BFC621;" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+        <div
+          class="w-16 h-16 rounded-full flex items-center justify-center"
+          style="background-color: rgba(191, 198, 33, 0.1)"
+        >
+          <svg
+            class="w-8 h-8"
+            style="color: #bfc621"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+              clip-rule="evenodd"
+            ></path>
           </svg>
         </div>
       </div>
@@ -39,9 +55,19 @@
           <p class="text-sm text-gray-600 mb-1">Total de Recursos</p>
           <p class="text-4xl font-bold text-gray-900">{{ totalRecursos }}</p>
         </div>
-        <div class="w-16 h-16 rounded-full flex items-center justify-center" style="background-color: rgba(191, 198, 33, 0.1);">
-          <svg class="w-8 h-8" style="color: #BFC621;" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+        <div
+          class="w-16 h-16 rounded-full flex items-center justify-center"
+          style="background-color: rgba(191, 198, 33, 0.1)"
+        >
+          <svg
+            class="w-8 h-8"
+            style="color: #bfc621"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+            ></path>
           </svg>
         </div>
       </div>
@@ -58,14 +84,29 @@
         <table class="w-full">
           <thead>
             <tr class="border-b border-gray-200">
-              <th class="text-left py-3 px-4 text-sm font-semibold text-gray-700">Ambiente</th>
-              <th class="text-right py-3 px-4 text-sm font-semibold text-gray-700">Recursos</th>
+              <th
+                class="text-left py-3 px-4 text-sm font-semibold text-gray-700"
+              >
+                Ambiente
+              </th>
+              <th
+                class="text-right py-3 px-4 text-sm font-semibold text-gray-700"
+              >
+                Recursos
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let ambiente of ambientesList" class="border-b border-gray-100 hover:bg-gray-50">
-              <td class="py-3 px-4 text-sm text-gray-900">{{ ambiente.nombre }}</td>
-              <td class="py-3 px-4 text-sm text-right" style="color: #BFC621;">{{ ambiente.recursos }}</td>
+            <tr
+              *ngFor="let ambiente of ambientesList"
+              class="border-b border-gray-100 hover:bg-gray-50"
+            >
+              <td class="py-3 px-4 text-sm text-gray-900">
+                {{ ambiente.nombre }}
+              </td>
+              <td class="py-3 px-4 text-sm text-right" style="color: #bfc621">
+                {{ ambiente.recursos }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -83,16 +124,25 @@
         <!-- Utilización de Recursos -->
         <div>
           <div class="flex items-center justify-between mb-2">
-            <p class="text-sm font-medium text-gray-700">Utilización de Recursos</p>
-            <p class="text-2xl font-bold text-gray-900">{{ utilizacionRecursos }}%</p>
+            <p class="text-sm font-medium text-gray-700">
+              Utilización de Recursos
+            </p>
+            <p class="text-2xl font-bold text-gray-900">
+              {{ utilizacionRecursos }}%
+            </p>
           </div>
-          <div class="text-xs text-gray-500 mb-3">Este Año <span style="color: #BFC621;">+8%</span></div>
-          
+          <div class="text-xs text-gray-500 mb-3">
+            Este Año <span style="color: #bfc621">+8%</span>
+          </div>
+
           <!-- Simple bar chart representation -->
           <div class="space-y-2">
             <div class="flex items-center gap-2">
               <div class="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden">
-                <div class="h-full rounded-lg transition-all duration-500" style="background-color: #BFC621; width: 75%;"></div>
+                <div
+                  class="h-full rounded-lg transition-all duration-500"
+                  style="background-color: #bfc621; width: 75%"
+                ></div>
               </div>
             </div>
           </div>
@@ -104,20 +154,37 @@
             <p class="text-sm font-medium text-gray-700">Tendencia de Uso</p>
             <p class="text-2xl font-bold text-gray-900">{{ tendenciaUso }}%</p>
           </div>
-          <div class="text-xs text-gray-500 mb-3">Este Año <span style="color: #BFC621;">+10%</span></div>
-          
+          <div class="text-xs text-gray-500 mb-3">
+            Este Año <span style="color: #bfc621">+10%</span>
+          </div>
+
           <!-- Simple wave chart representation -->
           <div class="h-24 flex items-end gap-1">
-            <div class="flex-1 bg-gray-200 rounded-t" style="height: 40%;"></div>
-            <div class="flex-1 rounded-t" style="background-color: #BFC621; height: 70%;"></div>
-            <div class="flex-1 bg-gray-200 rounded-t" style="height: 50%;"></div>
-            <div class="flex-1 rounded-t" style="background-color: #BFC621; height: 65%;"></div>
-            <div class="flex-1 bg-gray-200 rounded-t" style="height: 45%;"></div>
-            <div class="flex-1 rounded-t" style="background-color: #BFC621; height: 80%;"></div>
-            <div class="flex-1 bg-gray-200 rounded-t" style="height: 55%;"></div>
-            <div class="flex-1 rounded-t" style="background-color: #BFC621; height: 90%;"></div>
-            <div class="flex-1 bg-gray-200 rounded-t" style="height: 60%;"></div>
-            <div class="flex-1 rounded-t" style="background-color: #BFC621; height: 75%;"></div>
+            <div class="flex-1 bg-gray-200 rounded-t" style="height: 40%"></div>
+            <div
+              class="flex-1 rounded-t"
+              style="background-color: #bfc621; height: 70%"
+            ></div>
+            <div class="flex-1 bg-gray-200 rounded-t" style="height: 50%"></div>
+            <div
+              class="flex-1 rounded-t"
+              style="background-color: #bfc621; height: 65%"
+            ></div>
+            <div class="flex-1 bg-gray-200 rounded-t" style="height: 45%"></div>
+            <div
+              class="flex-1 rounded-t"
+              style="background-color: #bfc621; height: 80%"
+            ></div>
+            <div class="flex-1 bg-gray-200 rounded-t" style="height: 55%"></div>
+            <div
+              class="flex-1 rounded-t"
+              style="background-color: #bfc621; height: 90%"
+            ></div>
+            <div class="flex-1 bg-gray-200 rounded-t" style="height: 60%"></div>
+            <div
+              class="flex-1 rounded-t"
+              style="background-color: #bfc621; height: 75%"
+            ></div>
           </div>
           <div class="flex justify-between mt-2 text-xs text-gray-500">
             <span>Ene</span>
@@ -134,45 +201,60 @@
 
   <!-- Quick Actions -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <a routerLink="/main/ambientes" class="block bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+    <a
+      routerLink="/main/ambientes"
+      class="block bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+    >
       <div class="flex items-center">
-        <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: #BFC621;">
-          <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+        <div
+          class="w-12 h-12 rounded-lg flex items-center justify-center"
+          style="background-color: #bfc621"
+        >
+          <svg
+            class="w-6 h-6 text-white"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+              clip-rule="evenodd"
+            ></path>
           </svg>
         </div>
         <div class="ml-4">
-          <h3 class="text-lg font-semibold text-gray-900">Gestionar Ambientes</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Gestionar Ambientes
+          </h3>
           <p class="text-sm text-gray-600">Ver y editar espacios disponibles</p>
         </div>
       </div>
     </a>
 
-    <a routerLink="/main/recursos" class="block bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+    <a
+      routerLink="/main/recursos"
+      class="block bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+    >
       <div class="flex items-center">
-        <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: #BFC621;">
-          <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+        <div
+          class="w-12 h-12 rounded-lg flex items-center justify-center"
+          style="background-color: #bfc621"
+        >
+          <svg
+            class="w-6 h-6 text-white"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+            ></path>
           </svg>
         </div>
         <div class="ml-4">
-          <h3 class="text-lg font-semibold text-gray-900">Gestionar Recursos</h3>
+          <h3 class="text-lg font-semibold text-gray-900">
+            Gestionar Recursos
+          </h3>
           <p class="text-sm text-gray-600">Administrar recursos disponibles</p>
-        </div>
-      </div>
-    </a>
-
-    <a routerLink="/main/asignacion-automatica" class="block bg-gradient-to-br from-lime-500 to-lime-600 rounded-xl shadow-lg p-6 border border-lime-400 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-      <div class="flex items-center">
-        <div class="w-12 h-12 rounded-lg flex items-center justify-center bg-white bg-opacity-20">
-          <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M13 7H7v6h6V7z"></path>
-            <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-white">⚡ Asignación Automática</h3>
-          <p class="text-sm text-lime-100">Asignar ambientes por facultad</p>
         </div>
       </div>
     </a>

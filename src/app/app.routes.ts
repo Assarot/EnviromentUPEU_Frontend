@@ -44,7 +44,6 @@ import { AcademicStructureComponent } from './features/course-screen/academic-st
 import { CourseManagementCombinedComponent } from './features/course-screen/course-management-combined/course-management-combined.component';
 import { AsignarAmbientesComponent } from './features/asignar-ambientes/asignar-ambientes.component';
 import { ConsultarDisponibilidadComponent } from './features/consultar-disponibilidad/consultar-disponibilidad.component';
-import { AsignacionAutomaticaComponent } from './features/asignacion-automatica/asignacion-automatica.component';
 
 export const routes: Routes = [
   {
@@ -72,7 +71,10 @@ export const routes: Routes = [
       { path: 'mis-horarios', component: MisHorariosComponent },
       { path: 'reservar-salon', component: ReservarSalonComponent },
       { path: 'mis-solicitudes', component: MisSolicitudesComponent },
-      { path: 'notificar-incidencias', component: NotificarIncidenciasComponent },
+      {
+        path: 'notificar-incidencias',
+        component: NotificarIncidenciasComponent,
+      },
       { path: 'proximamente', component: ProximamenteComponent },
       { path: 'notificaciones', component: NotificacionesComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
@@ -115,8 +117,10 @@ export const routes: Routes = [
       },
       { path: 'res-assign', component: ResourceEnvComponent },
       { path: 'asignar-ambientes', component: AsignarAmbientesComponent },
-      { path: 'asignacion-automatica', component: AsignacionAutomaticaComponent },
-      { path: 'consultar-disponibilidad', component: ConsultarDisponibilidadComponent },
+      {
+        path: 'consultar-disponibilidad',
+        component: ConsultarDisponibilidadComponent,
+      },
 
       // Res-creation con rutas hijas
       {

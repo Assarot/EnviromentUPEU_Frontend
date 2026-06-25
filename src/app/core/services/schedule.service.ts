@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ScheduleRequest, ScheduleResponse } from '../models/schedule.model';
+import { ScheduleRequest, ScheduleResponse, AutoAssignRequest, AutoAssignResponse } from '../models/schedule.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +13,10 @@ export class ScheduleService {
 
   create(request: ScheduleRequest): Observable<ScheduleResponse> {
     return this.http.post<ScheduleResponse>(this.apiUrl, request);
+  }
+
+  autoAssign(request: AutoAssignRequest): Observable<AutoAssignResponse> {
+    return this.http.post<AutoAssignResponse>(`${this.apiUrl}/auto-assign`, request);
   }
 
   findById(id: number): Observable<ScheduleResponse> {

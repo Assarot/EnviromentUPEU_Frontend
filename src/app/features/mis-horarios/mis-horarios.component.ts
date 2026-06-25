@@ -15,6 +15,9 @@ import { AcademicSpaceService } from '../../core/services/academic-space.service
 import { CourseAssignmentCourseService } from '../../core/services/course-assignment-course.service';
 import { CourseAssignmentService } from '../../core/services/course-assignment.service';
 
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+
 import { ScheduleResponse, ScheduleRequest } from '../../core/models/schedule.model';
 import { Faculty } from '../../core/models/faculty';
 import { ProfessionalSchool } from '../../core/models/professional-school';
@@ -33,6 +36,8 @@ export interface ScheduleCell {
   color?: string;
   borderColor?: string;
   isCustomColor?: boolean;
+  topPercent?: number;
+  heightPercent?: number;
 }
 
 @Component({
@@ -55,7 +60,7 @@ export class MisHorariosComponent implements OnInit {
   private assignmentCourseService = inject(CourseAssignmentCourseService);
   private courseAssignmentService = inject(CourseAssignmentService);
 
-  days = ['LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO'];
+  days = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
 
   dayMap: { [key: number]: string } = {
     1: 'DOMINGO',
@@ -78,30 +83,22 @@ export class MisHorariosComponent implements OnInit {
   };
 
   timeSlots = [
-    { label: '00:00', start: '00:00:00', end: '01:00:00' },
-    { label: '01:00', start: '01:00:00', end: '02:00:00' },
-    { label: '02:00', start: '02:00:00', end: '03:00:00' },
-    { label: '03:00', start: '03:00:00', end: '04:00:00' },
-    { label: '04:00', start: '04:00:00', end: '05:00:00' },
-    { label: '05:00', start: '05:00:00', end: '06:00:00' },
-    { label: '06:00', start: '06:00:00', end: '07:00:00' },
-    { label: '07:00', start: '07:00:00', end: '08:00:00' },
-    { label: '08:00', start: '08:00:00', end: '09:00:00' },
-    { label: '09:00', start: '09:00:00', end: '10:00:00' },
-    { label: '10:00', start: '10:00:00', end: '11:00:00' },
-    { label: '11:00', start: '11:00:00', end: '12:00:00' },
-    { label: '12:00', start: '12:00:00', end: '13:00:00' },
-    { label: '13:00', start: '13:00:00', end: '14:00:00' },
-    { label: '14:00', start: '14:00:00', end: '15:00:00' },
-    { label: '15:00', start: '15:00:00', end: '16:00:00' },
-    { label: '16:00', start: '16:00:00', end: '17:00:00' },
-    { label: '17:00', start: '17:00:00', end: '18:00:00' },
-    { label: '18:00', start: '18:00:00', end: '19:00:00' },
-    { label: '19:00', start: '19:00:00', end: '20:00:00' },
-    { label: '20:00', start: '20:00:00', end: '21:00:00' },
-    { label: '21:00', start: '21:00:00', end: '22:00:00' },
-    { label: '22:00', start: '22:00:00', end: '23:00:00' },
-    { label: '23:00', start: '23:00:00', end: '24:00:00' }
+    { label: '07:30 - 08:20', start: '07:30:00', end: '08:20:00' },
+    { label: '08:25 - 09:15', start: '08:25:00', end: '09:15:00' },
+    { label: '09:20 - 10:10', start: '09:20:00', end: '10:10:00' },
+    { label: '10:20 - 11:10', start: '10:20:00', end: '11:10:00' },
+    { label: '11:15 - 12:05', start: '11:15:00', end: '12:05:00' },
+    { label: '12:10 - 13:00', start: '12:10:00', end: '13:00:00' },
+    { label: '13:10 - 14:00', start: '13:10:00', end: '14:00:00' },
+    { label: '14:05 - 14:55', start: '14:05:00', end: '14:55:00' },
+    { label: '15:00 - 15:50', start: '15:00:00', end: '15:50:00' },
+    { label: '16:00 - 16:50', start: '16:00:00', end: '16:50:00' },
+    { label: '16:55 - 17:45', start: '16:55:00', end: '17:45:00' },
+    { label: '17:50 - 18:40', start: '17:50:00', end: '18:40:00' },
+    { label: '18:45 - 19:35', start: '18:45:00', end: '19:35:00' },
+    { label: '19:40 - 20:30', start: '19:40:00', end: '20:30:00' },
+    { label: '20:35 - 21:25', start: '20:35:00', end: '21:25:00' },
+    { label: '21:30 - 22:20', start: '21:30:00', end: '22:20:00' }
   ];
 
   grid: ScheduleCell[][] = [];
@@ -146,6 +143,94 @@ export class MisHorariosComponent implements OnInit {
   searchTeacherText = '';
   calculatedDurationMins = 90;
   calculatedDurationText = '90 minutos (1.5 horas)';
+
+  // Auto Assign Modal
+  showAutoAssignModal = false;
+  autoAssignDays = [
+    { id: 2, label: 'LUNES', selected: true },
+    { id: 3, label: 'MARTES', selected: true },
+    { id: 4, label: 'MIÉRCOLES', selected: true },
+    { id: 5, label: 'JUEVES', selected: true },
+    { id: 6, label: 'VIERNES', selected: true },
+    { id: 7, label: 'SÁBADO', selected: false }
+  ];
+  autoAssignShift: 'MANANA' | 'TARDE' | 'AMBOS' = 'TARDE';
+  pendingCoursesForAutoAssign: any[] = [];
+
+  // Dynamic Activity Blocks Config for Auto Assign
+  autoAssignCulturaDay: number | '' = '';
+  autoAssignCulturaStart: string = '';
+  autoAssignCulturaEnd: string = '';
+
+  autoAssignActivateDay: number | '' = '';
+  autoAssignActivateStart: string = '';
+  autoAssignActivateEnd: string = '';
+
+  // Bulk Auto Assign Filters
+  autoAssignFacultyId: number | '' = '';
+  autoAssignSchoolId: number | '' = '';
+  autoAssignBuildingId: number | '' = '';
+
+  get autoAssignSchools() {
+    if (!this.autoAssignFacultyId) return [];
+    return this.allSchools.filter(s => s.faculty?.idFaculty == this.autoAssignFacultyId);
+  }
+
+  onAutoAssignFacultyChange() {
+    this.autoAssignSchoolId = '';
+    this.updatePendingCoursesForAutoAssign();
+  }
+
+  onAutoAssignSchoolChange() {
+    this.updatePendingCoursesForAutoAssign();
+  }
+
+  updatePendingCoursesForAutoAssign() {
+    let targetGroups: number[] = [];
+    
+    // Find all groups that belong to the selected School or Faculty
+    this.allGroups.forEach(g => {
+      if (this.autoAssignSchoolId) {
+        if (g.cycle?.professionalSchool?.idProfessionalSchool == this.autoAssignSchoolId) {
+          if (g.idGroup) targetGroups.push(g.idGroup);
+        }
+      } else if (this.autoAssignFacultyId) {
+        if (g.cycle?.professionalSchool?.faculty?.idFaculty == this.autoAssignFacultyId) {
+          if (g.idGroup) targetGroups.push(g.idGroup);
+        }
+      } else if (this.selectedGroupId) {
+        // Fallback to currently selected group if no bulk filter applied
+        targetGroups.push(Number(this.selectedGroupId));
+      }
+    });
+
+    const targetCourses = this.allAssignmentCourses.filter(ac => {
+      const gId = ac.course?.group?.idGroup;
+      return gId && targetGroups.includes(gId);
+    });
+
+    this.pendingCoursesForAutoAssign = targetCourses.map(ac => {
+      let hoursRequired = 4;
+      const rawTotalHours: any = ac.course?.totalHours;
+      if (typeof rawTotalHours === 'number') {
+        hoursRequired = rawTotalHours;
+      } else if (typeof rawTotalHours === 'string') {
+        if (rawTotalHours.startsWith('PT')) {
+          const match = rawTotalHours.match(/(\d+)H/);
+          if (match) hoursRequired = parseInt(match[1], 10);
+        } else {
+          const parsed = parseInt(rawTotalHours, 10);
+          if (!isNaN(parsed)) hoursRequired = parsed;
+        }
+      }
+      return {
+        course: ac.course,
+        assignment: ac,
+        hoursRequired: hoursRequired,
+        priority: 1
+      };
+    }).filter(pc => pc.assignment?.courseAssignment?.idCourseAssignment);
+  }
 
   onTimeChange() {
     const start = this.parseTime(this.formStartTime);
@@ -259,6 +344,112 @@ export class MisHorariosComponent implements OnInit {
   currentTimeSlotIndex = -1;
   timeUpdateInterval: any = null;
 
+  openAutoAssignModal() {
+    // Reset bulk filters to current view if possible
+    this.autoAssignFacultyId = this.selectedFacultyId || '';
+    this.autoAssignSchoolId = this.selectedSchoolId || '';
+    this.autoAssignBuildingId = '';
+    
+    this.updatePendingCoursesForAutoAssign();
+
+    if (this.pendingCoursesForAutoAssign.length === 0) {
+      this.showTransientToast('No hay cursos con asignaciones docentes para los filtros seleccionados.', 4000);
+      return;
+    }
+
+    this.showAutoAssignModal = true;
+  }
+
+  closeAutoAssignModal() {
+    this.showAutoAssignModal = false;
+  }
+
+  submitAutoAssign() {
+    const selectedDays = this.autoAssignDays.filter(d => d.selected).map(d => d.id);
+    if (selectedDays.length === 0) {
+      this.showTransientToast('Debes seleccionar al menos un día.', 4000);
+      return;
+    }
+
+    let filteredSpaces = this.allSpaces;
+    if (this.autoAssignBuildingId) {
+      filteredSpaces = filteredSpaces.filter(s => {
+        const bId = s.floor?.building?.id_building;
+        return bId == this.autoAssignBuildingId;
+      });
+    }
+    const candidateSpaceIds = filteredSpaces.map(s => s.id_academic_space).filter(id => id !== undefined) as number[];
+    const validCourses = this.pendingCoursesForAutoAssign.filter(pc => pc.assignment?.courseAssignment?.idCourseAssignment);
+
+    if (validCourses.length === 0) {
+      this.showTransientToast('No hay cursos válidos para asignar.', 4000);
+      return;
+    }
+
+    const manana = ['07:30:00', '08:25:00', '09:20:00', '10:20:00', '11:15:00', '12:10:00'];
+    const tarde = ['13:10:00', '14:05:00', '15:00:00', '16:00:00', '16:55:00', '17:50:00', '18:45:00', '19:40:00', '20:35:00', '21:30:00'];
+    let startTimes: string[] = [];
+    if (this.autoAssignShift === 'MANANA') startTimes = manana;
+    else if (this.autoAssignShift === 'TARDE') startTimes = tarde;
+    else startTimes = [...manana, ...tarde];
+
+    const coursesPayload = validCourses.map(pc => ({
+      idCourseAssignment: pc.assignment.courseAssignment.idCourseAssignment,
+      capacityRequired: pc.course.group?.capacity || 30,
+      preferredType: 'Teoría',
+      candidateAcademicSpaceIds: candidateSpaceIds,
+      idTypeSchedule: 1,
+      hoursRequired: pc.hoursRequired || 4,
+      idTeacher: pc.assignment.courseAssignment.teacher?.idTeacher,
+      idGroup: pc.course.group?.idGroup,
+      priority: pc.priority
+    }));
+
+    this.isLoading = true;
+    this.closeAutoAssignModal();
+
+    const payload: any = {
+      courses: coursesPayload,
+      startTimes: startTimes,
+      durationMinutes: 50,
+      weekDayIds: selectedDays
+    };
+
+    if (this.autoAssignCulturaDay && this.autoAssignCulturaStart && this.autoAssignCulturaEnd) {
+      payload.culturaDayId = this.autoAssignCulturaDay;
+      payload.culturaStartTime = this.autoAssignCulturaStart;
+      payload.culturaEndTime = this.autoAssignCulturaEnd;
+    }
+
+    if (this.autoAssignActivateDay && this.autoAssignActivateStart && this.autoAssignActivateEnd) {
+      payload.activateDayId = this.autoAssignActivateDay;
+      payload.activateStartTime = this.autoAssignActivateStart;
+      payload.activateEndTime = this.autoAssignActivateEnd;
+    }
+
+    if (this.autoAssignBuildingId) {
+      payload.idBuilding = Number(this.autoAssignBuildingId);
+    }
+
+    console.log('[MisHorarios] Payload de Generación Automática:', payload);
+
+    this.scheduleService.autoAssign(payload).subscribe({
+      next: (res: any) => {
+        console.log('[MisHorarios] Asignación completada:', res);
+      },
+      error: (err: any) => {
+        console.error('[MisHorarios] Error en asignación automática:', err);
+        this.isLoading = false;
+        this.showTransientToast('Error al generar los horarios. Revisa la consola.', 4000);
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.showTransientToast('Proceso de asignación completado.', 4000);
+        this.loadAllInitialData();
+      }
+    });
+  }
+
   ngOnInit() {
     console.log('[MisHorarios] Inicializando componente...');
     this.initEmptyGrid();
@@ -336,6 +527,7 @@ export class MisHorariosComponent implements OnInit {
       teachers: this.teacherService.getTeachers().pipe(catchError(err => { console.error('[MisHorarios - ERROR] TeacherService.getTeachers falló:', err); return of({ data: [] }); })),
       spaces: this.spaceService.getAcademicSpaces().pipe(catchError(err => { console.error('[MisHorarios - ERROR] SpaceService.getAcademicSpaces falló:', err); return of({ data: [] }); })),
       assignments: this.assignmentCourseService.getCouseAssignmentCourse().pipe(catchError(err => { console.error('[MisHorarios - ERROR] CourseAssignmentCourseService.getCouseAssignmentCourse falló:', err); return of({ data: [] }); })),
+      baseAssignments: this.courseAssignmentService.getCouseAssignment().pipe(catchError(err => { console.error('[MisHorarios - ERROR] CourseAssignmentService falló:', err); return of({ data: [] }); })),
       schedules: this.scheduleService.findAll().pipe(catchError(err => { console.error('[MisHorarios - ERROR] ScheduleService.findAll falló:', err); return of({ data: [] }); }))
     }).subscribe({
       next: (res: any) => {
@@ -380,15 +572,40 @@ export class MisHorariosComponent implements OnInit {
         this.allSpaces = rawSpaces;
         console.log(`[MisHorarios] Mapeadas ${this.allSpaces.length} Aulas:`, this.allSpaces);
 
+        // Build a lookup map for base assignments (to get teacher if missing)
+        const rawBaseAssigns = Array.isArray(res.baseAssignments?.data) ? res.baseAssignments.data : Array.isArray(res.baseAssignments) ? res.baseAssignments : [];
+        const baseAssignmentMap = new Map<number, any>();
+        rawBaseAssigns.forEach((ba: any) => {
+          const baId = ba.idCourseAssignment ?? ba.id;
+          if (baId) baseAssignmentMap.set(baId, ba);
+        });
+
         // Parse assignments and map them defensively
         const rawAssigns = Array.isArray(res.assignments?.data) ? res.assignments.data : Array.isArray(res.assignments) ? res.assignments : [];
         this.allAssignmentCourses = rawAssigns.map((item: any, idx: number) => {
-          const teacherData = item.courseAssignment?.teacher ?? {};
+          const ca = item.courseAssignment || item.course_assignment || {};
+          let teacherData = ca.teacher || item.teacher || {};
+          const caId = ca.idCourseAssignment ?? ca.id ?? idx + 1;
+          
+          // Fallback logic: if teacher name is missing, look it up in baseAssignments
+          if (!teacherData.name && !teacherData.names) {
+            const matchedBa = baseAssignmentMap.get(caId);
+            if (matchedBa && matchedBa.teacher) {
+              teacherData = matchedBa.teacher;
+            } else if (ca.idTeacher || item.idTeacher) { // Fallback 2: look up in allTeachers by idTeacher
+              const tId = ca.idTeacher || item.idTeacher;
+              const matchedTeacher = this.allTeachers.find(t => t.idTeacher == tId);
+              if (matchedTeacher) {
+                teacherData = matchedTeacher;
+              }
+            }
+          }
+
           const teacher = new Teacher(
-            teacherData.name ?? 'Sin Docente',
-            teacherData.lastName ?? teacherData.surname ?? '',
-            teacherData.email ?? '',
-            teacherData.idTeacher ?? teacherData.id ?? undefined
+            teacherData.name || teacherData.names || 'Sin Docente',
+            teacherData.lastName || teacherData.surname || '',
+            teacherData.email || '',
+            teacherData.idTeacher || teacherData.id || undefined
           );
 
           const courseAssignment = new CourseAssignment(
@@ -463,6 +680,7 @@ export class MisHorariosComponent implements OnInit {
             idCourseAssignment: rawAssignmentId ? Number(rawAssignmentId) : undefined,
             idAcademicSpace: rawSpaceId ? Number(rawSpaceId) : undefined,
             idWeekName: dayId ? Number(dayId) : undefined,
+            idTypeSchedule: s.idTypeSchedule ?? s.id_type_schedule ?? s.typeScheduleId,
             courseName: s.courseName ?? s.nombreCurso ?? s.curso,
             spaceName: s.spaceName ?? s.nombreAula ?? s.aula,
             colorHex: s.colorHex ?? s.color_hex,
@@ -577,7 +795,11 @@ export class MisHorariosComponent implements OnInit {
                   }
                 }
               } else {
-                this.initEmptyGrid();
+                if (this.selectedGroupId) {
+                  this.loadGroupGrid();
+                } else {
+                  this.initEmptyGrid();
+                }
               }
             },
             error: (err: any) => {
@@ -588,7 +810,11 @@ export class MisHorariosComponent implements OnInit {
                 this.currentUserName = `${fallback.name} ${fallback.lastName}`;
                 this.loadTeacherGrid();
               } else {
-                this.initEmptyGrid();
+                if (this.selectedGroupId) {
+                  this.loadGroupGrid();
+                } else {
+                  this.initEmptyGrid();
+                }
               }
             }
           });
@@ -692,8 +918,13 @@ export class MisHorariosComponent implements OnInit {
     const groupId = Number(this.selectedGroupId);
     console.log(`[MisHorarios] Cargando cuadrícula para el Grupo ID: ${groupId}...`);
     
-    // Filter schedules belonging to this group
+    // Filter schedules belonging to this group OR global activities (Type 101 = Cultura, Type 102 = Activate)
     const filtered = this.allSchedules.filter(sch => {
+      // Global activities check
+      if (sch.idTypeSchedule === 101 || sch.idTypeSchedule === 102) {
+        return true;
+      }
+
       const gId = this.getGroupIdForSchedule(sch);
       const isMatch = (gId == groupId);
       if (isMatch) {
@@ -765,11 +996,21 @@ export class MisHorariosComponent implements OnInit {
 
       let rowspan = 1;
       if (schedule.startTime && schedule.endTime) {
-        const start = this.parseTime(schedule.startTime);
-        const end = schedule.endTime === '24:00:00' ? 24 * 60 : this.parseTime(schedule.endTime);
-        const durationMins = end - start;
-        rowspan = Math.max(1, Math.ceil(durationMins / 60)); 
-        console.log(`[MisHorarios] Duración: ${durationMins} minutos. Rowspan calculado: ${rowspan}`);
+        const endMins = schedule.endTime === '24:00:00' ? 24 * 60 : this.parseTime(schedule.endTime);
+        
+        // Find end time slot index
+        let endTimeIdx = this.timeSlots.findIndex(slot => {
+          const slotStart = this.parseTime(slot.start);
+          const slotEnd = slot.end === '24:00:00' ? 24 * 60 : this.parseTime(slot.end);
+          return endMins > slotStart && endMins <= slotEnd;
+        });
+        
+        if (endTimeIdx === -1) {
+          endTimeIdx = this.timeSlots.length - 1;
+        }
+
+        rowspan = Math.max(1, (endTimeIdx - timeIdx) + 1);
+        console.log(`[MisHorarios] Rowspan calculado por bloques académicos: ${rowspan}`);
       }
 
       const color = colors[colorIndex % colors.length];
@@ -779,9 +1020,11 @@ export class MisHorariosComponent implements OnInit {
         type: 'schedule',
         schedule: {
           ...schedule,
-          courseName: schedule.courseName || this.getCourseNameForAssignment(schedule.idCourseAssignment),
+          courseName: schedule.idTypeSchedule === 101 ? 'CULTURA (Institucional)' :
+                      schedule.idTypeSchedule === 102 ? 'ACTÍVATE (Institucional)' :
+                      (schedule.courseName || this.getCourseNameForAssignment(schedule.idCourseAssignment)),
           spaceName: schedule.spaceName || this.getSpaceName(schedule.idAcademicSpace),
-          teacherName: this.getTeacherNameForAssignment(schedule.idCourseAssignment)
+          teacherName: schedule.idTypeSchedule === 101 || schedule.idTypeSchedule === 102 ? 'Institucional' : this.getTeacherNameForAssignment(schedule.idCourseAssignment)
         },
         rowspan,
         color: schedule.colorHex || color.bg,
@@ -906,8 +1149,15 @@ export class MisHorariosComponent implements OnInit {
   }
 
   saveSchedule() {
-    if (!this.formCourseId || !this.formTeacherId || !this.formSpaceId) {
+    const isInstitutional = (this.formTypeScheduleId == 101 || this.formTypeScheduleId == 102);
+
+    if (!isInstitutional && (!this.formCourseId || !this.formTeacherId || !this.formSpaceId)) {
       this.showTransientToast('Por favor completa la asignación de curso, docente y el aula.', 3000);
+      return;
+    }
+
+    if (isInstitutional) {
+      this.executeSave(null as any);
       return;
     }
 
@@ -987,20 +1237,23 @@ export class MisHorariosComponent implements OnInit {
     }
   }
 
-  private executeSave(assignmentId: number) {
+  private executeSave(assignmentId: number | null) {
     const start = this.parseTime(this.formStartTime);
     const end = this.parseTime(this.formEndTime);
     const calculatedDuration = Math.max(0, end - start);
 
     const payload: any = {
-      startTime: this.formStartTime,
-      endTime: this.formEndTime,
+      startTime: this.formStartTime.length === 5 ? `${this.formStartTime}:00` : this.formStartTime,
+      endTime: this.formEndTime.length === 5 ? `${this.formEndTime}:00` : this.formEndTime,
       idCourseAssignment: assignmentId,
-      idAcademicSpace: Number(this.formSpaceId),
       idWeekName: this.reverseDayMap[this.formDayOfWeek],
       duration: calculatedDuration,
       idTypeSchedule: Number(this.formTypeScheduleId)
     };
+
+    if (this.formSpaceId) {
+      payload.idAcademicSpace = Number(this.formSpaceId);
+    }
 
     if (this.isEditing && this.editingScheduleId) {
       payload.idSchedule = this.editingScheduleId;
@@ -1064,14 +1317,55 @@ export class MisHorariosComponent implements OnInit {
 
   // Export functions
   exportPDF() {
-    window.print();
+    this.showTransientToast('Generando PDF del horario...', 3000);
+    const element = document.querySelector('.schedule-grid-container') as HTMLElement;
+    if (!element) return;
+
+    // Save current style
+    const originalStyle = element.style.cssText;
+    element.style.maxHeight = 'none';
+    element.style.overflow = 'visible';
+
+    html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+      // Restore style
+      element.style.cssText = originalStyle;
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('l', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Horario_${this.currentUserName.replace(/\s+/g, '_')}.pdf`);
+    }).catch(err => {
+      console.error('Error exporting PDF', err);
+      element.style.cssText = originalStyle;
+    });
   }
 
   exportPNG() {
-    this.showTransientToast('Generando captura del horario para descarga... (PNG listo)', 3000);
-    const link = document.createElement('a');
-    link.download = `Horario_${this.currentUserName.replace(/\s+/g, '_')}.png`;
-    link.href = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="%23f8fafc"/><text x="20" y="40" font-family="sans-serif" font-size="24" font-weight="bold" fill="%2371801d">Horario Semanal</text></svg>';
-    link.click();
+    this.showTransientToast('Generando captura del horario...', 3000);
+    const element = document.querySelector('.schedule-grid-container') as HTMLElement;
+    if (!element) return;
+
+    // Save current style
+    const originalStyle = element.style.cssText;
+    element.style.maxHeight = 'none';
+    element.style.overflow = 'visible';
+
+    html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+      // Restore style
+      element.style.cssText = originalStyle;
+
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `Horario_${this.currentUserName.replace(/\s+/g, '_')}.png`;
+      link.href = imgData;
+      link.click();
+    }).catch(err => {
+      console.error('Error exporting PNG', err);
+      element.style.cssText = originalStyle;
+    });
   }
 }

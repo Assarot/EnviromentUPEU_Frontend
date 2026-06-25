@@ -385,7 +385,7 @@ export class ConsultarDisponibilidadComponent implements OnInit {
         confirmButton: 'rounded-lg px-4 py-2',
         cancelButton: 'rounded-lg px-4 py-2'
       }
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         this.mostrarMisReservas = true;
       }
@@ -496,7 +496,7 @@ export class ConsultarDisponibilidadComponent implements OnInit {
         confirmButton: 'rounded-lg px-4 py-2',
         cancelButton: 'rounded-lg px-4 py-2'
       }
-    }).then((result) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         // En modo simulación, simplemente eliminar del localStorage
         this.misReservas.splice(index, 1);

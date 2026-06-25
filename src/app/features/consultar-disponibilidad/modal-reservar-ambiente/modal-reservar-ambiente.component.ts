@@ -75,10 +75,10 @@ export interface ReservationData {
               <div class="flex-1">
                 <h3 class="font-bold text-lime-900">{{ ambiente.space_name }}</h3>
                 <p class="mt-0.5 text-xs text-lime-700">
-                  {{ ambiente.type_academic_space?.name }} · Capacidad: {{ ambiente.capacity }} personas
+                  {{ ambiente.type_academic_space.name }} · Capacidad: {{ ambiente.capacity }} personas
                 </p>
                 <p class="mt-1 text-xs text-lime-600">
-                  {{ ambiente.location }} · {{ ambiente.floor?.building?.name }}
+                  {{ ambiente.location }} · {{ ambiente.floor.building.name }}
                 </p>
               </div>
             </div>
@@ -221,14 +221,14 @@ export interface ReservationData {
                     [(ngModel)]="formData.cantidadPersonas"
                     (ngModelChange)="onCantidadPersonasChange($event)"
                     name="cantidadPersonas"
-                    [max]="ambiente?.capacity || 999"
+                    [max]="ambiente.capacity || 999"
                     min="1"
                     class="w-16 text-center rounded-lg border border-slate-300 bg-white py-2.5 text-sm text-slate-800 font-bold outline-none focus:border-[#BFC621] focus:ring-2 focus:ring-[#BFC621]/20"
                   />
                   <button
                     type="button"
                     (click)="incrementCap()"
-                    [disabled]="formData.cantidadPersonas >= (ambiente?.capacity || 999)"
+                    [disabled]="formData.cantidadPersonas >= (ambiente.capacity || 999)"
                     class="rounded-lg border border-slate-300 bg-white h-10 w-10 flex items-center justify-center font-bold hover:bg-slate-50 disabled:opacity-50"
                   >
                     +
@@ -324,7 +324,7 @@ export interface ReservationData {
 
               <!-- Nota informativa de límite -->
               <p class="text-[11px] text-slate-500">
-                Capacidad máxima del ambiente: <strong>{{ ambiente?.capacity }} personas</strong>. Total actual: <strong>{{ formData.cantidadPersonas }}</strong>.
+                Capacidad máxima del ambiente: <strong>{{ ambiente.capacity }} personas</strong>. Total actual: <strong>{{ formData.cantidadPersonas }}</strong>.
               </p>
             </div>
 
