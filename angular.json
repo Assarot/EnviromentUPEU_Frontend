@@ -19,7 +19,8 @@
               "jspdf",
               "canvg",
               "raf",
-              "rgbcolor"
+              "rgbcolor",
+              "core-js/*"
             ],
             "outputPath": "dist/enviroment-upeu-frontend",
             "index": "src/index.html",
