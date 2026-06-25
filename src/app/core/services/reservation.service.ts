@@ -109,6 +109,24 @@ export class ReservationService {
   }
 
   /**
+   * Obtener IDs de ambientes ocupados para un horario específico
+   */
+  checkBulkAvailability(
+    date: string,
+    startTime: string,
+    endTime: string
+  ): Observable<number[]> {
+    const params = {
+      date,
+      startTime,
+      endTime
+    };
+    // Aquí llamamos al endpoint correcto en ReservationBlockController a través del API Gateway
+    const scheduleApiUrl = `${environment.apiUrl}/schedules/api/v1/schedules`;
+    return this.http.get<number[]>(`${scheduleApiUrl}/reservation-blocks/occupied-spaces`, { params });
+  }
+
+  /**
    * Obtener estados de reserva disponibles
    */
   getReservationStates(): Observable<ReservationState[]> {

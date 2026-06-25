@@ -227,7 +227,7 @@
     <div class="flex flex-wrap gap-4 p-5 pb-3">
 
       <!-- Búsqueda -->
-      <div class="flex-1 min-w-[220px]">
+      <div class="flex-1 min-w-[180px]">
         <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
           Buscar ambiente
         </label>
@@ -243,6 +243,58 @@
             (ngModelChange)="applyFilters()"
             placeholder="Nombre o ubicación..."
             class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-[#BFC621] focus:ring-2 focus:ring-[#BFC621]/20"
+          />
+        </div>
+      </div>
+
+      <!-- Fecha -->
+      <div class="min-w-[140px]">
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Fecha
+        </label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <input
+            type="date"
+            [(ngModel)]="searchDate"
+            [min]="minDate"
+            class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-800 outline-none focus:border-[#BFC621] focus:ring-2 focus:ring-[#BFC621]/20"
+          />
+        </div>
+      </div>
+
+      <!-- Hora Inicio -->
+      <div class="min-w-[120px]">
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Hora Inicio
+        </label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <input
+            type="time"
+            [(ngModel)]="searchStartTime"
+            class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 pl-9 pr-2 text-sm text-slate-800 outline-none focus:border-[#BFC621] focus:ring-2 focus:ring-[#BFC621]/20"
+          />
+        </div>
+      </div>
+
+      <!-- Hora Fin -->
+      <div class="min-w-[120px]">
+        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Hora Fin
+        </label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <input
+            type="time"
+            [(ngModel)]="searchEndTime"
+            class="w-full rounded-lg border border-slate-300 bg-slate-50 py-2.5 pl-9 pr-2 text-sm text-slate-800 outline-none focus:border-[#BFC621] focus:ring-2 focus:ring-[#BFC621]/20"
           />
         </div>
       </div>
@@ -476,7 +528,7 @@
                 : 'bg-slate-100 text-slate-400'"
               [style.backgroundColor]="isDisponible(a) ? '#5d6a17' : ''"
             >
-              {{ isDisponible(a) ? 'Reservar' : 'No Disponible' }}
+              {{ isDisponible(a) ? 'Reservar' : (a.state.name === 'Sin horario' ? 'Falta horario' : 'No Disponible') }}
             </button>
           </div>
         </div>
@@ -540,7 +592,7 @@
                   [style.backgroundColor]="isDisponible(a) ? '#5d6a17' : ''"
                   [style.color]="isDisponible(a) ? 'white' : ''"
                 >
-                  {{ isDisponible(a) ? 'Reservar' : 'No Disponible' }}
+                  {{ isDisponible(a) ? 'Reservar' : (a.state.name === 'Sin horario' ? 'Falta horario' : 'No Disponible') }}
                 </button>
               </div>
             </td>
@@ -615,6 +667,9 @@
 <app-modal-reservar-ambiente
   [isOpen]="modalReservarOpen"
   [ambiente]="ambienteSeleccionado"
+  [prefillDate]="searchDate"
+  [prefillStartTime]="searchStartTime"
+  [prefillEndTime]="searchEndTime"
   (onClose)="onCloseModalReservar()"
   (onConfirm)="onConfirmReservation($event)"
 ></app-modal-reservar-ambiente>

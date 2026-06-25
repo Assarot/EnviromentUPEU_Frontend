@@ -448,6 +448,9 @@ export class ModalReservarAmbienteComponent implements OnChanges {
 
   @Input() isOpen = false;
   @Input() ambiente: AcademicSpace | null = null;
+  @Input() prefillDate = '';
+  @Input() prefillStartTime = '';
+  @Input() prefillEndTime = '';
 
   @Output() onClose = new EventEmitter<void>();
   @Output() onConfirm = new EventEmitter<ReservationData>();
@@ -493,10 +496,10 @@ export class ModalReservarAmbienteComponent implements OnChanges {
   private resetForm(): void {
     this.formData = {
       solicitante: '',
-      fecha: '',
-      fechaFin: '',
-      horaInicio: '',
-      horaFin: '',
+      fecha: this.prefillDate || '',
+      fechaFin: this.prefillDate || '',
+      horaInicio: this.prefillStartTime || '',
+      horaFin: this.prefillEndTime || '',
       motivo: '',
       cantidadPersonas: 1,
       equipamientoRequerido: '',

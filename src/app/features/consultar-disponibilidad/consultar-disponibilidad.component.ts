@@ -72,6 +72,12 @@ export class ConsultarDisponibilidadComponent implements OnInit {
   capacidadMax: number | null = null;
   selectedBuildingId = '';
 
+  // Filtros de fecha y hora
+  searchDate = '';
+  searchStartTime = '';
+  searchEndTime = '';
+  minDate = '';
+
   readonly estadosDisponibles = ['Disponible', 'Ocupado', 'Mantenimiento'];
 
   // ─── Modales ──────────────────────────────────────────────────────────────
@@ -86,8 +92,30 @@ export class ConsultarDisponibilidadComponent implements OnInit {
   // ─── Lifecycle ────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
+    this.initTimeDefaults();
     this.loadData();
     this.loadMisReservas();
+  }
+
+  private initTimeDefaults(): void {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    this.minDate = `${year}-${month}-${day}`;
+    
+    // Por defecto mostrar el estado actual
+    this.searchDate = this.minDate;
+    
+    const startHour = String(today.getHours()).padStart(2, '0');
+    this.searchStartTime = `${startHour}:00`;
+    
+    const endHourNum = today.getHours() + 1;
+    if (endHourNum >= 24) {
+      this.searchEndTime = '23:59';
+    } else {
+      this.searchEndTime = `${String(endHourNum).padStart(2, '0')}:00`;
+    }
   }
 
   loadData(): void {
@@ -172,6 +200,49 @@ export class ConsultarDisponibilidadComponent implements OnInit {
 
   applyFilters(): void {
     this.paginaActual = 0;
+    
+    // Si hay fecha y horas seleccionadas, verificar disponibilidad en backend
+    if (this.searchDate && this.searchStartTime && this.searchEndTime) {
+      if (this.searchStartTime >= this.searchEndTime) {
+        this.toastService.error('La hora de inicio debe ser menor a la hora de fin');
+        return;
+      }
+      
+      this.isLoading = true;
+      this.reservationService.checkBulkAvailability(this.searchDate, this.searchStartTime + ':00', this.searchEndTime + ':00')
+        .subscribe({
+          next: (occupiedSpacesIds) => {
+            // Actualizar estado dinámicamente según disponibilidad
+            this.todosLosAmbientes.forEach(a => {
+              if (a.id_academic_space && occupiedSpacesIds.includes(a.id_academic_space)) {
+                if (a.state) a.state.name = 'Ocupado';
+              } else {
+                if (a.state && a.state.name !== 'Mantenimiento') {
+                  a.state.name = 'Disponible';
+                }
+              }
+            });
+            this.runLocalFilters();
+            this.isLoading = false;
+          },
+          error: () => {
+            this.toastService.error('Error al verificar la disponibilidad');
+            this.runLocalFilters();
+            this.isLoading = false;
+          }
+        });
+    } else {
+      // Si no hay rango de fecha, exigir que seleccionen uno cambiando a "Sin horario"
+      this.todosLosAmbientes.forEach(a => {
+        if (a.state && a.state.name !== 'Mantenimiento') {
+          a.state.name = 'Sin horario';
+        }
+      });
+      this.runLocalFilters();
+    }
+  }
+
+  private runLocalFilters(): void {
     const term = this.searchTerm.toLowerCase().trim();
 
     this.ambientesFiltrados = this.todosLosAmbientes.filter((a) => {
@@ -189,6 +260,7 @@ export class ConsultarDisponibilidadComponent implements OnInit {
       // Estado (chips multi-select)
       const matchEstado =
         this.selectedEstados.length === 0 ||
+        a.state?.name === 'Sin horario' ||
         this.selectedEstados.some(
           (e) => a.state?.name?.toLowerCase() === e.toLowerCase()
         );
@@ -217,6 +289,7 @@ export class ConsultarDisponibilidadComponent implements OnInit {
     this.capacidadMin      = null;
     this.capacidadMax      = null;
     this.selectedBuildingId = '';
+    this.initTimeDefaults();
     this.applyFilters();
   }
 
@@ -272,6 +345,7 @@ export class ConsultarDisponibilidadComponent implements OnInit {
       disponible:    { label: 'Disponible',    dot: '#22c55e', badge: 'bg-green-500',  btn: 'disponible' },
       ocupado:       { label: 'Ocupado',       dot: '#f59e0b', badge: 'bg-amber-500',  btn: 'ocupado' },
       mantenimiento: { label: 'Mantenimiento', dot: '#6b7280', badge: 'bg-gray-500',   btn: 'mantenimiento' },
+      'sin horario': { label: 'Sin horario',   dot: '#3b82f6', badge: 'bg-blue-500',   btn: 'otro' }
     };
     const key = (nombre ?? '').toLowerCase();
     return map[key] ?? { label: nombre ?? '—', dot: '#94a3b8', badge: 'bg-slate-400', btn: 'otro' };
@@ -609,7 +683,10 @@ export class ConsultarDisponibilidadComponent implements OnInit {
       disponible:    'bg-lime-100 text-lime-700 ring-1 ring-lime-200',
       ocupado:       'bg-amber-100 text-amber-700 ring-1 ring-amber-200',
       mantenimiento: 'bg-slate-100 text-slate-600 ring-1 ring-slate-200',
+      'sin horario': 'bg-blue-100 text-blue-700 ring-1 ring-blue-200',
     };
     return map[(nombre ?? '').toLowerCase()] ?? 'bg-slate-100 text-slate-600';
   }
+
+
 }
