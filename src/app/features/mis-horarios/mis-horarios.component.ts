@@ -610,7 +610,7 @@ export class MisHorariosComponent implements OnInit {
 
           const courseAssignment = new CourseAssignment(
             teacher,
-            item.courseAssignment?.idCourseAssignment ?? item.courseAssignment?.id ?? idx + 1
+            item.courseAssignment?.idCourseAssignment ?? item.courseAssignment?.id ?? (1000000 + idx)
           );
 
           const courseData = item.course ?? {};
@@ -639,7 +639,7 @@ export class MisHorariosComponent implements OnInit {
           return new CourseAssignmentCourse(
             courseAssignment,
             course,
-            item.idCourseAssignmentCourse ?? item.id ?? idx + 1
+            item.idCourseAssignmentCourse ?? item.id ?? (1000000 + idx)
           );
         });
         console.log(`[MisHorarios] Mapeados ${this.allAssignmentCourses.length} Vínculos Curso-Docente:`, this.allAssignmentCourses);
