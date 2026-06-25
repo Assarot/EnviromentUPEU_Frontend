@@ -13,6 +13,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
+            "allowedCommonJsDependencies": [
+              "sweetalert2",
+              "html2canvas",
+              "jspdf",
+              "canvg",
+              "raf",
+              "rgbcolor"
+            ],
             "outputPath": "dist/enviroment-upeu-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
