@@ -480,16 +480,9 @@ export class MisHorariosComponent implements OnInit {
   updateCurrentTimeStatus() {
     const now = new Date();
     const day = now.getDay(); // 0 is Sunday, 1 is Monday, etc.
-    const dayMapping: { [key: number]: number } = {
-      1: 0, // Lunes
-      2: 1, // Martes
-      3: 2, // Miércoles
-      4: 3, // Jueves
-      5: 4, // Viernes
-      6: 5, // Sábado
-      0: 6  // Domingo
-    };
-    this.currentDayIndex = dayMapping[day] !== undefined ? dayMapping[day] : -1;
+    // days = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO']
+    // now.getDay() already returns 0 for Sunday, 1 for Monday... 6 for Saturday.
+    this.currentDayIndex = day;
 
     const currentHourStr = now.toTimeString().split(' ')[0]; // 'HH:mm:ss'
     const currentTimeVal = this.parseTime(currentHourStr);
