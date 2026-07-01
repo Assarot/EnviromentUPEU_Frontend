@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Teacher } from '../../../core/models/teacher';
 import { TeacherService } from '../../../core/services/teacher.service';
+import { UserService } from '../../../core/services/user.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,18 +15,22 @@ import { Router } from '@angular/router';
 })
 export class TeacherComponent implements OnInit {
   private service = inject(TeacherService);
+  private userService = inject(UserService);
   private router = inject(Router);
 
   teachers: Teacher[] = [];
+  users: any[] = [];
 
   name = '';
   lastName = '';
   email = '';
+  authUserId: number | '' = '';
 
   editingId?: number | null = null;
   editingName = '';
   editingLastName = '';
   editingEmail = '';
+  editingAuthUserId: number | '' = '';
 
   pendingDeleteId?: number | null = null;
   pendingDeleteName = '';
@@ -39,6 +44,16 @@ export class TeacherComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.userService.getUsers().subscribe({
+      next: (res) => {
+        this.users = res || [];
+      },
+      error: () => (this.users = [])
+    });
   }
 
   load(): void {
@@ -55,7 +70,8 @@ export class TeacherComponent implements OnInit {
               item.name ?? '',
               item.lastName ?? '',
               item.email ?? '',
-              item.idTeacher ?? item.id ?? idx + 1
+              item.idTeacher ?? item.id ?? idx + 1,
+              item.authUserId
             )
         );
       },
@@ -63,16 +79,24 @@ export class TeacherComponent implements OnInit {
     });
   }
 
+  getUserName(id?: number): string {
+    if (!id) return 'Ninguno';
+    const u = this.users.find((user) => user.id === id);
+    return u ? `${u.names} ${u.lastName}` : 'Desconocido';
+  }
+
   create(): void {
     const n = this.name.trim();
     const ln = this.lastName.trim();
     const em = this.email.trim();
+    const aId = this.authUserId ? Number(this.authUserId) : undefined;
     if (!n || !ln || !em) return;
-    this.service.createTeacher({ name: n, lastName: ln, email: em }).subscribe({
+    this.service.createTeacher({ name: n, lastName: ln, email: em, authUserId: aId }).subscribe({
       next: () => {
         this.name = '';
         this.lastName = '';
         this.email = '';
+        this.authUserId = '';
         this.load();
       },
       error: () =>
@@ -85,21 +109,24 @@ export class TeacherComponent implements OnInit {
     this.editingName = t.name;
     this.editingLastName = t.lastName;
     this.editingEmail = t.email;
+    this.editingAuthUserId = t.authUserId || '';
   }
   cancel(): void {
     this.editingId = null;
     this.editingName = '';
     this.editingLastName = '';
     this.editingEmail = '';
+    this.editingAuthUserId = '';
   }
   save(): void {
     if (this.editingId == null) return;
     const n = this.editingName.trim();
     const ln = this.editingLastName.trim();
     const em = this.editingEmail.trim();
+    const aId = this.editingAuthUserId ? Number(this.editingAuthUserId) : undefined;
     if (!n || !ln || !em) return;
     this.service
-      .updateTeacher(this.editingId, { name: n, lastName: ln, email: em })
+      .updateTeacher(this.editingId, { name: n, lastName: ln, email: em, authUserId: aId })
       .subscribe({
         next: () => {
           this.cancel();
@@ -193,6 +220,7 @@ export class TeacherComponent implements OnInit {
       name: this.lastDeleted.name,
       lastName: this.lastDeleted.lastName,
       email: this.lastDeleted.email,
+      authUserId: this.lastDeleted.authUserId
     };
     this.service.createTeacher(payload).subscribe({
       next: () => {
@@ -204,7 +232,4 @@ export class TeacherComponent implements OnInit {
     });
   }
 
-  volver(): void {
-    this.router.navigate(['/main/course-creation']);
-  }
 }

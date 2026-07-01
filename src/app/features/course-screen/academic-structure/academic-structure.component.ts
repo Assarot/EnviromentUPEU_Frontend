@@ -223,7 +223,4 @@ export class AcademicStructureComponent implements OnInit {
     schoolItem.expanded = !schoolItem.expanded;
   }
 
-  volver(): void {
-    this.router.navigate(['/main/course-creation']);
-  }
 }

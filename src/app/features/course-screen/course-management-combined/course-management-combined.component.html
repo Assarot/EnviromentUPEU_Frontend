@@ -1,48 +1,33 @@
 <div class="mx-auto max-w-5xl px-6 py-10 animate-fade-in">
-  <!-- Back navigation button -->
-  <button
-    (click)="volver()"
-    class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-all duration-300 transform hover:-translate-x-1"
-  >
-    <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-    </svg>
-    Volver a opciones
-  </button>
-
   <!-- Premium Header -->
   <header class="mb-10 relative">
-    <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full" [style.backgroundColor]="brand"></div>
+    <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full" [style.backgroundColor]="brand">
+    </div>
     <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Gestionar Cursos</h1>
     <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-2xl">
-      Configura y administra la oferta académica de asignaturas, los planes de estudio correspondientes y las clasificaciones por tipo de curso.
+      Configura y administra la oferta académica de asignaturas, los planes de estudio correspondientes y las
+      clasificaciones por tipo de curso.
     </p>
   </header>
 
   <!-- Modern Interactive Tabs -->
-  <div class="mb-8 border-b border-slate-200/80 bg-white/60 backdrop-blur-md sticky top-0 rounded-t-2xl shadow-sm border border-slate-100 p-2"
-       [class.z-40]="!sidebarService.modalOpen()"
-       [class.z-0]="sidebarService.modalOpen()">
+  <div
+    class="mb-8 border-b border-slate-200/80 bg-white/60 backdrop-blur-md sticky top-0 rounded-t-2xl shadow-sm border border-slate-100 p-2"
+    [class.z-40]="!sidebarService.modalOpen()" [class.z-0]="sidebarService.modalOpen()">
     <nav class="flex space-x-2" aria-label="Tabs">
-      <button
-        (click)="setTab('course')"
+      <button (click)="setTab('course')"
         [class]="activeTab === 'course' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
-        class="flex-1 text-center py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ease-out active:scale-98"
-      >
+        class="flex-1 text-center py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ease-out active:scale-98">
         Cursos / Asignaturas
       </button>
-      <button
-        (click)="setTab('plan')"
+      <button (click)="setTab('plan')"
         [class]="activeTab === 'plan' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
-        class="flex-1 text-center py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ease-out active:scale-98"
-      >
+        class="flex-1 text-center py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ease-out active:scale-98">
         Planes de Estudios
       </button>
-      <button
-        (click)="setTab('type')"
+      <button (click)="setTab('type')"
         [class]="activeTab === 'type' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
-        class="flex-1 text-center py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ease-out active:scale-98"
-      >
+        class="flex-1 text-center py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ease-out active:scale-98">
         Tipos de Cursos
       </button>
     </nav>

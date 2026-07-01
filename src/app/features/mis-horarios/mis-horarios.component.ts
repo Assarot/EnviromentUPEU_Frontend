@@ -561,7 +561,7 @@ export class MisHorariosComponent implements OnInit {
 
         // Parse teachers
         const rawTeachers = Array.isArray(res.teachers?.data) ? res.teachers.data : Array.isArray(res.teachers) ? res.teachers : [];
-        this.allTeachers = rawTeachers.map((t: any, idx: number) => new Teacher(t.name ?? '', t.lastName ?? '', t.email ?? '', t.idTeacher ?? t.id ?? idx + 1));
+        this.allTeachers = rawTeachers.map((t: any, idx: number) => new Teacher(t.name ?? '', t.lastName ?? '', t.email ?? '', t.idTeacher ?? t.id ?? idx + 1, t.authUserId));
 
         // Parse spaces
         const rawSpaces = Array.isArray(res.spaces?.data) ? res.spaces.data : Array.isArray(res.spaces) ? res.spaces : [];
@@ -600,7 +600,8 @@ export class MisHorariosComponent implements OnInit {
             teacherData.name || teacherData.names || 'Sin Docente',
             teacherData.lastName || teacherData.surname || '',
             teacherData.email || '',
-            teacherData.idTeacher || teacherData.id || undefined
+            teacherData.idTeacher || teacherData.id || undefined,
+            teacherData.authUserId || undefined
           );
 
           const courseData = item.course ?? {};
@@ -791,8 +792,7 @@ export class MisHorariosComponent implements OnInit {
               }
               
               if (this.isTeacher()) {
-                const userEmail = profile?.email?.toLowerCase() || '';
-                const match = this.allTeachers.find(t => t.email?.toLowerCase() === userEmail);
+                const match = this.allTeachers.find(t => t.authUserId === user.id);
                 if (match) {
                   this.currentTeacherId = match.idTeacher;
                   this.loadTeacherGrid();

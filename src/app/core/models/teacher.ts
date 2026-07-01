@@ -3,11 +3,13 @@ export class Teacher {
   name: string;
   lastName: string;
   email: string;
+  authUserId?: number;
   constructor(
     name: string,
     lastName: string,
     email: string,
-    idTeacher?: number
+    idTeacher?: number,
+    authUserId?: number
   ) {
     if (idTeacher) {
       this.idTeacher = idTeacher;
@@ -15,5 +17,6 @@ export class Teacher {
     this.name = name;
     this.lastName = lastName;
     this.email = email;
+    this.authUserId = authUserId;
   }
 }

@@ -1,67 +1,79 @@
-<div class="mx-auto max-w-4xl px-6 py-8">
+<div class="mx-auto max-w-5xl px-6 py-10 animate-fade-in">
   <div *ngIf="showToast" class="fixed top-5 right-5 z-50">
-    <div
-      class="toast rounded-md bg-emerald-600 px-4 py-2 text-white shadow-sm inline-flex items-center gap-3"
-    >
+    <div class="toast rounded-md bg-emerald-600 px-4 py-2 text-white shadow-sm inline-flex items-center gap-3">
       <span>{{ toastMessage }}</span>
-
     </div>
   </div>
 
+  <!-- Premium Header -->
+  <header class="mb-10 relative">
+    <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full" style="background-color: #bfc621"></div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Docentes</h1>
+    <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-2xl">
+      Registra y administra los profesores de la institución. Vincula sus cuentas de usuario para la asignación de horarios y carga académica.
+    </p>
+  </header>
 
-
-  <button
-    (click)="volver()"
-    class="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-  >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M15 19l-7-7 7-7"
-      ></path>
-    </svg>
-    Volver a opciones
-  </button>
-
-  <h1 class="text-2xl font-bold text-slate-800 mb-4">Docentes</h1>
-
-  <section
-    class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-  >
-    <h2 class="text-base font-semibold mb-3">Crear Docente</h2>
-    <div class="flex gap-3">
-      <input
-        type="text"
-        [(ngModel)]="name"
-        placeholder="Nombres"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-      />
-      <input
-        type="text"
-        [(ngModel)]="lastName"
-        placeholder="Apellidos"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-      />
-      <input
-        type="email"
-        [(ngModel)]="email"
-        placeholder="Email"
-        class="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-      />
+  <section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex items-center gap-2 mb-4">
+      <div class="w-2 h-2 rounded-full" style="background-color: #bfc621"></div>
+      <h2 class="text-base font-bold text-slate-800">Crear Docente</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Nombres</label>
+        <input
+          type="text"
+          [(ngModel)]="name"
+          placeholder="Ej: Juan Carlos"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Apellidos</label>
+        <input
+          type="text"
+          [(ngModel)]="lastName"
+          placeholder="Ej: Pérez"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Email</label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          placeholder="correo@upeu.edu.pe"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Usuario Vinculado</label>
+        <select
+          [(ngModel)]="authUserId"
+          class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+        >
+          <option value="">Ninguno (Opcional)</option>
+          <option *ngFor="let u of users" [value]="u.id">
+            {{ u.names }} {{ u.lastName }}
+          </option>
+        </select>
+      </div>
       <button
         (click)="create()"
-        class="rounded-lg px-4 py-2 text-sm font-semibold text-slate-900"
+        class="w-full rounded-lg px-4 py-2 text-sm font-semibold text-slate-900 transition-transform active:scale-95"
         style="background: #bfc621"
       >
-        Guardar
+        Guardar Docente
       </button>
     </div>
   </section>
 
-  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 class="text-base font-semibold mb-3">Lista de Docentes</h2>
+  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex items-center gap-2 mb-4">
+      <div class="w-2 h-2 rounded-full" style="background-color: #bfc621"></div>
+      <h2 class="text-base font-bold text-slate-800">Lista de Docentes</h2>
+    </div>
     <div class="overflow-x-auto">
       <table class="w-full table-auto text-left">
         <thead class="bg-slate-50">
@@ -71,6 +83,7 @@
             <th class="px-4 py-3">#</th>
             <th class="px-4 py-3">Nombre</th>
             <th class="px-4 py-3">Email</th>
+            <th class="px-4 py-3">Usuario Vinculado</th>
             <th class="px-4 py-3">Acciones</th>
           </tr>
         </thead>
@@ -85,25 +98,52 @@
                 >{{ t.name }} {{ t.lastName }}</ng-container
               >
               <ng-template #editName>
-                <input
-                  [(ngModel)]="editingName"
-                  class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-                <input
-                  [(ngModel)]="editingLastName"
-                  class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
+                <div class="flex flex-col gap-2">
+                  <input
+                    [(ngModel)]="editingName"
+                    placeholder="Nombres"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                  <input
+                    [(ngModel)]="editingLastName"
+                    placeholder="Apellidos"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                </div>
               </ng-template>
             </td>
             <td class="px-4 py-3">
               <ng-container *ngIf="editingId !== t.idTeacher; else editEmail">{{
                 t.email
               }}</ng-container>
-              <ng-template #editEmail
-                ><input
+              <ng-template #editEmail>
+                <input
                   [(ngModel)]="editingEmail"
-                  class="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              /></ng-template>
+                  placeholder="Email"
+                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+              </ng-template>
+            </td>
+            <td class="px-4 py-3">
+              <ng-container *ngIf="editingId !== t.idTeacher; else editAuth">
+                <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10" *ngIf="t.authUserId">
+                  {{ getUserName(t.authUserId) }}
+                </span>
+                <span class="inline-flex items-center rounded-full bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10" *ngIf="!t.authUserId">
+                  Ninguno
+                </span>
+              </ng-container>
+              <ng-template #editAuth>
+                <select
+                  [(ngModel)]="editingAuthUserId"
+                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                >
+                  <option value="">Ninguno</option>
+                  <option *ngFor="let u of users" [value]="u.id">
+                    {{ u.names }} {{ u.lastName }}
+                  </option>
+                </select>
+              </ng-template>
             </td>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3 relative">
@@ -222,7 +262,7 @@
           </tr>
           <tr *ngIf="teachers.length === 0">
             <td
-              colspan="4"
+              colspan="5"
               class="px-4 py-6 text-center text-sm text-slate-500"
             >
               No hay docentes disponibles

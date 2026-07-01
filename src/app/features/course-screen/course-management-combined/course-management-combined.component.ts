@@ -27,8 +27,4 @@ export class CourseManagementCombinedComponent {
   setTab(tab: 'course' | 'plan' | 'type'): void {
     this.activeTab = tab;
   }
-
-  volver(): void {
-    this.router.navigate(['/main/course-creation']);
-  }
 }

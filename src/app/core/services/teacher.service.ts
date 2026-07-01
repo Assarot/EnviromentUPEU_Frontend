@@ -23,13 +23,14 @@ export class TeacherService {
     name: string;
     lastName: string;
     email: string;
+    authUserId?: number;
   }): Observable<Teacher> {
     return this.http.post<Teacher>(this.apiUrl, body);
   }
 
   updateTeacher(
     id: number,
-    body: { name: string; lastName: string; email: string }
+    body: { name: string; lastName: string; email: string; authUserId?: number }
   ): Observable<Teacher> {
     return this.http.put<Teacher>(`${this.apiUrl}/${id}`, body);
   }
