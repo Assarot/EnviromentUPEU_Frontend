@@ -786,20 +786,20 @@ export class MisHorariosComponent implements OnInit {
         if (profileId) {
           this.userService.getUser(profileId).subscribe({
             next: (profile: any) => {
-              this.currentUserName = `${profile.names} ${profile.lastName}`;
+              if (profile) {
+                this.currentUserName = `${profile.names || ''} ${profile.lastName || ''}`.trim() || this.currentUserName;
+              }
               
               if (this.isTeacher()) {
-                const userEmail = profile.email?.toLowerCase() || '';
+                const userEmail = profile?.email?.toLowerCase() || '';
                 const match = this.allTeachers.find(t => t.email?.toLowerCase() === userEmail);
                 if (match) {
                   this.currentTeacherId = match.idTeacher;
-                  this.currentUserName = `${match.name} ${match.lastName}`;
                   this.loadTeacherGrid();
                 } else {
                   if (this.allTeachers.length > 0) {
                     const fallback = this.allTeachers[0];
                     this.currentTeacherId = fallback.idTeacher;
-                    this.currentUserName = `${fallback.name} ${fallback.lastName}`;
                     this.loadTeacherGrid();
                   }
                 }
@@ -815,7 +815,6 @@ export class MisHorariosComponent implements OnInit {
               if (this.isTeacher() && this.allTeachers.length > 0) {
                 const fallback = this.allTeachers[0];
                 this.currentTeacherId = fallback.idTeacher;
-                this.currentUserName = `${fallback.name} ${fallback.lastName}`;
                 this.loadTeacherGrid();
               } else {
                 if (this.selectedGroupId) {
@@ -827,7 +826,13 @@ export class MisHorariosComponent implements OnInit {
             }
           });
         } else {
-          this.initEmptyGrid();
+          if (this.isTeacher() && this.allTeachers.length > 0) {
+            const fallback = this.allTeachers[0];
+            this.currentTeacherId = fallback.idTeacher;
+            this.loadTeacherGrid();
+          } else {
+            this.initEmptyGrid();
+          }
         }
       }
     });
