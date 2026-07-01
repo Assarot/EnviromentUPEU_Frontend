@@ -14,6 +14,8 @@ import { Faculty } from '../../../core/models/faculty';
 import { ProfessionalSchool } from '../../../core/models/professional-school';
 import { Cycle } from '../../../core/models/cycle';
 import { Group } from '../../../core/models/group';
+import { CourseService } from '../../../core/services/course.service';
+import { Course } from '../../../core/models/course';
 
 @Component({
   selector: 'app-academic-structure',
@@ -34,6 +36,7 @@ export class AcademicStructureComponent implements OnInit {
   private schoolService = inject(ProfessionalSchoolService);
   private cycleService = inject(CycleService);
   private groupService = inject(GroupService);
+  private courseService = inject(CourseService);
 
   activeTab: 'unified' | 'faculty' | 'school' | 'cycle' | 'group' = 'unified';
   readonly brand = '#BFC621';
@@ -42,6 +45,7 @@ export class AcademicStructureComponent implements OnInit {
   schools: ProfessionalSchool[] = [];
   cycles: Cycle[] = [];
   groups: Group[] = [];
+  courses: Course[] = [];
 
   unifiedStructure: {
     faculty: Faculty;
@@ -51,7 +55,10 @@ export class AcademicStructureComponent implements OnInit {
       expanded: boolean;
       cycles: {
         cycle: Cycle;
-        groups: Group[];
+        groups: {
+          group: Group;
+          courses: Course[];
+        }[];
       }[];
     }[];
   }[] = [];
@@ -85,7 +92,8 @@ export class AcademicStructureComponent implements OnInit {
       faculties: this.facultyService.getFaculties(),
       schools: this.schoolService.getProfessionalSchools(),
       cycles: this.cycleService.getCycles(),
-      groups: this.groupService.getGroups()
+      groups: this.groupService.getGroups(),
+      courses: this.courseService.getCourses()
     }).subscribe({
       next: (res: any) => {
         // Parse faculties
@@ -111,6 +119,24 @@ export class AcademicStructureComponent implements OnInit {
         this.groups = rawGroups.map((g: any, idx: number) => {
           const cycle = g.cycle ? new Cycle(g.cycle.name ?? '', null as any, g.cycle.idCycle ?? idx + 1) : new Cycle('', null as any, idx + 1);
           return new Group(g.groupNumber ?? 0, g.capacity ?? 0, cycle, g.idGroup ?? g.id ?? idx + 1);
+        });
+
+        // Parse courses
+        const rawCourses = Array.isArray(res.courses?.data) ? res.courses.data : Array.isArray(res.courses) ? res.courses : [];
+        this.courses = rawCourses.map((c: any, idx: number) => {
+          return new Course(
+            c.name ?? '',
+            c.code ?? '',
+            c.description ?? '',
+            c.duration ?? 0,
+            c.practicalHours ?? 0,
+            c.theoreticalHours ?? 0,
+            c.totalHours ?? 0,
+            c.courseType ? c.courseType : null,
+            c.group ? c.group : null,
+            c.plan ? c.plan : null,
+            c.idCourse ?? c.id ?? idx + 1
+          );
         });
 
         // Link parent references
@@ -152,11 +178,21 @@ export class AcademicStructureComponent implements OnInit {
                   const cGroups = this.groups.filter(g => g.cycle?.idCycle === c.idCycle);
                   
                   // Ordenar grupos de menor a mayor
-                  cGroups.sort((a, b) => (a.groupNumber ?? 0) - (b.groupNumber ?? 0));
+                  cGroups.sort((a, b) => {
+                    const numA = (a.groupNumber + '').toUpperCase() === 'UNICO' ? 0 : Number(a.groupNumber) || 0;
+                    const numB = (b.groupNumber + '').toUpperCase() === 'UNICO' ? 0 : Number(b.groupNumber) || 0;
+                    return numA - numB;
+                  });
 
                   return {
                     cycle: c,
-                    groups: cGroups
+                    groups: cGroups.map(g => {
+                      const gCourses = this.courses.filter(course => course.group?.idGroup === g.idGroup);
+                      return {
+                        group: g,
+                        courses: gCourses
+                      };
+                    })
                   };
                 })
               };

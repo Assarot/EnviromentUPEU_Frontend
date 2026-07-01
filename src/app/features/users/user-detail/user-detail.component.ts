@@ -13,7 +13,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, LoaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './user-detail.component.html',
 })
 export class UserDetailComponent implements OnInit {
@@ -108,7 +108,24 @@ export class UserDetailComponent implements OnInit {
       userProfileId: this.profileId,
     };
     this.authService.createAuthUser(payload).subscribe({
-      next: (u) => { this.authUser = u; this.creatingAuth = false; this.e_username = u.username; this.e_isActive = u.isActive; },
+      next: (u) => { 
+        if (this.roleName) {
+          this.authService.assignRoleToUser(u.id, this.roleName).subscribe({
+            next: (uWithRole) => {
+              this.authUser = uWithRole; 
+              this.creatingAuth = false; 
+              this.e_username = uWithRole.username; 
+              this.e_isActive = uWithRole.isActive;
+              this.roleName = '';
+            }
+          });
+        } else {
+          this.authUser = u; 
+          this.creatingAuth = false; 
+          this.e_username = u.username; 
+          this.e_isActive = u.isActive; 
+        }
+      },
     });
     console.log('Creating auth user with payload:', payload);
   }

@@ -29,6 +29,11 @@ export interface UnifiedSchoolLoad {
 
 export interface UnifiedCycleLoad {
   cycle: Cycle;
+  groups: UnifiedGroupLoad[];
+}
+
+export interface UnifiedGroupLoad {
+  group: Group;
   courses: Course[];
 }
 
@@ -202,23 +207,38 @@ export class CargaAcademicaComponent implements OnInit {
         
         sCycles.forEach(cy => {
           const cyGroups = this.allGroups.filter(g => g.cycle?.idCycle === cy.idCycle);
-          const cyCourses: Course[] = [];
+          cyGroups.sort((a, b) => {
+            const numA = (a.groupNumber + '').toUpperCase() === 'UNICO' ? 0 : Number(a.groupNumber) || 0;
+            const numB = (b.groupNumber + '').toUpperCase() === 'UNICO' ? 0 : Number(b.groupNumber) || 0;
+            return numA - numB;
+          });
           
-          this.allCourses.forEach(c => {
-            if (!c.group) return;
-            const belongs = cyGroups.some(g => g.idGroup === c.group?.idGroup);
-            if (belongs) {
-              if (!cyCourses.some(added => added.idCourse === c.idCourse)) {
-                c.group.cycle = cy;
-                cyCourses.push(c);
+          const groupsLoad: UnifiedGroupLoad[] = [];
+          
+          cyGroups.forEach(g => {
+            const cyCourses: Course[] = [];
+            this.allCourses.forEach(c => {
+              if (!c.group) return;
+              if (c.group.idGroup === g.idGroup) {
+                if (!cyCourses.some(added => added.idCourse === c.idCourse)) {
+                  c.group.cycle = cy;
+                  cyCourses.push(c);
+                }
               }
+            });
+            
+            if (cyCourses.length > 0) {
+              groupsLoad.push({
+                group: g,
+                courses: cyCourses
+              });
             }
           });
           
-          if (cyCourses.length > 0) {
+          if (groupsLoad.length > 0) {
             cyclesLoad.push({
               cycle: cy,
-              courses: cyCourses
+              groups: groupsLoad
             });
           }
         });
@@ -240,20 +260,17 @@ export class CargaAcademicaComponent implements OnInit {
         });
       }
     });
+    this.applyFilters();
   }
 
-  getFilteredUnifiedLoad(): UnifiedFacultyLoad[] {
+  filteredUnifiedLoad: UnifiedFacultyLoad[] = [];
+
+  applyFilters() {
     let list = this.unifiedLoad;
     if (this.selectedFaculty) {
       list = list.filter(f => f.faculty.idFaculty == this.selectedFaculty);
     }
-    if (this.selectedSchool) {
-      list = list.map(f => ({
-        ...f,
-        schools: f.schools.filter(s => s.school.idProfessionalSchool == this.selectedSchool)
-      })).filter(f => f.schools.length > 0);
-    }
-    return list;
+    this.filteredUnifiedLoad = list;
   }
 
   toggleFaculty(item: UnifiedFacultyLoad) {
@@ -265,16 +282,12 @@ export class CargaAcademicaComponent implements OnInit {
   }
 
   onFacultyChange() {
-    this.selectedSchool = '';
     if (this.selectedFaculty) {
       this.schools = this.allSchools.filter(s => s.faculty?.idFaculty == this.selectedFaculty);
     } else {
       this.schools = [];
     }
-  }
-
-  onSchoolChange() {
-    // No-op ya que el filtrado se maneja en getFilteredUnifiedLoad()
+    this.applyFilters();
   }
 
   downloadTemplate() {

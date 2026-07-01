@@ -411,109 +411,53 @@ export class ConsultarDisponibilidadComponent implements OnInit {
   }
 
   onConfirmReservation(data: ReservationData): void {
-    // 🔄 MODO SIMULACIÓN: Guardar solo en localStorage hasta que el backend esté listo
-    // TODO: Cuando el endpoint /reservations esté disponible, descomentar el código de backend
-    
-    // ✅ SIMULACIÓN: Guardar en localStorage
-    this.misReservas.unshift(data);
-    this.saveMisReservas();
-    
-    // Generar ID simulado
-    const simulatedId = Math.floor(Math.random() * 10000);
-    
-    // Mostrar mensaje de éxito
-    const fechaFormateada = this.formatDate(data.fecha);
-    const fechaFinFormateada = data.fechaFin && data.fechaFin !== data.fecha 
-      ? ` hasta ${this.formatDate(data.fechaFin)}` 
-      : '';
-    
-    const equipamientoHTML = data.equipamientoRequerido 
-      ? `<p style="margin: 8px 0;"><strong>Equipamiento:</strong> ${data.equipamientoRequerido}</p>`
-      : '';
-    
-    Swal.fire({
-      icon: 'success',
-      title: '¡Reserva Confirmada!',
-      html: `
-        <div style="text-align: left; padding: 10px;">
-          <p style="margin: 8px 0;"><strong>ID Reserva:</strong> #${simulatedId}</p>
-          <p style="margin: 8px 0;"><strong>Ambiente:</strong> ${data.ambiente.space_name}</p>
-          <p style="margin: 8px 0;"><strong>Fecha:</strong> ${fechaFormateada}${fechaFinFormateada}</p>
-          <p style="margin: 8px 0;"><strong>Horario:</strong> ${data.horaInicio} - ${data.horaFin}</p>
-          <p style="margin: 8px 0;"><strong>Solicitante:</strong> ${data.solicitante}</p>
-          <p style="margin: 8px 0;"><strong>Personas:</strong> ${data.cantidadPersonas} de ${data.ambiente.capacity}</p>
-          ${equipamientoHTML}
-          <p style="margin: 8px 0; color: #64748b;"><em>${data.motivo}</em></p>
-          <p style="margin: 12px 0 0 0; padding: 8px; background: #fff3cd; border-radius: 6px; color: #856404; font-size: 12px;">
-            ⚠️ Modo simulación: Los datos se guardan solo en tu navegador. Cuando el backend esté listo, se guardarán en la base de datos.
-          </p>
-        </div>
-      `,
-      confirmButtonText: 'Ver Mis Reservas',
-      showCancelButton: true,
-      cancelButtonText: 'Cerrar',
-      confirmButtonColor: '#BFC621',
-      cancelButtonColor: '#64748b',
-      customClass: {
-        popup: 'rounded-2xl',
-        confirmButton: 'rounded-lg px-4 py-2',
-        cancelButton: 'rounded-lg px-4 py-2'
-      }
-    }).then((result: any) => {
-      if (result.isConfirmed) {
-        this.mostrarMisReservas = true;
-      }
-    });
-    
-    this.modalReservarOpen = false;
-    this.ambienteSeleccionado = null;
-
-    /* 
-    // 🔥 CÓDIGO PARA BACKEND (Descomentar cuando esté listo)
     const startDatetime = `${data.fecha}T${data.horaInicio}:00`;
     const endDate = data.fechaFin || data.fecha;
     const endDatetime = `${endDate}T${data.horaFin}:00`;
 
     const reservationRequest: CreateReservationRequest = {
-      id_academic_space: data.ambiente.id_academic_space!,
-      start_datetime: startDatetime,
-      end_datetime: endDatetime,
+      idAcademicSpace: data.ambiente.id_academic_space!,
+      startDatetime: startDatetime,
+      endDatetime: endDatetime,
       reason: data.motivo,
       description: data.equipamientoRequerido 
         ? `Personas: ${data.cantidadPersonas}. Equipamiento: ${data.equipamientoRequerido}`
         : `Personas: ${data.cantidadPersonas}`,
+      memberIds: data.members,
+      idempotencyKey: crypto.randomUUID()
     };
 
     this.reservationService.createReservation(reservationRequest).subscribe({
       next: (response) => {
-        this.misReservas.unshift(data);
-        this.saveMisReservas();
-        
         Swal.fire({
           icon: 'success',
           title: '¡Reserva Confirmada!',
-          html: `<p>ID: ${response.id_reservation}</p>`,
+          html: `<p>ID de Reserva: #${response.idReservation}</p><p>Tu solicitud ha sido enviada para aprobación.</p>`,
+          confirmButtonText: 'Ver Mis Solicitudes',
           confirmButtonColor: '#BFC621',
         }).then((result) => {
           if (result.isConfirmed) {
+            // Optional: navigate to mis-solicitudes or open a local panel
             this.mostrarMisReservas = true;
           }
         });
         
         this.modalReservarOpen = false;
         this.ambienteSeleccionado = null;
+        
+        // Recargar disponibilidad para reflejar el ambiente como ocupado
+        this.applyFilters();
       },
       error: (error) => {
         console.error('Error al crear reserva:', error);
         Swal.fire({
           icon: 'error',
           title: 'Error al Crear Reserva',
-          text: error.error?.message || 'No se pudo guardar la reserva',
+          text: error.error?.message || 'No se pudo guardar la reserva. Intenta de nuevo más tarde.',
           confirmButtonColor: '#ef4444',
         });
       }
     });
-    */
   }
 
   formatDate(dateStr: string): string {

@@ -3,44 +3,47 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-// Interfaz para crear una reserva (request) - ACTUALIZADA según diagrama
+// Interfaz para crear una reserva (request)
 export interface CreateReservationRequest {
-  id_academic_space: number;
-  start_datetime: string; // ISO 8601: "2026-01-15T08:00:00"
-  end_datetime: string;   // ISO 8601: "2026-01-15T10:00:00"
+  idAcademicSpace: number;
+  startDatetime: string; // ISO 8601: "2026-01-15T08:00:00"
+  endDatetime: string;   // ISO 8601: "2026-01-15T10:00:00"
   reason: string;         // Motivo principal
   description?: string;   // Descripción adicional (opcional)
-  id_user_profile?: number; // FK a user_profile (opcional si viene del token)
-  members?: number[];     // IDs de miembros adicionales (RESERVATION_MEMBER)
+  idCourse?: number;      // NULL si es actividad extracurricular
+  memberIds?: number[];   // IDs de miembros adicionales
+  idempotencyKey?: string;// Para evitar duplicados
 }
 
-// Interfaz para la respuesta de reserva - ACTUALIZADA según diagrama
+// Interfaz para la respuesta de reserva
 export interface Reservation {
-  id_reservation: number;
-  start_datetime: string;
-  end_datetime: string;
+  idReservation: number;
+  startDatetime: string;
+  endDatetime: string;
   reason: string;
   description?: string;
-  resquested_at: string; // Fecha de solicitud
-  id_user_profile: number;
-  id_academic_space: number;
-  id_state: number; // FK a STATE
-  created_at?: string;
-  updated_at?: string;
+  requestedAt: string; // Fecha de solicitud
+  idUserProfile: number;
+  idAcademicSpace: number;
+  idCourse?: number;
+  idSchedule?: number;
+  status: ReservationState; // FK a STATE
+  idempotencyKey?: string;
+  changeReason?: string;
 }
 
 // Interfaz para el estado de reserva
 export interface ReservationState {
-  id_state: number;
+  idStatus: number;
   name: string; // "Pendiente", "Aprobada", "Rechazada", "Cancelada"
-  is_active: string;
+  isActive: boolean;
 }
 
 // Interfaz para miembros de reserva
 export interface ReservationMember {
-  id_reservation_member: number;
-  id_reservation: number;
-  id_user_profile: number;
+  idReservationMember: number;
+  idReservation: number;
+  idUserProfile: number;
 }
 
 @Injectable({
@@ -48,7 +51,7 @@ export interface ReservationMember {
 })
 export class ReservationService {
   // 🔧 AJUSTA ESTA URL según tu backend
-  private apiUrl = `${environment.apiUrl}/reservations`; // Ejemplo: http://146.181.39.73:8080/reservations
+  private apiUrl = `${environment.apiUrl}/api/reservations`;
 
   constructor(private http: HttpClient) {}
 
@@ -61,10 +64,32 @@ export class ReservationService {
   }
 
   /**
-   * Obtener todas las reservas del usuario actual
+   * Obtener todas las reservas del usuario actual por perfil
    */
-  getMyReservations(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${this.apiUrl}/my-reservations`);
+  getMyReservations(userProfileId: number): Observable<Reservation[]> {
+    return this.http.get<Reservation[]>(`${this.apiUrl}/student/${userProfileId}`);
+  }
+
+  /**
+   * Obtener todas las reservas (Para COOROOMS/Admins)
+   */
+  getAllReservations(): Observable<Reservation[]> {
+    return this.http.get<Reservation[]>(this.apiUrl);
+  }
+
+  /**
+   * Aprobar una reserva
+   */
+  approveReservation(id: number): Observable<Reservation> {
+    return this.http.put<Reservation>(`${this.apiUrl}/${id}/approve`, { changeReason: 'Aprobado' });
+  }
+
+  /**
+   * Rechazar una reserva
+   */
+  rejectReservation(id: number, reason?: string): Observable<Reservation> {
+    const body = reason ? { changeReason: reason } : { changeReason: 'Rechazado' };
+    return this.http.put<Reservation>(`${this.apiUrl}/${id}/reject`, body);
   }
 
   /**
@@ -75,10 +100,17 @@ export class ReservationService {
   }
 
   /**
-   * Cancelar una reserva (cambiar estado)
+   * Cancelar una reserva (cambiar estado a cancelada)
    */
   cancelReservation(id: number): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/cancel`, {});
+    return this.http.put<void>(`${this.apiUrl}/${id}/cancel`, { changeReason: 'Cancelado por el usuario' });
+  }
+
+  /**
+   * Deshacer decisión (Volver a PENDIENTE)
+   */
+  revertToPending(id: number): Observable<Reservation> {
+    return this.http.put<Reservation>(`${this.apiUrl}/${id}/revert-to-pending`, {});
   }
 
   /**

@@ -1,156 +1,75 @@
-<div class="p-6">
-  <div class="max-w-4xl mx-auto space-y-6">
-    
-    <!-- Top Bar -->
-    <div class="flex items-center justify-between mb-8">
-      <div class="relative flex-1 max-w-xl">
-        <input type="text" placeholder="Buscar notificaciones..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-[#BFC621] text-sm bg-gray-50">
-        <svg class="w-4 h-4 absolute left-4 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-      </div>
-      <div class="flex items-center gap-4 ml-4">
-        <button class="relative w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-          <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-        </button>
-        <div class="w-10 h-10 rounded-full border border-gray-200 overflow-hidden">
-          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="w-full h-full text-gray-400">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
-          </svg>
-        </div>
-      </div>
+<div class="p-6 max-w-4xl mx-auto min-h-[calc(100vh-100px)]">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+      <span class="w-3 h-3 rounded-full" style="background-color: #BFC621;"></span>
+      Notificaciones
+    </h1>
+    <p class="mt-1.5 text-sm text-slate-500 max-w-xl leading-relaxed">
+      Mantente al tanto de las actualizaciones sobre tus solicitudes de reserva.
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading"
+    class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+    <div class="relative w-10 h-10 mb-4">
+      <div class="absolute inset-0 border-4 border-slate-100 rounded-full"></div>
+      <div class="absolute inset-0 border-4 border-[#BFC621] rounded-full border-t-transparent animate-spin"></div>
     </div>
+    <p class="text-sm font-medium text-slate-500">Cargando notificaciones...</p>
+  </div>
 
-    <!-- Header Section with Buttons -->
-    <div class="flex items-end justify-between mb-2">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Centro de Notificaciones</h1>
-        <p class="text-gray-500 text-sm mt-1">Mantente al día con tus solicitudes académicas y horarios.</p>
-      </div>
-      <div class="flex items-center gap-3">
-        <button class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-[#5d6a17] bg-white border border-[#d4e2a2] hover:bg-[#e8eacc]">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          Marcar como leídas
-        </button>
-        <button class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg text-red-500 bg-white border border-red-200 hover:bg-red-50">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          Limpiar todo
-        </button>
-      </div>
-    </div>
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && notifications.length === 0"
+    class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+    <svg class="mx-auto h-16 w-16 text-slate-300 mb-4" fill="none" stroke="currentColor" stroke-width="1.5"
+      viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <h3 class="text-lg font-bold text-slate-700 mb-1">Todo al día</h3>
+    <p class="text-sm text-slate-500 max-w-sm mx-auto">
+      No tienes notificaciones nuevas por el momento.
+    </p>
+  </div>
 
-    <!-- Tabs -->
-    <div class="border-b border-gray-200 mb-6">
-      <div class="flex gap-8">
-        <button class="py-3 text-sm font-bold border-b-2 text-[#5d6a17] border-[#71801D]">Todo</button>
-        <button class="py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700">Salones</button>
-        <button class="py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700">Eventos</button>
-        <button class="py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700">Sistema</button>
-      </div>
-    </div>
+  <!-- Notifications List -->
+  <div *ngIf="!isLoading && notifications.length > 0"
+    class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden divide-y divide-slate-100">
+    <div *ngFor="let notif of notifications" (click)="markAsRead(notif)" [class.bg-slate-50]="notif.is_read"
+      [class.hover:bg-slate-50]="!notif.is_read" class="p-5 flex gap-4 transition-colors cursor-pointer relative group">
 
-    <!-- Notifications List -->
-    <div class="space-y-4">
-      
-      <!-- Notif 1 -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition-shadow">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#71801D]"></div>
-        <div class="p-5 pl-6 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-[#e8eacc] text-[#5d6a17] flex items-center justify-center shrink-0 mt-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-1">
-              <h3 class="font-bold text-gray-900 text-base">Solicitud Aprobada</h3>
-              <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded uppercase tracking-wider">Hace 5 min</span>
-            </div>
-            <p class="text-sm text-gray-600 mb-3">Tu solicitud para el <strong>Lab A-301</strong> ha sido aprobada para el horario de 14:00 - 16:00 hoy.</p>
-            <div class="flex items-center gap-3">
-              <button class="px-4 py-1.5 bg-[#5d6a17] text-white text-xs font-semibold rounded hover:bg-[#4d5612]">Ver Detalles</button>
-              <button class="px-4 py-1.5 text-gray-500 text-xs font-semibold hover:text-gray-800">Descartar</button>
-            </div>
-          </div>
+      <!-- Unread indicator line -->
+      <div *ngIf="!notif.is_read" class="absolute left-0 top-0 bottom-0 w-1 bg-[#BFC621]"></div>
+
+      <!-- Icon -->
+      <div class="shrink-0 mt-1">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center" [ngClass]="getIconClass(notif.type)">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            [innerHtml]="getIconSvg(notif.type)"></svg>
         </div>
       </div>
 
-      <!-- Notif 2 -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition-shadow">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-400"></div>
-        <div class="p-5 pl-6 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center shrink-0 mt-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-1">
-              <h3 class="font-bold text-gray-900 text-base">Recordatorio de Reserva</h3>
-              <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded uppercase tracking-wider">Hace 2 horas</span>
-            </div>
-            <p class="text-sm text-gray-600">Tienes una reserva pendiente en el Pabellón B - Sala 2 en 30 minutos.</p>
-          </div>
+      <!-- Content -->
+      <div class="flex-1">
+        <div class="flex justify-between items-start gap-4 mb-1">
+          <p class="text-sm text-slate-800 leading-relaxed font-medium">
+            {{ notif.message }}
+          </p>
+          <span class="text-[11px] font-bold text-slate-400 whitespace-nowrap shrink-0 mt-0.5 uppercase tracking-wider">
+            {{ formatDate(notif.created_at) }}
+          </span>
         </div>
-      </div>
 
-      <!-- Notif 3 -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition-shadow">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-300"></div>
-        <div class="p-5 pl-6 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 mt-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-1">
-              <h3 class="font-bold text-gray-900 text-base">Actualización de Sistema</h3>
-              <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded uppercase tracking-wider">Ayer</span>
-            </div>
-            <p class="text-sm text-gray-600">El módulo de reservas ha sido actualizado con nuevas funcionalidades de filtrado por piso.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Notif 4 -->
-      <div class="bg-red-50/30 rounded-xl shadow-sm border border-red-100 overflow-hidden relative group hover:shadow-md transition-shadow">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-400"></div>
-        <div class="p-5 pl-6 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-red-100 text-red-500 flex items-center justify-center shrink-0 mt-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-1">
-              <h3 class="font-bold text-red-600 text-base">Solicitud Rechazada</h3>
-              <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded uppercase tracking-wider">Hace 1 día</span>
-            </div>
-            <p class="text-sm text-gray-600 mb-2">Tu solicitud para el Auditorio Central no pudo ser procesada debido a un cruce con un evento institucional.</p>
-            <button class="text-[#5d6a17] text-xs font-semibold hover:underline">Intentar otro horario</button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Divider -->
-      <div class="flex items-center py-4">
-        <div class="flex-1 h-px bg-gray-200"></div>
-        <span class="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Semana Pasada</span>
-        <div class="flex-1 h-px bg-gray-200"></div>
-      </div>
-
-      <!-- Notif 5 -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group hover:shadow-md transition-shadow opacity-60 hover:opacity-100">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#e8eacc]"></div>
-        <div class="p-5 pl-6 flex items-start gap-4">
-          <div class="w-10 h-10 rounded-full bg-[#e8eacc] text-[#71801D] flex items-center justify-center shrink-0 mt-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-1">
-              <h3 class="font-bold text-gray-900 text-base">Asistencia Confirmada</h3>
-              <span class="text-[10px] font-bold text-gray-400 tracking-wider">5 MAY</span>
-            </div>
-            <p class="text-sm text-gray-500">Se ha registrado tu asistencia al taller de "Gestión Ambiental" en el Aula 102.</p>
-          </div>
+        <!-- Status badge/indicator if needed -->
+        <div *ngIf="!notif.is_read"
+          class="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-[#BFC621] bg-[#BFC621]/10">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#BFC621]"></span>
+          Nueva
         </div>
       </div>
 
     </div>
-
   </div>
 </div>

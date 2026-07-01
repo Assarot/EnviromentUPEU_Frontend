@@ -130,18 +130,61 @@
                 </div>
 
                 <!-- Loop Cycles -->
-                <div *ngFor="let cyItem of sItem.cycles" class="flex flex-col md:flex-row md:items-center justify-between gap-2 py-2.5 border-b border-slate-100 last:border-0">
-                  <div class="flex items-center gap-3">
-                    <span class="text-xs font-bold text-slate-600 bg-slate-100/80 px-2.5 py-1 rounded-lg">{{ cyItem.cycle.name }}</span>
+                <div *ngFor="let cyItem of sItem.cycles" class="space-y-4">
+                  <!-- Cycle Label Header -->
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-extrabold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">
+                      {{ cyItem.cycle.name }}
+                    </span>
                   </div>
-                  <!-- Groups row -->
-                  <div class="flex flex-wrap gap-2">
-                    <span *ngIf="cyItem.groups.length === 0" class="text-xs text-slate-400 italic">Sin grupos registrados</span>
-                    <!-- Loop Groups -->
-                    <div *ngFor="let g of cyItem.groups" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-sm hover:border-slate-300 transition-all select-none">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      <span>Grupo {{ g.groupNumber }}</span>
-                      <span class="text-slate-400">| Cap: {{ g.capacity }}</span>
+
+                  <!-- Loop Groups -->
+                  <div *ngFor="let gItem of cyItem.groups" class="ml-2 pl-4 border-l-2 border-slate-100 space-y-3">
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center justify-center px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-700 text-xs font-bold">
+                        {{ (gItem.group.groupNumber + '') === 'UNICO' || (gItem.group.groupNumber + '') === 'Unico' || (gItem.group.groupNumber + '') === 'unico' ? 'UNICO' : 'G' + gItem.group.groupNumber }}
+                      </span>
+                      <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                        (Cap: {{ gItem.group.capacity }}) • ({{ gItem.courses.length }} Cursos)
+                      </span>
+                    </div>
+
+                    <!-- Courses grid for this group -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <!-- Course Item Card -->
+                      <div *ngFor="let course of gItem.courses" class="flex flex-col justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50/85 hover:border-slate-200 transition-all duration-300 shadow-sm">
+                        <div>
+                          <div class="flex justify-between items-start gap-2 mb-1">
+                            <strong class="text-sm font-bold text-slate-800 leading-snug">{{ course.name }}</strong>
+                            <span class="text-[10px] font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-md uppercase">
+                              {{ course.code }}
+                            </span>
+                          </div>
+                          <p class="text-xs text-slate-500 leading-relaxed mb-3 font-medium">
+                            {{ course.description || 'Sin descripción detallada disponible.' }}
+                          </p>
+                        </div>
+
+                        <!-- Badges Footer -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100/60 pt-3">
+                          <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {{ course.totalHours }} Hrs
+                          </span>
+
+                          <span 
+                            class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border"
+                            [ngClass]="{
+                              'bg-emerald-500/10 text-emerald-700 border-emerald-500/20': course.courseType && course.courseType.name === 'Presencial',
+                              'bg-blue-500/10 text-blue-700 border-blue-500/20': !course.courseType || course.courseType.name !== 'Presencial'
+                            }"
+                          >
+                            {{ course.courseType ? course.courseType.name : 'Clásico' }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

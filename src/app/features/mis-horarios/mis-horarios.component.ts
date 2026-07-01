@@ -190,7 +190,7 @@ export class MisHorariosComponent implements OnInit {
   updatePendingCoursesForAutoAssign() {
     let targetGroups: number[] = [];
     
-    // Find all groups that belong to the selected School or Faculty
+    // Find all groups that belong to the selected Faculty
     this.allGroups.forEach(g => {
       if (this.autoAssignSchoolId) {
         if (g.cycle?.professionalSchool?.idProfessionalSchool == this.autoAssignSchoolId) {
@@ -200,9 +200,8 @@ export class MisHorariosComponent implements OnInit {
         if (g.cycle?.professionalSchool?.faculty?.idFaculty == this.autoAssignFacultyId) {
           if (g.idGroup) targetGroups.push(g.idGroup);
         }
-      } else if (this.selectedGroupId) {
-        // Fallback to currently selected group if no bulk filter applied
-        targetGroups.push(Number(this.selectedGroupId));
+      } else {
+        if (g.idGroup) targetGroups.push(g.idGroup);
       }
     });
 
@@ -360,8 +359,8 @@ export class MisHorariosComponent implements OnInit {
 
   openAutoAssignModal() {
     // Reset bulk filters to current view if possible
-    this.autoAssignFacultyId = this.selectedFacultyId || '';
-    this.autoAssignSchoolId = this.selectedSchoolId || '';
+    this.autoAssignFacultyId = '';
+    this.autoAssignSchoolId = '';
     this.autoAssignBuildingId = '';
     
     this.updatePendingCoursesForAutoAssign();
@@ -1293,6 +1292,11 @@ export class MisHorariosComponent implements OnInit {
 
   // Export functions
   exportPDF() {
+    if (this.isAsacad() && (!this.selectedFacultyId || !this.selectedSchoolId || !this.selectedCycleId || !this.selectedGroupId)) {
+      this.showTransientToast('Debes seleccionar Facultad, Escuela, Ciclo y Grupo para exportar.', 4000);
+      return;
+    }
+
     this.showTransientToast('Generando PDF del horario...', 3000);
     const element = document.querySelector('.schedule-grid-container') as HTMLElement;
     if (!element) return;
@@ -1316,11 +1320,17 @@ export class MisHorariosComponent implements OnInit {
       pdf.save(`Horario_${this.currentUserName.replace(/\s+/g, '_')}.pdf`);
     }).catch(err => {
       console.error('Error exporting PDF', err);
+      alert('Error exporting PDF: ' + (err?.message || err));
       element.style.cssText = originalStyle;
     });
   }
 
   exportPNG() {
+    if (this.isAsacad() && (!this.selectedFacultyId || !this.selectedSchoolId || !this.selectedCycleId || !this.selectedGroupId)) {
+      this.showTransientToast('Debes seleccionar Facultad, Escuela, Ciclo y Grupo para exportar.', 4000);
+      return;
+    }
+
     this.showTransientToast('Generando captura del horario...', 3000);
     const element = document.querySelector('.schedule-grid-container') as HTMLElement;
     if (!element) return;
@@ -1341,6 +1351,7 @@ export class MisHorariosComponent implements OnInit {
       link.click();
     }).catch(err => {
       console.error('Error exporting PNG', err);
+      alert('Error exporting PNG: ' + (err?.message || err));
       element.style.cssText = originalStyle;
     });
   }

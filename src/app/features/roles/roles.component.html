@@ -1,85 +1,121 @@
-<div class="mx-auto max-w-4xl px-6 py-8">
-  <h1 class="text-2xl font-bold text-slate-800 mb-4">Roles</h1>
-
-  <!-- Crear rol -->
-  <section class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 class="text-base font-semibold mb-3">Crear Rol</h2>
-    <div class="grid md:grid-cols-3 gap-4">
-      <input [(ngModel)]="r_name" placeholder="Nombre" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-      <label class="flex items-center gap-2 text-sm text-slate-600">
-        <input type="checkbox" [(ngModel)]="r_isActive" class="rounded border-slate-300 text-slate-600" />
-        Activo
-      </label>
-      <div></div>
+<div class="mx-auto max-w-5xl px-4 sm:px-6 py-8 min-h-[calc(100vh-100px)]">
+  <!-- Header -->
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full" style="background-color: #BFC621;"></span>
+        Gestión de Roles
+      </h1>
+      <p class="mt-1.5 text-sm text-slate-500 max-w-xl leading-relaxed">
+        Administra los niveles de acceso y los roles que pueden ser asignados a los usuarios.
+      </p>
     </div>
-    <div class="flex items-center gap-3 mt-4">
-      <button (click)="create()" class="rounded-lg px-4 py-2 text-sm font-semibold text-slate-900" style="background: #bfc621">Guardar</button>
-    </div>
-  </section>
+  </div>
 
-  <!-- Lista de roles -->
-  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <div class="flex items-center justify-between">
-      <h2 class="text-base font-semibold">Lista de Roles</h2>
+  <!-- Crear / Editar Rol -->
+  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden mb-8 transition-all duration-300">
+    <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+      <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+        <svg class="w-5 h-5 text-[#BFC621]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        {{ editingId != null ? 'Editar Rol' : 'Nuevo Rol' }}
+      </h2>
+      <button *ngIf="editingId != null" (click)="cancel()" class="text-sm font-semibold text-slate-500 hover:text-slate-700">
+        Cancelar Edición
+      </button>
     </div>
+    
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-end">
+        <div class="space-y-1.5">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nombre del Rol</label>
+          <input *ngIf="editingId == null" [(ngModel)]="r_name" placeholder="Ej. ADMINISTRADOR" class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 uppercase transition-colors" />
+          <input *ngIf="editingId != null" [(ngModel)]="e_name" placeholder="Ej. ADMINISTRADOR" class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 uppercase transition-colors" />
+        </div>
 
-    <div class="mt-4">
-      <div class="relative overflow-x-auto">
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3">#</th>
-              <th scope="col" class="px-6 py-3">Nombre</th>
-              <th scope="col" class="px-6 py-3">Estado</th>
-              <th scope="col" class="px-6 py-3">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let r of roles; let i = index" class="bg-white border-b border-gray-200">
-              <td class="px-6 py-4">{{ i + 1 }}</td>
-              <td class="px-6 py-4">{{ r.name }}</td>
-              <td class="px-6 py-4">
-                <span class="inline-block rounded-full px-2 py-0.5 text-xs font-medium" [ngClass]="r.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
-                  {{ r.isActive ? 'Activo' : 'Inactivo' }}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <button (click)="startEdit(r)" title="Editar" class="text-slate-600 hover:text-emerald-700">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
-                    </svg>
-                  </button>
-                  <button (click)="remove(r)" title="Eliminar" class="text-slate-600 hover:text-red-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-7 4v12m6-12v12" />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="!isLoading && roles.length === 0">
-              <td colspan="4" class="px-6 py-6 text-center text-sm text-slate-500">No hay roles registrados.</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 cursor-pointer group">
+            <div class="relative flex items-center justify-center">
+              <input *ngIf="editingId == null" type="checkbox" [(ngModel)]="r_isActive" class="peer sr-only" />
+              <input *ngIf="editingId != null" type="checkbox" [(ngModel)]="e_isActive" class="peer sr-only" />
+              <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+            </div>
+            <span class="text-sm font-semibold text-slate-600 group-hover:text-slate-800 transition-colors">Estado Activo</span>
+          </label>
+          
+          <button (click)="editingId != null ? save() : create()" class="px-6 py-2.5 rounded-xl text-white font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2" style="background-color: #BFC621;">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            {{ editingId != null ? 'Actualizar' : 'Crear Rol' }}
+          </button>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- Editar rol -->
-  <section *ngIf="editingId != null" class="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <h2 class="text-base font-semibold mb-3">Editar Rol</h2>
-    <div class="grid md:grid-cols-3 gap-4">
-      <input [(ngModel)]="e_name" placeholder="Nombre" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-      <label class="flex items-center gap-2 text-sm text-slate-600">
-        <input type="checkbox" [(ngModel)]="e_isActive" class="rounded border-slate-300 text-slate-600" />
-        Activo
-      </label>
+  <!-- Lista de Roles -->
+  <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+        <svg class="w-5 h-5 text-[#BFC621]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        Directorio de Roles
+      </h2>
     </div>
-    <div class="flex items-center gap-3 mt-4">
-      <button (click)="save()" class="rounded-lg px-4 py-2 text-sm font-semibold text-slate-900" style="background: #bfc621">Actualizar</button>
-      <button (click)="cancel()" class="rounded-lg px-4 py-2 text-sm font-semibold text-slate-900" style="background: #fca5a5">Cancelar</button>
+
+    <div class="w-full overflow-x-auto">
+      <table class="w-full text-sm text-left text-slate-600">
+        <thead class="text-[10px] uppercase text-slate-400 bg-slate-50/50 font-bold tracking-wider">
+          <tr>
+            <th class="px-6 py-4 w-16">#</th>
+            <th class="px-6 py-4">Nombre del Rol</th>
+            <th class="px-6 py-4">Estado</th>
+            <th class="px-6 py-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let r of roles; let i = index" class="hover:bg-slate-50/50 transition-colors group">
+            <td class="px-6 py-4 font-bold text-slate-400">{{ i + 1 }}</td>
+            <td class="px-6 py-4 font-bold text-slate-800">{{ r.name }}</td>
+            <td class="px-6 py-4">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                [ngClass]="r.isActive ? 'text-[#BFC621] bg-[#BFC621]/10' : 'text-red-500 bg-red-50'">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="r.isActive ? 'bg-[#BFC621]' : 'bg-red-500'"></span>
+                {{ r.isActive ? 'Activo' : 'Inactivo' }}
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button (click)="startEdit(r)" class="p-2 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
+                  </svg>
+                </button>
+                <button (click)="remove(r)" class="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-7 4v12m6-12v12" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <tr *ngIf="roles.length === 0">
+            <td colspan="4" class="px-6 py-12 text-center">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4">
+                <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 class="text-sm font-bold text-slate-700 mb-1">No hay roles</h3>
+              <p class="text-xs text-slate-500">Aún no se han registrado roles en el sistema.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </section>
+  </div>
 </div>

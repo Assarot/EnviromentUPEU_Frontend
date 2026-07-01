@@ -1,29 +1,101 @@
 <div class="mx-auto max-w-5xl px-6 py-10 animate-fade-in">
   <!-- Premium Header -->
   <header class="mb-10 relative">
-    <div class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full" style="background-color: #BFC621;"></div>
-    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">Carga Académica</h1>
+    <div
+      class="absolute -left-6 top-1/2 -translate-y-1/2 w-1.5 h-10 rounded-full"
+      style="background-color: #bfc621"
+    ></div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">
+      Carga Académica
+    </h1>
     <p class="mt-2 text-slate-500 text-sm leading-relaxed max-w-2xl">
-      Monitorea la oferta educativa e importa archivos de planificación académica para actualizar los cursos, ciclos y asignaciones institucionales.
+      Monitorea la oferta educativa e importa archivos de planificación
+      académica para actualizar los cursos, ciclos y asignaciones
+      institucionales.
     </p>
   </header>
 
-  <!-- Control Panel & Imports -->
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-xl p-6 md:p-8 mb-10 transition-all">
-    <h2 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-      <span class="w-2.5 h-2.5 rounded-full" style="background-color: #BFC621;"></span>
-      Configuración de Filtros e Importación
-    </h2>
+  <!-- Import Actions Section -->
+  <div
+    class="bg-white rounded-3xl border border-slate-100 shadow-md p-6 md:p-8 mb-8 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6"
+  >
+    <div>
+      <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
+        <span
+          class="w-2.5 h-2.5 rounded-full"
+          style="background-color: #bfc621"
+        ></span>
+        Gestión de Importación
+      </h2>
+      <p class="text-sm text-slate-500 max-w-sm">
+        Descarga la plantilla oficial y sube la carga estructurada. La
+        asignación de Facultades y Escuelas se leerá automáticamente del
+        documento.
+      </p>
+    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <!-- Faculty Selection -->
-      <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filtrar por Facultad</label>
-        <div class="relative">
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap gap-4">
+      <button
+        (click)="downloadTemplate()"
+        class="min-w-[180px] flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl border border-slate-200 hover:border-[#BFC621] bg-white text-slate-700 hover:text-slate-900 font-bold text-sm shadow-sm hover:shadow transition-all duration-300 transform active:scale-98"
+      >
+        <svg
+          class="w-5 h-5 text-[#BFC621]"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+          ></path>
+        </svg>
+        <span>Descargar Plantilla</span>
+      </button>
+
+      <button
+        (click)="openUploadModal()"
+        class="min-w-[180px] flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl text-white font-bold text-sm shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 active:scale-98"
+        style="background-color: #bfc621"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+        <span>Subir Carga Académica</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- View Filters Section -->
+  <div class="bg-slate-50/70 rounded-2xl border border-slate-200/60 p-4 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center gap-4">
+      <div class="flex items-center gap-2 md:w-1/4">
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+        </svg>
+        <h3 class="text-sm font-bold text-slate-700">Filtros de Visualización:</h3>
+      </div>
+      
+      <div class="md:w-3/4 flex flex-col md:flex-row gap-4">
+        <!-- Faculty Selection -->
+        <div class="flex-1 relative">
           <select 
             [(ngModel)]="selectedFaculty" 
             (change)="onFacultyChange()"
-            class="w-full px-4 py-3 border border-slate-200/80 bg-slate-50/50 focus:bg-white text-slate-700 font-semibold text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BFC621]/30 appearance-none cursor-pointer transition-all duration-300"
+            class="w-full px-4 py-2.5 border border-slate-200/80 bg-white focus:bg-white text-slate-700 font-semibold text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BFC621]/30 appearance-none cursor-pointer transition-all duration-300 shadow-sm"
             style="background-image: none !important;"
           >
             <option value="">Todas las Facultades</option>
@@ -38,157 +110,238 @@
           </div>
         </div>
       </div>
-
-      <!-- School Selection -->
-      <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Filtrar por Escuela Profesional</label>
-        <div class="relative">
-          <select 
-            [(ngModel)]="selectedSchool" 
-            (change)="onSchoolChange()"
-            class="w-full px-4 py-3 border border-slate-200/80 bg-slate-50/50 focus:bg-white text-slate-700 font-semibold text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BFC621]/30 appearance-none cursor-pointer transition-all duration-300 disabled:opacity-60"
-            [disabled]="!selectedFaculty"
-            style="background-image: none !important;"
-          >
-            <option value="">Todas las Escuelas</option>
-            <option *ngFor="let school of schools" [value]="school.idProfessionalSchool">
-              {{ school.name }}
-            </option>
-          </select>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Premium Action Buttons -->
-    <div class="flex flex-wrap gap-4 border-t border-slate-100 pt-6">
-      <button 
-        (click)="downloadTemplate()"
-        class="flex-1 min-w-[200px] flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border border-slate-200 hover:border-[#BFC621] bg-white text-slate-700 hover:text-slate-900 font-bold text-sm shadow-sm hover:shadow transition-all duration-300 transform active:scale-98"
-      >
-        <svg class="w-5 h-5 text-[#BFC621]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
-        </svg>
-        <span>Plantilla de Carga Académica</span>
-      </button>
-      
-      <button 
-        (click)="openUploadModal()"
-        class="flex-1 min-w-[200px] flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl text-white font-bold text-sm shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 active:scale-98"
-        style="background-color: #BFC621;"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <span>Subir Carga Académica</span>
-      </button>
     </div>
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style="border-color: #BFC621;"></div>
-    <p class="mt-4 text-slate-500 text-sm font-semibold">Cargando carga académica institucional...</p>
+  <div
+    *ngIf="isLoading"
+    class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl"
+  >
+    <div
+      class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
+      style="border-color: #bfc621"
+    ></div>
+    <p class="mt-4 text-slate-500 text-sm font-semibold">
+      Cargando carga académica institucional...
+    </p>
   </div>
 
   <!-- Unified Accordion Structure -->
-  <div *ngIf="!isLoading && getFilteredUnifiedLoad().length > 0" class="space-y-6">
+  <div
+    *ngIf="!isLoading && filteredUnifiedLoad.length > 0"
+    class="space-y-6"
+  >
     <!-- Faculty Card Accordion -->
-    <div *ngFor="let item of getFilteredUnifiedLoad()" class="rounded-3xl border border-slate-200/80 bg-white shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg">
-      
+    <div
+      *ngFor="let item of filteredUnifiedLoad"
+      class="rounded-3xl border border-slate-200/80 bg-white shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg"
+    >
       <!-- Faculty Header -->
-      <div (click)="toggleFaculty(item)" class="flex items-center justify-between px-6 py-5 bg-slate-50/50 cursor-pointer border-b border-slate-100 hover:bg-slate-50 select-none">
+      <div
+        (click)="toggleFaculty(item)"
+        class="flex items-center justify-between px-6 py-5 bg-slate-50/50 cursor-pointer border-b border-slate-100 hover:bg-slate-50 select-none"
+      >
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-lime-700 bg-lime-500/10" [style.color]="'#71801D'">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          <div
+            class="w-12 h-12 rounded-2xl flex items-center justify-center text-lime-700 bg-lime-500/10"
+            [style.color]="'#71801D'"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
             </svg>
           </div>
           <div>
-            <h3 class="text-lg font-extrabold text-slate-800">{{ item.faculty.name }}</h3>
-            <p class="text-xs text-slate-500 font-medium">{{ item.schools.length }} Escuelas profesionales en oferta</p>
+            <h3 class="text-lg font-extrabold text-slate-800">
+              {{ item.faculty.name }}
+            </h3>
+            <p class="text-xs text-slate-500 font-medium">
+              {{ item.schools.length }} Escuelas profesionales en oferta
+            </p>
           </div>
         </div>
         <div class="text-slate-400">
-          <svg class="w-5 h-5 transition-transform duration-300" [class.rotate-180]="item.expanded" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          <svg
+            class="w-5 h-5 transition-transform duration-300"
+            [class.rotate-180]="item.expanded"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
       </div>
 
       <!-- Faculty Content: Schools -->
       <div *ngIf="item.expanded" class="p-6 space-y-6 bg-slate-50/20">
-        
         <!-- Loop Schools -->
-        <div *ngFor="let sItem of item.schools" class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm space-y-4">
-          
+        <div
+          *ngFor="let sItem of item.schools"
+          class="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm space-y-4"
+        >
           <!-- School Title -->
-          <div (click)="toggleSchool(sItem)" class="flex items-center justify-between cursor-pointer select-none">
+          <div
+            (click)="toggleSchool(sItem)"
+            class="flex items-center justify-between cursor-pointer select-none"
+          >
             <div class="flex items-center gap-3">
-              <span class="w-2.5 h-2.5 rounded-full shadow-sm" style="background-color: #BFC621;"></span>
-              <h4 class="text-base font-extrabold text-slate-700 hover:text-slate-900 transition-colors">{{ sItem.school.name }}</h4>
+              <span
+                class="w-2.5 h-2.5 rounded-full shadow-sm"
+                style="background-color: #bfc621"
+              ></span>
+              <h4
+                class="text-base font-extrabold text-slate-700 hover:text-slate-900 transition-colors"
+              >
+                {{ sItem.school.name }}
+              </h4>
             </div>
             <div class="text-slate-400 flex items-center gap-2.5">
-              <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">{{ sItem.cycles.length }} Ciclos Planificados</span>
-              <svg class="w-4 h-4 transition-transform duration-300" [class.rotate-180]="sItem.expanded" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+              <span
+                class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full"
+                >{{ sItem.cycles.length }} Ciclos Planificados</span
+              >
+              <svg
+                class="w-4 h-4 transition-transform duration-300"
+                [class.rotate-180]="sItem.expanded"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </div>
           </div>
 
           <!-- School Content: Cycles & Courses -->
-          <div *ngIf="sItem.expanded" class="pl-4 border-l-2 border-slate-200/80 ml-1.5 mt-4 space-y-5">
-            
+          <div
+            *ngIf="sItem.expanded"
+            class="pl-4 border-l-2 border-slate-200/80 ml-1.5 mt-4 space-y-5"
+          >
             <!-- Loop Cycles -->
-            <div *ngFor="let cyItem of sItem.cycles" class="space-y-3">
+            <div *ngFor="let cyItem of sItem.cycles" class="space-y-4">
               <!-- Cycle Label Header -->
               <div class="flex items-center gap-2">
-                <span class="text-xs font-extrabold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">
+                <span
+                  class="text-xs font-extrabold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg"
+                >
                   {{ cyItem.cycle.name }}
-                </span>
-                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                  ({{ cyItem.courses.length }} Cursos)
                 </span>
               </div>
 
-              <!-- Courses grid for this cycle -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-1">
-                <!-- Course Item Card -->
-                <div *ngFor="let course of cyItem.courses" class="flex flex-col justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50/85 hover:border-slate-200 transition-all duration-300 shadow-sm">
-                  <div>
-                    <div class="flex justify-between items-start gap-2 mb-1">
-                      <strong class="text-sm font-bold text-slate-800 leading-snug">{{ course.name }}</strong>
-                      <span class="text-[10px] font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-md uppercase">
-                        {{ course.code }}
+              <!-- Loop Groups -->
+              <div
+                *ngFor="let gItem of cyItem.groups"
+                class="ml-2 pl-4 border-l-2 border-slate-100 space-y-3"
+              >
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex items-center justify-center px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-700 text-xs font-bold"
+                  >
+                    {{
+                      gItem.group.groupNumber + "" === "UNICO" ||
+                      gItem.group.groupNumber + "" === "Unico" ||
+                      gItem.group.groupNumber + "" === "unico"
+                        ? "UNICO"
+                        : "G" + gItem.group.groupNumber
+                    }}
+                  </span>
+                  <span
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-wider"
+                  >
+                    (Cap: {{ gItem.group.capacity }}) • ({{
+                      gItem.courses.length
+                    }}
+                    Cursos)
+                  </span>
+                </div>
+
+                <!-- Courses grid for this group -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Course Item Card -->
+                  <div
+                    *ngFor="let course of gItem.courses"
+                    class="flex flex-col justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50/85 hover:border-slate-200 transition-all duration-300 shadow-sm"
+                  >
+                    <div>
+                      <div class="flex justify-between items-start gap-2 mb-1">
+                        <strong
+                          class="text-sm font-bold text-slate-800 leading-snug"
+                          >{{ course.name }}</strong
+                        >
+                        <span
+                          class="text-[10px] font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-md uppercase"
+                        >
+                          {{ course.code }}
+                        </span>
+                      </div>
+                      <p
+                        class="text-xs text-slate-500 leading-relaxed mb-3 font-medium"
+                      >
+                        {{
+                          course.description ||
+                            "Sin descripción detallada disponible."
+                        }}
+                      </p>
+                    </div>
+
+                    <!-- Badges Footer -->
+                    <div
+                      class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100/60 pt-3"
+                    >
+                      <span
+                        class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600"
+                      >
+                        <svg
+                          class="w-3.5 h-3.5 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                          ></path>
+                        </svg>
+                        {{ course.totalHours }} Hrs
+                      </span>
+
+                      <span
+                        class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border"
+                        [ngClass]="{
+                          'bg-emerald-500/10 text-emerald-700 border-emerald-500/20':
+                            course.courseType &&
+                            course.courseType.name === 'Presencial',
+                          'bg-blue-500/10 text-blue-700 border-blue-500/20':
+                            !course.courseType ||
+                            course.courseType.name !== 'Presencial',
+                        }"
+                      >
+                        {{
+                          course.courseType ? course.courseType.name : "Clásico"
+                        }}
                       </span>
                     </div>
-                    <p class="text-xs text-slate-500 leading-relaxed mb-3 font-medium">
-                      {{ course.description || 'Sin descripción detallada disponible.' }}
-                    </p>
-                  </div>
-
-                  <!-- Badges Footer -->
-                  <div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100/60 pt-3">
-                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600">
-                      <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
-                      </svg>
-                      Grupo {{ course.group.groupNumber }}
-                    </span>
-
-                    <span 
-                      class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase border"
-                      [ngClass]="{
-                        'bg-emerald-500/10 text-emerald-700 border-emerald-500/20': course.courseType && course.courseType.name === 'Presencial',
-                        'bg-blue-500/10 text-blue-700 border-blue-500/20': !course.courseType || course.courseType.name !== 'Presencial'
-                      }"
-                    >
-                      {{ course.courseType ? course.courseType.name : 'Clásico' }}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -200,77 +353,132 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && getFilteredUnifiedLoad().length === 0" class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl text-slate-500">
-    <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
+  <div
+    *ngIf="!isLoading && filteredUnifiedLoad.length === 0"
+    class="text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-xl text-slate-500"
+  >
+    <svg
+      class="w-16 h-16 text-slate-300 mx-auto mb-4"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+      ></path>
     </svg>
     <h3 class="text-lg font-bold text-slate-700 mb-1">Carga Académica Vacía</h3>
-    <p class="text-slate-400 text-sm max-w-sm mx-auto">No se ha importado o filtrado ninguna planificación para esta selección. Intenta subiendo un archivo Excel.</p>
+    <p class="text-slate-400 text-sm max-w-sm mx-auto">
+      No se ha importado o filtrado ninguna planificación para esta selección.
+      Intenta subiendo un archivo Excel.
+    </p>
   </div>
 </div>
 
 <!-- Upload Modal -->
-<div *ngIf="showUploadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in" (click)="closeUploadModal()">
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-scale-up" (click)="$event.stopPropagation()">
+<div
+  *ngIf="showUploadModal"
+  class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in"
+  (click)="closeUploadModal()"
+>
+  <div
+    class="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-scale-up"
+    (click)="$event.stopPropagation()"
+  >
     <!-- Modal Header -->
     <div class="p-6 md:p-8 text-center pb-2">
-      <h3 class="text-2xl font-extrabold text-slate-900 mb-2">Importar Carga Académica</h3>
-      <p class="text-slate-500 text-xs leading-relaxed">Sube tu archivo Excel o CSV de planificación para cargar automáticamente asignaturas, ciclos y grupos.</p>
+      <h3 class="text-2xl font-extrabold text-slate-900 mb-2">
+        Importar Carga Académica
+      </h3>
+      <p class="text-slate-500 text-xs leading-relaxed">
+        Sube tu archivo Excel o CSV de planificación para cargar automáticamente
+        asignaturas, ciclos y grupos.
+      </p>
     </div>
 
     <!-- Modal Form Body -->
     <div class="p-6 md:p-8 pt-2">
       <!-- Error Message -->
-      <div *ngIf="uploadError" class="mb-4 p-3.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs font-semibold leading-relaxed">
+      <div
+        *ngIf="uploadError"
+        class="mb-4 p-3.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs font-semibold leading-relaxed"
+      >
         {{ uploadError }}
       </div>
 
       <!-- Drag & Drop Zone -->
-      <div 
+      <div
         class="border-2 border-dashed rounded-2xl p-8 mb-6 transition-all duration-300 cursor-pointer text-center"
         [ngClass]="{
-          'border-[#BFC621] bg-[#BFC621]/5': isDragging, 
-          'border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300': !isDragging
+          'border-[#BFC621] bg-[#BFC621]/5': isDragging,
+          'border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300':
+            !isDragging,
         }"
         (dragover)="onDragOver($event)"
         (dragleave)="onDragLeave($event)"
         (drop)="onDrop($event)"
         (click)="fileInput.click()"
       >
-        <input 
-          type="file" 
-          #fileInput 
-          class="hidden" 
-          (change)="onFileSelected($event)" 
+        <input
+          type="file"
+          #fileInput
+          class="hidden"
+          (change)="onFileSelected($event)"
           accept=".xlsx,.xls,.csv"
-        >
-        
+        />
+
         <!-- Upload Icon -->
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-emerald-800 bg-emerald-500/10">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"></path>
+        <div
+          class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-emerald-800 bg-emerald-500/10"
+        >
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+            ></path>
           </svg>
         </div>
-        
+
         <div *ngIf="!selectedFile" class="text-slate-600 text-xs">
-          <span class="font-bold text-[#71801D]">Haz clic para explorar</span> o arrastra y suelta tu archivo aquí<br>
-          <span class="text-[10px] text-slate-400 mt-2 block font-semibold">Formatos Excel (.xlsx, .xls) o CSV</span>
+          <span class="font-bold text-[#71801D]">Haz clic para explorar</span> o
+          arrastra y suelta tu archivo aquí<br />
+          <span class="text-[10px] text-slate-400 mt-2 block font-semibold"
+            >Formatos Excel (.xlsx, .xls) o CSV</span
+          >
         </div>
-        <div *ngIf="selectedFile" class="text-[#71801D] text-xs font-bold break-all">
-          Archivo seleccionado:<br> 
-          <span class="text-slate-800 text-[11px] bg-slate-100 px-2 py-1 rounded-lg mt-1 inline-block">{{ selectedFile.name }}</span>
+        <div
+          *ngIf="selectedFile"
+          class="text-[#71801D] text-xs font-bold break-all"
+        >
+          Archivo seleccionado:<br />
+          <span
+            class="text-slate-800 text-[11px] bg-slate-100 px-2 py-1 rounded-lg mt-1 inline-block"
+            >{{ selectedFile.name }}</span
+          >
         </div>
       </div>
-      
-      <button 
+
+      <button
         [disabled]="!selectedFile || isUploading"
         (click)="uploadSelectedFile()"
         class="w-full px-6 py-3.5 rounded-xl text-white font-bold text-sm shadow-md hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-98"
-        style="background-color: #BFC621;"
+        style="background-color: #bfc621"
       >
-        {{ isUploading ? 'Importando Planificación...' : 'Cargar Carga Académica' }}
+        {{
+          isUploading ? "Importando Planificación..." : "Cargar Carga Académica"
+        }}
       </button>
-      
+
       <!-- Progress Bar -->
       <div *ngIf="isUploading" class="space-y-2 mt-6">
         <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
@@ -278,9 +486,9 @@
           <span>{{ uploadProgress }}%</span>
         </div>
         <div class="w-full bg-slate-100 rounded-full h-2">
-          <div 
+          <div
             class="h-2 rounded-full transition-all duration-300"
-            style="background-color: #BFC621;"
+            style="background-color: #bfc621"
             [style.width.%]="uploadProgress"
           ></div>
         </div>
@@ -290,21 +498,43 @@
 </div>
 
 <!-- Upload Success Modal -->
-<div *ngIf="showSuccessModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in">
-  <div class="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-md w-full mx-4 p-8 text-center animate-scale-up">
+<div
+  *ngIf="showSuccessModal"
+  class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in"
+>
+  <div
+    class="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-md w-full mx-4 p-8 text-center animate-scale-up"
+  >
     <!-- Success Icon -->
-    <div class="w-20 h-20 mx-auto bg-emerald-50 rounded-full flex items-center justify-center mb-6 text-emerald-600 animate-bounce">
-      <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
+    <div
+      class="w-20 h-20 mx-auto bg-emerald-50 rounded-full flex items-center justify-center mb-6 text-emerald-600 animate-bounce"
+    >
+      <svg
+        class="w-10 h-10"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4.5 12.75l6 6 9-13.5"
+        ></path>
       </svg>
     </div>
 
-    <h3 class="text-2xl font-extrabold text-slate-900 mb-2">¡Carga Importada con Éxito!</h3>
-    <p class="text-slate-500 text-xs max-w-xs mx-auto mb-6 leading-relaxed">La base de datos institucional ha sido actualizada correctamente con los cursos y ciclos planificados.</p>
-    
-    <button 
+    <h3 class="text-2xl font-extrabold text-slate-900 mb-2">
+      ¡Carga Importada con Éxito!
+    </h3>
+    <p class="text-slate-500 text-xs max-w-xs mx-auto mb-6 leading-relaxed">
+      La base de datos institucional ha sido actualizada correctamente con los
+      cursos y ciclos planificados.
+    </p>
+
+    <button
       class="w-full px-6 py-3.5 rounded-xl text-white font-bold text-sm shadow-md hover:shadow-xl transition-all duration-300 transform active:scale-98"
-      style="background-color: #BFC621;"
+      style="background-color: #bfc621"
       (click)="closeSuccessModal()"
     >
       Entendido, Volver a la Vista

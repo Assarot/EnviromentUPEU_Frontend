@@ -1,237 +1,157 @@
-<div class="p-6">
-  <div class="max-w-6xl mx-auto space-y-6">
-    
-    <!-- Top Bar -->
-    <div class="flex items-center justify-between mb-8">
-      <div class="flex items-center gap-4 flex-1">
-        <div class="relative flex-1 max-w-xl">
-          <input type="text" placeholder="Buscar solicitudes..." class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:border-[#BFC621] text-sm bg-gray-50">
-          <svg class="w-4 h-4 absolute left-4 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+<div class="p-6 max-w-7xl mx-auto min-h-[calc(100vh-100px)]">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full" style="background-color: #BFC621;"></span>
+          {{ isCoorooms ? 'Gestión de Solicitudes' : 'Mis Solicitudes' }}
+        </h1>
+        <p class="mt-1.5 text-sm text-slate-500 max-w-xl leading-relaxed">
+          {{ isCoorooms 
+              ? 'Administra, aprueba o rechaza las solicitudes de reserva de ambientes académicos realizadas por los usuarios.' 
+              : 'Haz seguimiento al estado de tus solicitudes de reserva de ambientes académicos.' 
+          }}
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button (click)="loadData()" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+          <svg [class.animate-spin]="isLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <button class="w-10 h-10 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+          Actualizar
         </button>
-        <div class="w-10 h-10 rounded-full border border-gray-200 overflow-hidden">
-          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="w-full h-full text-gray-400">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>
-          </svg>
-        </div>
       </div>
     </div>
 
-    <!-- Header Section -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Mis Solicitudes</h1>
-      <p class="text-gray-500 text-sm mt-1">Gestiona y revisa el estado de tus reservas de espacios académicos.</p>
+    <!-- Tabs -->
+    <div class="mt-6 flex border-b border-slate-200">
+      <button (click)="activeTab = 'PENDING'"
+              [class.text-indigo-600]="activeTab === 'PENDING'"
+              [class.border-indigo-600]="activeTab === 'PENDING'"
+              [class.text-slate-500]="activeTab !== 'PENDING'"
+              [class.border-transparent]="activeTab !== 'PENDING'"
+              class="px-5 py-3 border-b-2 font-semibold text-sm transition-colors hover:text-indigo-600">
+        Nuevas / Pendientes
+        <span *ngIf="pendingReservations.length > 0" class="ml-1.5 bg-indigo-100 text-indigo-700 py-0.5 px-2 rounded-full text-xs">
+          {{ pendingReservations.length }}
+        </span>
+      </button>
+      <button (click)="activeTab = 'HISTORY'"
+              [class.text-indigo-600]="activeTab === 'HISTORY'"
+              [class.border-indigo-600]="activeTab === 'HISTORY'"
+              [class.text-slate-500]="activeTab !== 'HISTORY'"
+              [class.border-transparent]="activeTab !== 'HISTORY'"
+              class="px-5 py-3 border-b-2 font-semibold text-sm transition-colors hover:text-indigo-600">
+        Historial
+      </button>
     </div>
+  </div>
 
-    <!-- Stats Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <!-- Card 1 -->
-      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
-        <div class="flex justify-between items-start mb-4">
-          <div class="w-12 h-12 rounded-xl bg-[#e8eacc] text-[#71801D] flex items-center justify-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          </div>
-          <span class="text-xs font-medium text-[#71801D]">+2 este mes</span>
-        </div>
-        <div>
-          <h3 class="text-xs font-semibold text-gray-500 tracking-wider uppercase mb-1">Total Solicitudes</h3>
-          <p class="text-3xl font-bold text-gray-900">24</p>
-        </div>
-      </div>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-5 animate-pulse">
+    <div *ngFor="let i of [1,2,3,4]" class="bg-slate-100 h-64 rounded-2xl"></div>
+  </div>
 
-      <!-- Card 2 -->
-      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
-        <div class="flex justify-between items-start mb-4">
-          <div class="w-12 h-12 rounded-xl bg-[#d4e2a2] text-[#5d6a17] flex items-center justify-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          </div>
-          <span class="text-xs font-medium text-[#cda434]">Próximas</span>
-        </div>
-        <div>
-          <h3 class="text-xs font-semibold text-gray-500 tracking-wider uppercase mb-1">Reservas Activas</h3>
-          <p class="text-3xl font-bold text-gray-900">3</p>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
-        <div class="flex justify-between items-start mb-4">
-          <div class="w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-        </div>
-        <div>
-          <h3 class="text-xs font-semibold text-gray-500 tracking-wider uppercase mb-1">Última Actividad</h3>
-          <p class="text-lg font-bold text-gray-900">Hace 2 horas</p>
-        </div>
-      </div>
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && (activeTab === 'PENDING' ? pendingReservations.length === 0 : historyReservations.length === 0)" class="flex flex-col items-center justify-center py-20 text-center">
+    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
     </div>
+    <h3 class="text-lg font-bold text-slate-800 mb-1">No hay solicitudes</h3>
+    <p class="text-slate-500 max-w-sm">
+      {{ activeTab === 'PENDING' ? 'No tienes solicitudes pendientes en este momento.' : 'No hay historial de solicitudes para mostrar.' }}
+    </p>
+  </div>
 
-    <!-- Table Section -->
-    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <!-- Filters -->
-      <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
-        <button class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-          Filtrar
+  <!-- Reservations List (Cards Layout) -->
+  <div *ngIf="!isLoading && (activeTab === 'PENDING' ? pendingReservations : historyReservations).length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    <div *ngFor="let res of (activeTab === 'PENDING' ? pendingReservations : historyReservations); let i = index" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+      <!-- Card Header -->
+      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">
+              #{{ i + 1 }} • {{ formatDateTime(res.requestedAt || res.startDatetime) }}
+            </p>
+            <h3 class="text-sm font-bold text-slate-800 line-clamp-1">{{ getSpaceName(res.idAcademicSpace) }}</h3>
+          </div>
+        </div>
+        <span [class]="getBadgeClass(res.status.idStatus || res.status.name)" class="px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+          {{ res.status.name || getStateName(res.status.idStatus) }}
+        </span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="p-5 flex-1 flex flex-col gap-4">
+        
+        <!-- Schedule Info -->
+        <div class="grid grid-cols-2 gap-4 bg-slate-50 rounded-xl p-3 border border-slate-100">
+          <div>
+            <p class="text-[11px] font-bold text-slate-500 uppercase">Inicio</p>
+            <p class="text-sm font-semibold text-slate-800">{{ formatDateTime(res.startDatetime) }}</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-slate-500 uppercase">Fin</p>
+            <p class="text-sm font-semibold text-slate-800">{{ formatDateTime(res.endDatetime) }}</p>
+          </div>
+        </div>
+
+        <!-- Request Details -->
+        <div>
+          <p class="text-[11px] font-bold text-slate-500 uppercase mb-1">Motivo / Uso</p>
+          <p class="text-sm text-slate-700 leading-relaxed">{{ res.reason }}</p>
+        </div>
+
+        <div *ngIf="res.description">
+          <p class="text-[11px] font-bold text-slate-500 uppercase mb-1">Detalles Adicionales</p>
+          <p class="text-sm text-slate-600 italic bg-slate-50 border border-slate-100 p-2.5 rounded-lg">
+            {{ res.description }}
+          </p>
+        </div>
+        
+        <div *ngIf="res.changeReason && (res.status.idStatus === 3 || res.status.name === 'Rechazada' || res.status.idStatus === 6 || res.status.name === 'Revocada')">
+          <p class="text-[11px] font-bold text-red-500 uppercase mb-1">Motivo del Rechazo / Revocación</p>
+          <p class="text-sm text-red-700 italic bg-red-50/50 border border-red-100 p-2.5 rounded-lg">
+            {{ res.changeReason }}
+          </p>
+        </div>
+        
+        <div *ngIf="isCoorooms" class="pt-3 mt-auto border-t border-slate-100">
+          <p class="text-[11px] font-bold text-slate-500 uppercase mb-1 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Solicitado por
+          </p>
+          <p class="text-sm font-medium text-slate-800">{{ getUserName(res.idUserProfile) }}</p>
+        </div>
+
+      </div>
+
+      <!-- Card Actions (Only for COOROOMS if Pending) -->
+      <div *ngIf="isCoorooms && activeTab === 'PENDING' && (res.status.idStatus === 1 || res.status.name === 'Pendiente')" class="px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center gap-3">
+        <button (click)="rejectReservation(res.idReservation)" class="flex-1 px-4 py-2 bg-white border border-red-200 text-red-600 rounded-xl text-sm font-bold hover:bg-red-50 hover:border-red-300 transition-colors flex justify-center items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          Rechazar
         </button>
-        <div class="flex items-center gap-2">
-          <button class="px-4 py-2 rounded-lg text-sm font-medium bg-[#5d6a17] text-white">Todas</button>
-          <button class="px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900">Pendientes</button>
-          <button class="px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-900">Aprobadas</button>
-        </div>
+        <button (click)="approveReservation(res.idReservation)" class="flex-1 px-4 py-2 bg-[#BFC621] text-slate-900 rounded-xl text-sm font-bold hover:brightness-95 transition-all flex justify-center items-center gap-1.5 shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Aprobar
+        </button>
       </div>
 
-      <!-- Table content -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              <th class="px-6 py-4 border-b border-gray-100">Fecha & Hora</th>
-              <th class="px-6 py-4 border-b border-gray-100">Salón / Espacio</th>
-              <th class="px-6 py-4 border-b border-gray-100 text-center">Estado</th>
-              <th class="px-6 py-4 border-b border-gray-100 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 text-sm">
-            
-            <!-- Row 1 -->
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="font-bold text-gray-900">15 Oct, 2024</div>
-                <div class="text-gray-500 text-xs">10:00 AM - 12:00 PM</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded bg-[#e8eacc] text-[#5d6a17] flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"></path></svg>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-900">Laboratorio de Cómputo B</div>
-                    <div class="text-gray-500 text-xs">Pabellón D, Piso 3</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#e8eacc]/50 text-[#5d6a17] border border-[#d4e2a2]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#5d6a17]"></span>
-                  Pending
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <button class="text-red-500 hover:text-red-700 font-semibold text-xs flex items-center justify-end gap-1 w-full">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  Cancel
-                </button>
-              </td>
-            </tr>
-
-            <!-- Row 2 -->
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="font-bold text-gray-900">12 Oct, 2024</div>
-                <div class="text-gray-500 text-xs">02:00 PM - 04:00 PM</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded bg-green-50 text-green-600 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"></path></svg>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-900">Salón de Conferencias 101</div>
-                    <div class="text-gray-500 text-xs">Pabellón Administrativo</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">
-                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                  Green Approved
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <span class="text-gray-500 font-medium text-xs">Completada</span>
-              </td>
-            </tr>
-
-            <!-- Row 3 -->
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="font-bold text-gray-900">08 Oct, 2024</div>
-                <div class="text-gray-500 text-xs">08:00 AM - 10:00 AM</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded bg-gray-100 text-gray-600 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-900">Sala de Estudio Grupal 4</div>
-                    <div class="text-gray-500 text-xs">Biblioteca Central</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
-                  <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                  Red Rejected
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <button class="text-gray-400 hover:text-gray-600 w-full flex justify-end">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </button>
-              </td>
-            </tr>
-
-            <!-- Row 4 -->
-            <tr class="hover:bg-gray-50 transition-colors">
-              <td class="px-6 py-4">
-                <div class="font-bold text-gray-900">20 Oct, 2024</div>
-                <div class="text-gray-500 text-xs">04:00 PM - 06:00 PM</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded bg-[#e8eacc] text-[#5d6a17] flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                  </div>
-                  <div>
-                    <div class="font-bold text-gray-900">Laboratorio de Química Avanzada</div>
-                    <div class="text-gray-500 text-xs">Pabellón F, Lab 2</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-center">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#e8eacc]/50 text-[#5d6a17] border border-[#d4e2a2]">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#5d6a17]"></span>
-                  Pending
-                </span>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <button class="text-red-500 hover:text-red-700 font-semibold text-xs flex items-center justify-end gap-1 w-full">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                  Cancel
-                </button>
-              </td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination footer -->
-      <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-        <div>Mostrando 4 de 24 solicitudes</div>
-        <div class="flex items-center gap-2">
-          <button class="p-1 hover:text-gray-900"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-          <button class="p-1 hover:text-gray-900"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
-        </div>
+      <!-- Card Actions (Only for COOROOMS if History) -->
+      <div *ngIf="isCoorooms && activeTab === 'HISTORY'" class="px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-3">
+        <button (click)="revertToPending(res.idReservation)" class="px-4 py-2 bg-white border border-blue-200 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-50 hover:border-blue-300 transition-colors flex justify-center items-center gap-1.5 shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+          Deshacer Decisión
+        </button>
       </div>
     </div>
   </div>

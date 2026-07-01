@@ -32,6 +32,9 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  public isRefreshing = false;
+  public refreshTokenSubject = new BehaviorSubject<string | null>(null);
+
   constructor() {}
 
   /**

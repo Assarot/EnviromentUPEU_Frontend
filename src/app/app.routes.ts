@@ -11,7 +11,6 @@ import { ProximamenteComponent } from './features/proximamente/proximamente.comp
 import { NotificacionesComponent } from './features/notificaciones/notificaciones.component';
 import { ConfiguracionComponent } from './features/configuracion/configuracion.component';
 import { MisHorariosComponent } from './features/mis-horarios/mis-horarios.component';
-import { ReservarSalonComponent } from './features/reservar-salon/reservar-salon.component';
 import { MisSolicitudesComponent } from './features/mis-solicitudes/mis-solicitudes.component';
 import { NotificarIncidenciasComponent } from './features/notificar-incidencias/notificar-incidencias.component';
 import { EnvScreenComponent } from './features/env-screen/env-screen.component';
@@ -42,7 +41,7 @@ import { CourseTypeComponent } from './features/course-screen/course-type/course
 import { PlanComponent } from './features/course-screen/plan/plan.component';
 import { AcademicStructureComponent } from './features/course-screen/academic-structure/academic-structure.component';
 import { CourseManagementCombinedComponent } from './features/course-screen/course-management-combined/course-management-combined.component';
-import { AsignarAmbientesComponent } from './features/asignar-ambientes/asignar-ambientes.component';
+
 import { ConsultarDisponibilidadComponent } from './features/consultar-disponibilidad/consultar-disponibilidad.component';
 
 export const routes: Routes = [
@@ -69,7 +68,6 @@ export const routes: Routes = [
       { path: 'home', component: HomeComponent },
       { path: 'carga-academica', component: CargaAcademicaComponent },
       { path: 'mis-horarios', component: MisHorariosComponent },
-      { path: 'reservar-salon', component: ReservarSalonComponent },
       { path: 'mis-solicitudes', component: MisSolicitudesComponent },
       {
         path: 'notificar-incidencias',
@@ -116,7 +114,7 @@ export const routes: Routes = [
         ],
       },
       { path: 'res-assign', component: ResourceEnvComponent },
-      { path: 'asignar-ambientes', component: AsignarAmbientesComponent },
+
       {
         path: 'consultar-disponibilidad',
         component: ConsultarDisponibilidadComponent,

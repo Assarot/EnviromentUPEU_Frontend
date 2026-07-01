@@ -45,8 +45,8 @@
         </a>
       </ng-container>
 
-      <!-- ════ USER / TEACHER ════ -->
-      <ng-container *ngIf="isUser() || isTeacher() || isAdmin()">
+      <!-- ════ USER / TEACHER / ASACAD / COOROOMS / ADMIN ════ -->
+      <ng-container *ngIf="isUser() || isTeacher() || isAdmin() || isAsacad() || isCoorooms()">
         <div class="nav-section-label">Académico</div>
 
         <a routerLink="/main/mis-horarios" id="nav-horarios"
@@ -75,19 +75,6 @@
           <span class="nav-active-dot" *ngIf="isActive('/main/consultar-disponibilidad')"></span>
         </a>
 
-        <a routerLink="/main/reservar-salon" id="nav-reservar"
-           class="nav-item"
-           [class.nav-item--active]="isActive('/main/reservar-salon')">
-          <span class="nav-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/>
-              <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/>
-            </svg>
-          </span>
-          <span class="nav-label">Reservar Salón</span>
-          <span class="nav-active-dot" *ngIf="isActive('/main/reservar-salon')"></span>
-        </a>
-
         <a routerLink="/main/mis-solicitudes" id="nav-solicitudes"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/mis-solicitudes')">
@@ -97,11 +84,11 @@
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
             </svg>
           </span>
-          <span class="nav-label">Mis Solicitudes</span>
+          <span class="nav-label">{{ (isCoorooms() || isAdmin()) ? 'Solicitudes' : 'Mis Solicitudes' }}</span>
           <span class="nav-active-dot" *ngIf="isActive('/main/mis-solicitudes')"></span>
         </a>
 
-        <a *ngIf="!isAdmin()" routerLink="/main/notificaciones" id="nav-noti-user"
+        <a *ngIf="isUser() || isTeacher()" routerLink="/main/notificaciones" id="nav-noti-user"
            class="nav-item"
            [class.nav-item--active]="isActive('/main/notificaciones')">
           <span class="nav-icon">
@@ -132,7 +119,6 @@
 
       <!-- ════ ASACAD ════ -->
       <ng-container *ngIf="isAsacad() || isAdmin()">
-        <div class="nav-section-label" *ngIf="!isAdmin()">Académico</div>
 
         <!-- Cursos (expandible) - visible to Admin and ASACAD -->
         <button type="button" class="nav-item nav-item--expandable"
@@ -158,15 +144,15 @@
             <span class="nav-subitem-dot"></span>
             Carga Académica
           </a>
-          <a *ngIf="isAdmin()" routerLink="/main/course-creation/academic-structure" id="nav-cursos-structure" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/academic-structure')">
+          <a routerLink="/main/course-creation/academic-structure" id="nav-cursos-structure" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/academic-structure')">
             <span class="nav-subitem-dot"></span>
             Estructura Académica
           </a>
-          <a *ngIf="isAdmin()" routerLink="/main/course-creation/course-management" id="nav-cursos-mgmt" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/course-management')">
+          <a routerLink="/main/course-creation/course-management" id="nav-cursos-mgmt" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/course-management')">
             <span class="nav-subitem-dot"></span>
             Gestionar Cursos
           </a>
-          <a *ngIf="isAdmin()" routerLink="/main/course-creation/teacher" id="nav-cursos-teacher" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/teacher')">
+          <a routerLink="/main/course-creation/teacher" id="nav-cursos-teacher" class="nav-subitem" [class.nav-subitem--active]="isActive('/main/course-creation/teacher')">
             <span class="nav-subitem-dot"></span>
             Docentes
           </a>
@@ -203,7 +189,20 @@
 
       <!-- ════ COOROOMS ════ -->
       <ng-container *ngIf="isCoorooms() || isAdmin()">
-        <div class="nav-section-label">Recursos</div>
+        <div class="nav-section-label">Recursos y Ambientes</div>
+
+        <a *ngIf="!isAdmin()" routerLink="/main/env-creation" id="nav-ambientes-coo"
+           class="nav-item"
+           [class.nav-item--active]="isActive('/main/env-creation')">
+          <span class="nav-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+          </span>
+          <span class="nav-label">Ambientes</span>
+          <span class="nav-active-dot" *ngIf="isActive('/main/env-creation')"></span>
+        </a>
 
         <a *ngIf="!isAdmin()" routerLink="/main/res-creation" id="nav-recursos-coo"
            class="nav-item"
@@ -286,19 +285,6 @@
           </span>
           <span class="nav-label">Ambientes</span>
           <span class="nav-active-dot" *ngIf="isActive('/main/env-creation')"></span>
-        </a>
-
-        <a routerLink="/main/asignar-ambientes" id="nav-asignar-ambientes"
-           class="nav-item"
-           [class.nav-item--active]="isActive('/main/asignar-ambientes')">
-          <span class="nav-icon">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 11l3 3L22 4"/>
-              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-            </svg>
-          </span>
-          <span class="nav-label">Asignar Ambientes</span>
-          <span class="nav-active-dot" *ngIf="isActive('/main/asignar-ambientes')"></span>
         </a>
 
         <a routerLink="/main/res-creation" id="nav-recursos-admin"
